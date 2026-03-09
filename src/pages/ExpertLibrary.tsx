@@ -174,12 +174,17 @@ const ExpertLibrary = () => {
 
             {/* Consult CTA */}
             <div className="rounded-xl bg-foreground p-5 text-card">
-              <h4 className="font-semibold text-sm text-card mb-1">专家咨询</h4>
-              <p className="text-xs text-card/70 mb-4">
-                预约与 {selectedExpert.name} 的 1 对 1 交流，解决您的技术难题。
+              <div className="flex justify-center mb-3">
+                <div className="w-12 h-12 rounded-full bg-card/15 flex items-center justify-center">
+                  <MessageCircle className="w-6 h-6 text-card" />
+                </div>
+              </div>
+              <h4 className="font-semibold text-sm text-card mb-1 text-center">专家咨询</h4>
+              <p className="text-xs text-card/70 mb-4 text-center">
+                与 {selectedExpert.name} 1 对 1 交流，解决您的技术难题。
               </p>
               <button className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-card text-foreground text-sm font-medium hover:bg-card/90 transition-colors">
-                <Calendar className="w-4 h-4" /> 立即预约
+                <MessageCircle className="w-4 h-4" /> 咨询一下
               </button>
             </div>
           </aside>
