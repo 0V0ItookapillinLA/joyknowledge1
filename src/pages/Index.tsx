@@ -70,9 +70,8 @@ const Index = () => {
 
   const activeZoneObj = HOT_ZONES.find(z => z.label === activeZone);
 
-  // Find active item across all sections
   const allSectionItems = BGBU_SECTIONS.flatMap(s => s.items);
-  const activeItem = allSectionItems.find(i => i.label === activeSection);
+  const activeItem = allSectionItems.find(i => i.label === activeSection) as any;
 
   let filteredCases = MOCK_CASES;
   if (activeZoneObj) {
