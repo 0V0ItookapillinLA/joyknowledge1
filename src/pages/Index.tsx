@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Flame, Users, Sparkles, ArrowRight, MessageSquare, Home as HomeIcon, TrendingUp, Search } from "lucide-react";
+import { Flame, Users, Sparkles, ArrowRight, MessageSquare, Home as HomeIcon, TrendingUp, Search, ChevronDown } from "lucide-react";
 import { motion } from "framer-motion";
 import AppLayout from "@/components/AppLayout";
 import CaseCard from "@/components/CaseCard";
@@ -32,23 +32,47 @@ const NAV_ITEMS = [
   { label: "关注", icon: Users },
 ];
 
-const CATEGORY_ITEMS = [
-  { label: "营销管理", icon: "📣" },
-  { label: "研发管理", icon: "💻" },
-  { label: "质量管理", icon: "✅" },
-  { label: "采购管理", icon: "🛒" },
-  { label: "产品管理", icon: "📦" },
-  { label: "运营管理", icon: "📈" },
+const BGBU_ITEMS = [
+  { label: "AI中台", matchDept: "AI中台" },
+  { label: "数据平台", matchDept: "数据平台" },
+  { label: "研发效能", matchDept: "研发效能" },
+  { label: "项目管理", matchDept: "项目管理部" },
 ];
+
+const DOMAIN_ITEMS = [
+  { label: "营销管理", icon: "📣", matchTags: ["客户案例"] },
+  { label: "研发管理", icon: "💻", matchTags: ["技术架构"] },
+  { label: "质量管理", icon: "✅", matchTags: ["流程优化"] },
+  { label: "采购管理", icon: "🛒", matchTags: ["数据分析"] },
+  { label: "产品管理", icon: "📦", matchTags: ["产品设计"] },
+  { label: "运营管理", icon: "📈", matchTags: ["最佳实践"] },
+];
+
+const DATE_OPTIONS = ["全部时间", "最近一周", "最近一月", "最近三月"];
 
 const Index = () => {
   const [activeZone, setActiveZone] = useState<string | null>(null);
   const [activeNav, setActiveNav] = useState("推荐");
 
+  const [activeBGBU, setActiveBGBU] = useState<string | null>(null);
+  const [activeDomain, setActiveDomain] = useState<string | null>(null);
+  const [dateFilter, setDateFilter] = useState("全部时间");
+  const [showDateDropdown, setShowDateDropdown] = useState(false);
+
   const activeZoneObj = HOT_ZONES.find(z => z.label === activeZone);
-  const filteredCases = activeZoneObj
-    ? MOCK_CASES.filter((c) => c.tags.some(t => activeZoneObj.matchTags.includes(t)))
-    : MOCK_CASES;
+  const activeDomainObj = DOMAIN_ITEMS.find(d => d.label === activeDomain);
+  const activeBGBUObj = BGBU_ITEMS.find(b => b.label === activeBGBU);
+
+  let filteredCases = MOCK_CASES;
+  if (activeZoneObj) {
+    filteredCases = filteredCases.filter((c) => c.tags.some(t => activeZoneObj.matchTags.includes(t)));
+  }
+  if (activeDomainObj) {
+    filteredCases = filteredCases.filter((c) => c.tags.some(t => activeDomainObj.matchTags.includes(t)));
+  }
+  if (activeBGBUObj) {
+    filteredCases = filteredCases.filter((c) => c.department === activeBGBUObj.matchDept);
+  }
 
   const trendingItems = [
     { title: "如何利用 AI 工具优化供应链效率", views: "1.2k" },
@@ -83,17 +107,71 @@ const Index = () => {
           </div>
 
           <div>
-            <p className="text-xs text-muted-foreground mb-2 px-3">专题</p>
+            <p className="text-xs text-muted-foreground mb-2 px-3">BGBU专区</p>
             <div className="space-y-0.5">
-              {CATEGORY_ITEMS.map((item) => (
+              {BGBU_ITEMS.map((item) => (
                 <button
                   key={item.label}
-                  className="flex items-center gap-2.5 w-full px-3 py-2 rounded-md text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+                  onClick={() => { setActiveBGBU(activeBGBU === item.label ? null : item.label); setActiveDomain(null); }}
+                  className={`flex items-center gap-2.5 w-full px-3 py-2 rounded-md text-sm transition-colors ${
+                    activeBGBU === item.label
+                      ? "bg-primary/10 text-primary font-medium"
+                      : "text-muted-foreground hover:text-foreground hover:bg-accent"
+                  }`}
+                >
+                  {item.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <p className="text-xs text-muted-foreground mb-2 px-3">领域专区</p>
+            <div className="space-y-0.5">
+              {DOMAIN_ITEMS.map((item) => (
+                <button
+                  key={item.label}
+                  onClick={() => { setActiveDomain(activeDomain === item.label ? null : item.label); setActiveBGBU(null); }}
+                  className={`flex items-center gap-2.5 w-full px-3 py-2 rounded-md text-sm transition-colors ${
+                    activeDomain === item.label
+                      ? "bg-primary/10 text-primary font-medium"
+                      : "text-muted-foreground hover:text-foreground hover:bg-accent"
+                  }`}
                 >
                   <span>{item.icon}</span>
                   {item.label}
                 </button>
               ))}
+            </div>
+          </div>
+
+          {/* Date filter */}
+          <div className="mt-auto pt-4 border-t border-border">
+            <p className="text-xs text-muted-foreground mb-2 px-3">筛选条件</p>
+            <p className="text-xs text-muted-foreground px-3 mb-1">发布时间</p>
+            <div className="relative px-3">
+              <button
+                onClick={() => setShowDateDropdown(!showDateDropdown)}
+                className="flex items-center justify-between w-full px-3 py-2 rounded-md border border-border text-sm text-foreground hover:border-primary/40 transition-colors"
+              >
+                {dateFilter}
+                <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${showDateDropdown ? "rotate-180" : ""}`} />
+              </button>
+              {showDateDropdown && (
+                <div className="absolute left-3 right-3 top-full mt-1 bg-card border border-border rounded-md shadow-md z-10">
+                  {DATE_OPTIONS.map((opt) => (
+                    <button
+                      key={opt}
+                      onClick={() => { setDateFilter(opt); setShowDateDropdown(false); }}
+                      className={`block w-full text-left px-3 py-2 text-sm transition-colors ${
+                        dateFilter === opt ? "text-primary bg-primary/5" : "text-foreground hover:bg-accent"
+                      }`}
+                    >
+                      {opt}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </aside>
