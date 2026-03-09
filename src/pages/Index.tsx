@@ -6,13 +6,22 @@ import AppLayout from "@/components/AppLayout";
 import CaseCard from "@/components/CaseCard";
 import { MOCK_CASES } from "@/data/mockData";
 
-const RECOMMENDED_TOPICS = [
-  "人资团队管理的最佳实践指南",
-  "2025年企业人力资源平台建设路线总图",
-  "如何利用 AI 工具优化 HR 招聘流程",
-  "Q3季度研发效能提升专项行动总结",
-  "企业级混合云架构落地实践指南",
-  "敏捷开发在大型项目中的应用案例",
+const RECOMMENDED_TOPICS_ROW1 = [
+  "重塑护城河：AI 时代业务壁垒从\u201C数据孤岛\u201D到\u201C智能模型\u201D的跃迁",
+  "从工具到资产：如何通过 AI 深度耦合业务流程，构建不可复制的竞争优势？",
+  "算法溢价：AI 如何在存量市场中压榨出新的业务增长点？",
+  "下一代生产力入口：AI 浏览器将如何颠覆企业级应用的交互范式？",
+  "从\u201C搜寻\u201D到\u201C投喂\u201D：解析 LMM 驱动下人机交互的智能化拐点",
+  "消灭 UI：AI 时代下，自然语言如何取代点击成为 B 端产品的新触点？",
+];
+
+const RECOMMENDED_TOPICS_ROW2 = [
+  "从 0 到 1 的\u201C重型武器\u201D：垂直领域平台级产品的高效落地实操手册",
+  "拒绝伪需求：如何在垂直赛道精准定义平台级 AI 的\u201C第一落点\u201D？",
+  "组织进化论：企业级 HR 智能体（Agent）从试点到全面应用的技术路径",
+  "从降本到增益：HR 智能体如何在高频复杂场景下替代 70% 的重复性决策？",
+  "数据主权：企业私有化部署\u201C龙虾\u201D系统的战略意义与合规边界",
+  "安全与敏捷：如何在保障数据隐私的前提下，释放企业内部 AI 的原生动力？",
 ];
 
 const HOT_ZONES = [
@@ -214,22 +223,46 @@ const Index = () => {
 
         {/* Main content */}
         <div className="flex-1 min-w-0">
+          {/* Marquee recommendations */}
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-center py-8 px-6"
+            className="py-8 px-6 overflow-hidden"
           >
-            <h1 className="text-2xl font-semibold text-foreground mb-5">为你推荐</h1>
-            <div className="flex flex-wrap justify-center gap-2 max-w-2xl mx-auto">
-              {RECOMMENDED_TOPICS.map((topic) => (
-                <Link
-                  key={topic}
-                  to={`/case/1`}
-                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-md border border-border bg-card text-sm text-foreground hover:border-primary/40 hover:bg-primary/5 transition-colors"
-                >
-                  {topic}
-                </Link>
-              ))}
+            <h1 className="text-2xl font-semibold text-foreground mb-5 text-center">为你推荐</h1>
+
+            {/* Row 1 - scrolls left */}
+            <div className="relative mb-3 overflow-hidden">
+              <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-background to-transparent z-10" />
+              <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-background to-transparent z-10" />
+              <div className="flex gap-3 animate-marquee-left">
+                {[...RECOMMENDED_TOPICS_ROW1, ...RECOMMENDED_TOPICS_ROW1].map((topic, i) => (
+                  <Link
+                    key={`r1-${i}`}
+                    to={`/case/1`}
+                    className="inline-flex items-center shrink-0 px-4 py-2.5 rounded-md border border-border bg-card text-sm text-foreground hover:border-primary/40 hover:bg-primary/5 transition-colors whitespace-nowrap"
+                  >
+                    {topic}
+                  </Link>
+                ))}
+              </div>
+            </div>
+
+            {/* Row 2 - scrolls left (slower) */}
+            <div className="relative overflow-hidden">
+              <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-background to-transparent z-10" />
+              <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-background to-transparent z-10" />
+              <div className="flex gap-3 animate-marquee-left-slow">
+                {[...RECOMMENDED_TOPICS_ROW2, ...RECOMMENDED_TOPICS_ROW2].map((topic, i) => (
+                  <Link
+                    key={`r2-${i}`}
+                    to={`/case/1`}
+                    className="inline-flex items-center shrink-0 px-4 py-2.5 rounded-md border border-border bg-card text-sm text-foreground hover:border-primary/40 hover:bg-primary/5 transition-colors whitespace-nowrap"
+                  >
+                    {topic}
+                  </Link>
+                ))}
+              </div>
             </div>
           </motion.div>
 

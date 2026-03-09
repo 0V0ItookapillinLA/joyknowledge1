@@ -84,8 +84,39 @@ const KnowledgeList = () => {
     );
   };
 
-  // Simple filter: show all cases (mock data doesn't map perfectly to tree)
-  const filteredCases = MOCK_CASES;
+  // Filter cases based on selected filters (multi-select)
+  let filteredCases = MOCK_CASES;
+  
+  // If we have selected filters from the tree, apply them
+  if (selectedFilters.length > 0) {
+    filteredCases = filteredCases.filter((c) => {
+      // Match against department, tags, or category
+      return selectedFilters.some((f) => 
+        c.department.includes(f) || 
+        c.tags.some(t => t.includes(f)) || 
+        c.category.includes(f) ||
+        f.includes(c.department)
+      );
+    });
+    // If strict filtering yields nothing, show all (graceful fallback)
+    if (filteredCases.length === 0) {
+      filteredCases = MOCK_CASES;
+    }
+  }
+
+  // Content type filter
+  if (selectedContentTypes.length > 0) {
+    filteredCases = filteredCases.filter((c) =>
+      selectedContentTypes.some((t) => c.category.includes(t))
+    );
+  }
+
+  // Search filter
+  const searchFiltered = searchQuery
+    ? filteredCases.filter((c) =>
+        c.title.includes(searchQuery) || c.summary.includes(searchQuery)
+      )
+    : filteredCases;
 
   return (
     <AppLayout>
@@ -309,7 +340,7 @@ const KnowledgeList = () => {
 
           {/* Article list */}
           <div className="space-y-0">
-            {filteredCases.map((c, i) => (
+            {searchFiltered.map((c, i) => (
               <motion.div
                 key={c.id}
                 initial={{ opacity: 0, y: 6 }}
@@ -375,7 +406,7 @@ const KnowledgeList = () => {
             ))}
           </div>
 
-          {filteredCases.length === 0 && (
+          {searchFiltered.length === 0 && (
             <div className="text-center py-20">
               <p className="text-muted-foreground">暂无相关知识内容</p>
             </div>
