@@ -359,7 +359,284 @@ const KnowledgeExtract = () => {
     );
   }
 
-  // ───── Generating Animation ─────
+  // ───── Quick Mode: Step 1 - Upload Documents ─────
+  if (appMode === "quick-upload") {
+    const quickAddSource = (type: Source["type"], name: string) => {
+      const newSource: Source = { id: Date.now().toString(), name, type, status: "analyzing", selected: true };
+      setSources(prev => [...prev, newSource]);
+      setTimeout(() => {
+        setSources(prev => prev.map(s => s.id === newSource.id ? { ...s, status: "ready" } : s));
+      }, 1500);
+    };
+
+    return (
+      <AppLayout>
+        <div className="flex items-center justify-center h-[calc(100vh-56px)] bg-background">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="w-full max-w-2xl px-6"
+          >
+            {/* Step indicator */}
+            <div className="flex items-center justify-center gap-2 mb-8">
+              <div className="flex items-center gap-2 text-sm">
+                <span className="w-7 h-7 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-medium">1</span>
+                <span className="text-foreground font-medium">上传文档</span>
+              </div>
+              <div className="w-12 h-px bg-border" />
+              <div className="flex items-center gap-2 text-sm">
+                <span className="w-7 h-7 rounded-full bg-accent text-muted-foreground flex items-center justify-center text-xs font-medium">2</span>
+                <span className="text-muted-foreground">AI 萃取</span>
+              </div>
+              <div className="w-12 h-px bg-border" />
+              <div className="flex items-center gap-2 text-sm">
+                <span className="w-7 h-7 rounded-full bg-accent text-muted-foreground flex items-center justify-center text-xs font-medium">3</span>
+                <span className="text-muted-foreground">确认发布</span>
+              </div>
+            </div>
+
+            <div className="text-center mb-6">
+              <h1 className="text-2xl font-bold text-foreground mb-2">上传你的知识文档</h1>
+              <p className="text-muted-foreground">AI 将自动分析并提炼结构化内容</p>
+            </div>
+
+            {/* Drop zone */}
+            <div className="border-2 border-dashed border-border rounded-2xl p-12 text-center hover:border-primary/40 hover:bg-primary/5 transition-all cursor-pointer mb-4">
+              <Upload className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
+              <p className="text-base text-muted-foreground font-medium">拖放文件到这里</p>
+              <p className="text-sm text-muted-foreground/70 mt-1">支持 PDF, Word, Markdown, 图片等格式</p>
+            </div>
+
+            {/* Source type buttons */}
+            <div className="grid grid-cols-4 gap-3 mb-6">
+              {[
+                { icon: Upload, label: "上传文件", type: "file" as const, name: `文档_${sources.length + 1}.pdf` },
+                { icon: Link2, label: "网页链接", type: "url" as const, name: "https://wiki.company.com" },
+                { icon: HardDrive, label: "云盘", type: "file" as const, name: "云盘文档.pdf" },
+                { icon: ClipboardPaste, label: "粘贴文本", type: "text" as const, name: "粘贴的笔记" },
+              ].map(opt => (
+                <button key={opt.label} onClick={() => quickAddSource(opt.type, opt.name)} className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-border bg-card text-sm text-muted-foreground hover:text-foreground hover:border-primary/40 hover:bg-primary/5 transition-all">
+                  <opt.icon className="w-4 h-4" />{opt.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Uploaded files list */}
+            {sources.length > 0 && (
+              <div className="space-y-2 mb-6">
+                <p className="text-sm font-medium text-foreground">已上传文件（{sources.length}）</p>
+                {sources.map(s => (
+                  <div key={s.id} className="flex items-center gap-3 px-4 py-3 rounded-xl border border-border bg-card">
+                    <File className="w-4 h-4 text-primary shrink-0" />
+                    <span className="text-sm text-foreground flex-1 truncate">{s.name}</span>
+                    {s.status === "analyzing" ? (
+                      <Loader2 className="w-4 h-4 text-primary animate-spin" />
+                    ) : (
+                      <CheckCircle2 className="w-4 h-4 text-primary" />
+                    )}
+                    <button onClick={() => removeSource(s.id)} className="p-0.5 rounded hover:bg-accent text-muted-foreground">
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Actions */}
+            <div className="flex items-center justify-between">
+              <button
+                onClick={() => setAppMode("select")}
+                className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+              >
+                <ChevronLeft className="w-4 h-4" /> 返回
+              </button>
+              <button
+                onClick={() => {
+                  setAppMode("quick-extract");
+                  setQuickStep(0);
+                  // Simulate extraction
+                  setTimeout(() => setQuickStep(1), 3000);
+                }}
+                disabled={sources.filter(s => s.status === "ready").length === 0}
+                className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors shadow-sm disabled:opacity-50"
+              >
+                下一步：AI 萃取 <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      </AppLayout>
+    );
+  }
+
+  // ───── Quick Mode: Step 2 - AI Extracting + Naming ─────
+  if (appMode === "quick-extract") {
+    return (
+      <AppLayout>
+        <div className="flex items-center justify-center h-[calc(100vh-56px)] bg-background">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="w-full max-w-2xl px-6"
+          >
+            {/* Step indicator */}
+            <div className="flex items-center justify-center gap-2 mb-8">
+              <div className="flex items-center gap-2 text-sm">
+                <span className="w-7 h-7 rounded-full bg-primary/20 text-primary flex items-center justify-center text-xs font-medium">✓</span>
+                <span className="text-muted-foreground">上传文档</span>
+              </div>
+              <div className="w-12 h-px bg-primary" />
+              <div className="flex items-center gap-2 text-sm">
+                <span className="w-7 h-7 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-medium">2</span>
+                <span className="text-foreground font-medium">AI 萃取</span>
+              </div>
+              <div className="w-12 h-px bg-border" />
+              <div className="flex items-center gap-2 text-sm">
+                <span className="w-7 h-7 rounded-full bg-accent text-muted-foreground flex items-center justify-center text-xs font-medium">3</span>
+                <span className="text-muted-foreground">确认发布</span>
+              </div>
+            </div>
+
+            <AnimatePresence mode="wait">
+              {quickStep === 0 ? (
+                /* Extracting animation */
+                <motion.div
+                  key="extracting"
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  className="text-center py-12"
+                >
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                    className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-6"
+                  >
+                    <Wand2 className="w-10 h-10 text-primary" />
+                  </motion.div>
+                  <h2 className="text-xl font-bold text-foreground mb-2">AI 正在萃取知识</h2>
+                  <p className="text-sm text-muted-foreground mb-6">正在分析 {sources.length} 个文档，提炼核心内容...</p>
+                  <div className="max-w-xs mx-auto">
+                    <motion.div className="h-2 rounded-full bg-accent overflow-hidden">
+                      <motion.div
+                        className="h-full rounded-full bg-primary"
+                        initial={{ width: "0%" }}
+                        animate={{ width: "100%" }}
+                        transition={{ duration: 3, ease: "easeInOut" }}
+                      />
+                    </motion.div>
+                  </div>
+                  <div className="mt-4 space-y-2">
+                    {["📄 解析文档结构...", "🔍 提取关键信息...", "🧠 生成结构化内容..."].map((step, i) => (
+                      <motion.p
+                        key={step}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: i * 0.8 }}
+                        className="text-xs text-muted-foreground"
+                      >
+                        {step}
+                      </motion.p>
+                    ))}
+                  </div>
+                </motion.div>
+              ) : (
+                /* Naming & confirmation */
+                <motion.div
+                  key="naming"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="space-y-6"
+                >
+                  <div className="text-center">
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ type: "spring", stiffness: 200 }}
+                      className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4"
+                    >
+                      <CheckCircle2 className="w-7 h-7 text-primary" />
+                    </motion.div>
+                    <h2 className="text-xl font-bold text-foreground mb-1">萃取完成！</h2>
+                    <p className="text-sm text-muted-foreground">AI 已从 {sources.length} 个文档中提炼出结构化知识</p>
+                  </div>
+
+                  {/* AI extracted summary */}
+                  <div className="p-4 rounded-xl border border-border bg-card space-y-3">
+                    <div className="flex items-center gap-2 text-sm">
+                      <Sparkles className="w-4 h-4 text-primary" />
+                      <span className="font-medium text-foreground">AI 萃取摘要</span>
+                    </div>
+                    <ul className="space-y-1.5 text-sm text-muted-foreground">
+                      <li className="flex items-start gap-2"><span className="text-primary mt-0.5">•</span>识别到 4 个核心章节</li>
+                      <li className="flex items-start gap-2"><span className="text-primary mt-0.5">•</span>提取 6 个关键数据指标</li>
+                      <li className="flex items-start gap-2"><span className="text-primary mt-0.5">•</span>归纳 3 条核心经验总结</li>
+                      <li className="flex items-start gap-2"><span className="text-primary mt-0.5">•</span>推荐标签：研发效能、DevOps、流程优化</li>
+                    </ul>
+                  </div>
+
+                  {/* Title naming */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-foreground">知识标题</label>
+                    <input
+                      value={quickTitle}
+                      onChange={(e) => setQuickTitle(e.target.value)}
+                      className="w-full px-4 py-3 rounded-xl border border-border bg-background text-foreground text-sm outline-none focus:border-primary/50 transition-colors"
+                      placeholder="为这份知识文档命名..."
+                    />
+                    <p className="text-xs text-muted-foreground">AI 已根据内容自动生成标题，你可以修改</p>
+                  </div>
+
+                  {/* Tool selection */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-foreground">选择包含的内容类型</label>
+                    <div className="grid grid-cols-3 gap-2">
+                      {tools.map((tool) => (
+                        <button
+                          key={tool.id}
+                          onClick={() => toggleTool(tool.id)}
+                          className={`flex items-center gap-2 p-2.5 rounded-xl border text-sm transition-all ${
+                            tool.checked ? `${tool.color} shadow-sm` : "bg-card border-border hover:border-primary/30"
+                          }`}
+                        >
+                          <div className={`w-4 h-4 rounded border-2 flex items-center justify-center shrink-0 transition-colors ${
+                            tool.checked ? "bg-primary border-primary" : "border-muted-foreground/30"
+                          }`}>
+                            {tool.checked && <Check className="w-2.5 h-2.5 text-primary-foreground" />}
+                          </div>
+                          <tool.icon className="w-3.5 h-3.5" />
+                          <span className="text-xs font-medium">{tool.label}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex items-center justify-between pt-2">
+                    <button
+                      onClick={() => setAppMode("quick-upload")}
+                      className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+                    >
+                      <ChevronLeft className="w-4 h-4" /> 上一步
+                    </button>
+                    <button
+                      onClick={startGeneration}
+                      disabled={checkedTools.length === 0}
+                      className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors shadow-sm disabled:opacity-50"
+                    >
+                      <Wand2 className="w-4 h-4" /> 生成文档（{checkedTools.length} 项）
+                    </button>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.div>
+        </div>
+      </AppLayout>
+    );
+  }
+
+
   if (appMode === "generating") {
     const currentToolIdx = Math.floor((generatingProgress / 100) * checkedTools.length);
     const currentTool = checkedTools[Math.min(currentToolIdx, checkedTools.length - 1)];
