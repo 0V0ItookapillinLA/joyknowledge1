@@ -309,12 +309,11 @@ const Index = () => {
               {HOT_ZONES.map((zone) => (
                 <button
                   key={zone.label}
-                  onClick={() => setActiveZone(activeZone === zone.label ? null : zone.label)}
-                  className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-md border text-sm transition-colors ${
-                    activeZone === zone.label
-                      ? "border-primary bg-primary/5 text-primary"
-                      : "border-border bg-card text-foreground hover:border-primary/40"
-                  }`}
+                  onClick={() => {
+                    const filters = zone.navFilters.length > 0 ? zone.navFilters.join(",") : "";
+                    navigate(`/knowledge?type=domain&value=${encodeURIComponent(zone.navDomain)}&label=${encodeURIComponent(zone.label)}${filters ? `&filters=${encodeURIComponent(filters)}` : ""}`);
+                  }}
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-md border border-border bg-card text-sm text-foreground hover:border-primary/40 hover:bg-primary/5 transition-colors"
                 >
                   <span>{zone.emoji}</span>
                   {zone.label}
