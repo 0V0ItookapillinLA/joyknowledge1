@@ -28,6 +28,7 @@ const AVATAR_MAP: Record<string, string> = {
 const DOMAINS = ["全部领域", "营销管理", "研发管理", "质量管理", "采购管理", "产品管理", "运营管理"];
 
 const ExpertLibrary = () => {
+  const navigate = useNavigate();
   const [selectedDomain, setSelectedDomain] = useState("全部领域");
   const [selectedExpert, setSelectedExpert] = useState<typeof MOCK_EXPERTS[0] | null>(null);
   const [sortBy, setSortBy] = useState("按热度排序");
