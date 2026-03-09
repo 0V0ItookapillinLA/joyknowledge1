@@ -10,6 +10,7 @@ import PersonalZone from "./pages/PersonalZone";
 import KnowledgeExtract from "./pages/KnowledgeExtract";
 import KnowledgeList from "./pages/KnowledgeList";
 import Community from "./pages/Community";
+import Messages from "./pages/Messages";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -28,6 +29,7 @@ const App = () => (
           <Route path="/extract" element={<KnowledgeExtract />} />
           <Route path="/knowledge" element={<KnowledgeList />} />
           <Route path="/community" element={<Community />} />
+          <Route path="/messages" element={<Messages />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

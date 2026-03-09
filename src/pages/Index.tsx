@@ -5,7 +5,21 @@ import { Flame, Users, Sparkles, MessageSquare, Home as HomeIcon, ChevronDown, C
 import { motion, AnimatePresence } from "framer-motion";
 import AppLayout from "@/components/AppLayout";
 import CaseCard from "@/components/CaseCard";
-import { MOCK_CASES } from "@/data/mockData";
+import { MOCK_CASES, MOCK_EXPERTS } from "@/data/mockData";
+
+import samAvatar from "@/assets/avatars/sam.jpg";
+import ericAvatar from "@/assets/avatars/eric.jpg";
+import richardAvatar from "@/assets/avatars/richard.jpg";
+import sophieAvatar from "@/assets/avatars/sophie.jpg";
+import kevinAvatar from "@/assets/avatars/kevin.jpg";
+import amyAvatar from "@/assets/avatars/amy.jpg";
+import davidAvatar from "@/assets/avatars/david.jpg";
+import graceAvatar from "@/assets/avatars/grace.jpg";
+
+const AVATAR_MAP: Record<string, string> = {
+  "1": samAvatar, "2": ericAvatar, "3": richardAvatar, "4": sophieAvatar,
+  "5": kevinAvatar, "6": amyAvatar, "7": davidAvatar, "8": graceAvatar,
+};
 
 const RECOMMENDED_TOPICS_ROW1 = [
   "重塑护城河：AI 时代业务壁垒从\u201C数据孤岛\u201D到\u201C智能模型\u201D的跃迁",
@@ -244,114 +258,230 @@ const Index = () => {
 
         {/* Main content */}
         <div className="flex-1 min-w-0">
-          {/* Marquee recommendations */}
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="py-8 px-6 overflow-hidden"
-          >
-            <h1 className="text-2xl font-semibold text-foreground mb-5 text-center">为你推荐</h1>
-
-            {/* Row 1 - scrolls left */}
-            <div
-              className="relative mb-3 overflow-hidden"
-              onMouseEnter={() => setMarqueeRow1Paused(true)}
-              onMouseLeave={() => setMarqueeRow1Paused(false)}
-            >
-              <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-background to-transparent z-10" />
-              <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-background to-transparent z-10" />
-              <div
-                className="flex gap-3 animate-marquee-left"
-                style={marqueeRow1Paused ? { animationPlayState: "paused" } : undefined}
+          {activeNav === "推荐" && (
+            <>
+              {/* Marquee recommendations */}
+              <motion.div
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="py-8 px-6 overflow-hidden"
               >
-                {[...RECOMMENDED_TOPICS_ROW1, ...RECOMMENDED_TOPICS_ROW1].map((topic, i) => (
-                  <Link
-                    key={`r1-${i}`}
-                    to={`/case/1`}
-                    className="inline-flex items-center shrink-0 px-4 py-2.5 rounded-md border border-border bg-card text-sm text-foreground hover:border-primary/40 hover:bg-primary/5 transition-colors whitespace-nowrap"
-                  >
-                    {topic}
-                  </Link>
-                ))}
-              </div>
-            </div>
+                <h1 className="text-2xl font-semibold text-foreground mb-5 text-center">为你推荐</h1>
 
-            {/* Row 2 - scrolls left (slower) */}
-            <div
-              className="relative overflow-hidden"
-              onMouseEnter={() => setMarqueeRow2Paused(true)}
-              onMouseLeave={() => setMarqueeRow2Paused(false)}
-            >
-              <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-background to-transparent z-10" />
-              <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-background to-transparent z-10" />
-              <div
-                className="flex gap-3 animate-marquee-left-slow"
-                style={marqueeRow2Paused ? { animationPlayState: "paused" } : undefined}
-              >
-                {[...RECOMMENDED_TOPICS_ROW2, ...RECOMMENDED_TOPICS_ROW2].map((topic, i) => (
-                  <Link
-                    key={`r2-${i}`}
-                    to={`/case/1`}
-                    className="inline-flex items-center shrink-0 px-4 py-2.5 rounded-md border border-border bg-card text-sm text-foreground hover:border-primary/40 hover:bg-primary/5 transition-colors whitespace-nowrap"
-                  >
-                    {topic}
-                  </Link>
-                ))}
-              </div>
-            </div>
-          </motion.div>
-
-          <div className="px-6 pb-4">
-            <div className="mb-4">
-              <h2 className="text-lg font-semibold text-foreground">热门专区</h2>
-              <p className="text-sm text-muted-foreground">来自专业人士的精选观点与洞察</p>
-            </div>
-            <div className="flex flex-wrap gap-2 mb-4">
-              {HOT_ZONES.map((zone) => (
-                <button
-                  key={zone.label}
-                  onClick={() => {
-                    const filters = zone.navFilters.length > 0 ? zone.navFilters.join(",") : "";
-                    navigate(`/knowledge?type=domain&value=${encodeURIComponent(zone.navDomain)}&label=${encodeURIComponent(zone.label)}${filters ? `&filters=${encodeURIComponent(filters)}` : ""}`);
-                  }}
-                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-md border border-border bg-card text-sm text-foreground hover:border-primary/40 hover:bg-primary/5 transition-colors"
+                {/* Row 1 */}
+                <div
+                  className="relative mb-3 overflow-hidden"
+                  onMouseEnter={() => setMarqueeRow1Paused(true)}
+                  onMouseLeave={() => setMarqueeRow1Paused(false)}
                 >
-                  <span>{zone.emoji}</span>
-                  {zone.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="px-6 pb-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {MOCK_CASES.slice(0, 4).map((c, i) => (
-                <motion.div
-                  key={c.id}
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.05 }}
-                >
-                  <CaseCard caseItem={c} />
-                </motion.div>
-              ))}
-            </div>
-
-            {MOCK_CASES.length > 4 && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                {MOCK_CASES.slice(4, 8).map((c, i) => (
-                  <motion.div
-                    key={c.id}
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: i * 0.05 }}
+                  <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-background to-transparent z-10" />
+                  <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-background to-transparent z-10" />
+                  <div
+                    className="flex gap-3 animate-marquee-left"
+                    style={marqueeRow1Paused ? { animationPlayState: "paused" } : undefined}
                   >
-                    <CaseCard caseItem={c} />
-                  </motion.div>
-                ))}
+                    {[...RECOMMENDED_TOPICS_ROW1, ...RECOMMENDED_TOPICS_ROW1].map((topic, i) => (
+                      <Link
+                        key={`r1-${i}`}
+                        to={`/case/1`}
+                        className="inline-flex items-center shrink-0 px-4 py-2.5 rounded-md border border-border bg-card text-sm text-foreground hover:border-primary/40 hover:bg-primary/5 transition-colors whitespace-nowrap"
+                      >
+                        {topic}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Row 2 */}
+                <div
+                  className="relative overflow-hidden"
+                  onMouseEnter={() => setMarqueeRow2Paused(true)}
+                  onMouseLeave={() => setMarqueeRow2Paused(false)}
+                >
+                  <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-background to-transparent z-10" />
+                  <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-background to-transparent z-10" />
+                  <div
+                    className="flex gap-3 animate-marquee-left-slow"
+                    style={marqueeRow2Paused ? { animationPlayState: "paused" } : undefined}
+                  >
+                    {[...RECOMMENDED_TOPICS_ROW2, ...RECOMMENDED_TOPICS_ROW2].map((topic, i) => (
+                      <Link
+                        key={`r2-${i}`}
+                        to={`/case/1`}
+                        className="inline-flex items-center shrink-0 px-4 py-2.5 rounded-md border border-border bg-card text-sm text-foreground hover:border-primary/40 hover:bg-primary/5 transition-colors whitespace-nowrap"
+                      >
+                        {topic}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              </motion.div>
+
+              <div className="px-6 pb-4">
+                <div className="mb-4">
+                  <h2 className="text-lg font-semibold text-foreground">热门专区</h2>
+                  <p className="text-sm text-muted-foreground">来自专业人士的精选观点与洞察</p>
+                </div>
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {HOT_ZONES.map((zone) => (
+                    <button
+                      key={zone.label}
+                      onClick={() => {
+                        const filters = zone.navFilters.length > 0 ? zone.navFilters.join(",") : "";
+                        navigate(`/knowledge?type=domain&value=${encodeURIComponent(zone.navDomain)}&label=${encodeURIComponent(zone.label)}${filters ? `&filters=${encodeURIComponent(filters)}` : ""}`);
+                      }}
+                      className="inline-flex items-center gap-1.5 px-4 py-2 rounded-md border border-border bg-card text-sm text-foreground hover:border-primary/40 hover:bg-primary/5 transition-colors"
+                    >
+                      <span>{zone.emoji}</span>
+                      {zone.label}
+                    </button>
+                  ))}
+                </div>
               </div>
-            )}
-          </div>
+
+              <div className="px-6 pb-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {MOCK_CASES.slice(0, 4).map((c, i) => (
+                    <motion.div
+                      key={c.id}
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: i * 0.05 }}
+                    >
+                      <CaseCard caseItem={c} />
+                    </motion.div>
+                  ))}
+                </div>
+
+                {MOCK_CASES.length > 4 && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                    {MOCK_CASES.slice(4, 8).map((c, i) => (
+                      <motion.div
+                        key={c.id}
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: i * 0.05 }}
+                      >
+                        <CaseCard caseItem={c} />
+                      </motion.div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </>
+          )}
+
+          {activeNav === "热门" && (
+            <div className="p-6">
+              <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
+                <h2 className="text-xl font-semibold text-foreground mb-1">热门内容</h2>
+                <p className="text-sm text-muted-foreground mb-6">过去7天最受关注的知识内容</p>
+
+                <div className="space-y-0">
+                  {[...MOCK_CASES].sort((a, b) => b.views - a.views).map((c, i) => (
+                    <Link
+                      key={c.id}
+                      to={`/case/${c.id}`}
+                      className="flex items-start gap-4 py-5 border-b border-border hover:bg-accent/30 transition-colors -mx-2 px-2 rounded"
+                    >
+                      <span className={`text-2xl font-bold shrink-0 w-8 text-right ${
+                        i < 3 ? "text-primary" : "text-muted-foreground/40"
+                      }`}>
+                        {i + 1}
+                      </span>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1.5">
+                          <span className="px-2 py-0.5 rounded text-xs font-medium bg-primary/10 text-primary">{c.category}</span>
+                          {i < 3 && <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-destructive/10 text-destructive">HOT</span>}
+                        </div>
+                        <h3 className="text-base font-semibold text-foreground mb-1.5 line-clamp-1">{c.title}</h3>
+                        <p className="text-sm text-muted-foreground line-clamp-2 mb-2">{c.summary}</p>
+                        <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                          <span>{c.author} · {c.department}</span>
+                          <span>{c.views >= 1000 ? (c.views / 1000).toFixed(1) + "k" : c.views} 阅读</span>
+                          <span>{c.likes} 点赞</span>
+                          <span>{c.comments} 评论</span>
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              </motion.div>
+            </div>
+          )}
+
+          {activeNav === "关注" && (
+            <div className="p-6">
+              <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
+                <h2 className="text-xl font-semibold text-foreground mb-1">关注动态</h2>
+                <p className="text-sm text-muted-foreground mb-6">你关注的专家和话题的最新动态</p>
+
+                {/* Following experts */}
+                <div className="mb-8">
+                  <h3 className="text-sm font-semibold text-foreground mb-3">已关注的专家</h3>
+                  <div className="flex gap-4 overflow-x-auto pb-2">
+                    {MOCK_EXPERTS.slice(0, 5).map((expert) => (
+                      <Link
+                        key={expert.id}
+                        to="/experts"
+                        className="flex flex-col items-center gap-2 shrink-0 group"
+                      >
+                        <img
+                          src={AVATAR_MAP[expert.id]}
+                          alt={expert.name}
+                          className="w-14 h-14 rounded-full object-cover border-2 border-primary/20 group-hover:border-primary transition-colors"
+                        />
+                        <span className="text-xs text-foreground">{expert.name.split(" ")[0]}</span>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Feed from followed */}
+                <h3 className="text-sm font-semibold text-foreground mb-3">最新动态</h3>
+                <div className="space-y-0">
+                  {MOCK_CASES.slice(0, 6).map((c, i) => {
+                    const expert = MOCK_EXPERTS[i % MOCK_EXPERTS.length];
+                    return (
+                      <motion.div
+                        key={c.id}
+                        initial={{ opacity: 0, y: 6 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: i * 0.04 }}
+                      >
+                        <Link
+                          to={`/case/${c.id}`}
+                          className="block py-4 border-b border-border hover:bg-accent/30 transition-colors -mx-2 px-2 rounded"
+                        >
+                          <div className="flex items-center gap-2.5 mb-2.5">
+                            <img
+                              src={AVATAR_MAP[expert.id]}
+                              alt={expert.name}
+                              className="w-8 h-8 rounded-full object-cover"
+                            />
+                            <div>
+                              <span className="text-sm font-medium text-foreground">{expert.name}</span>
+                              <span className="text-xs text-muted-foreground ml-2">发布了新内容</span>
+                            </div>
+                            <span className="text-xs text-muted-foreground ml-auto">{c.createdAt}</span>
+                          </div>
+                          <h3 className="text-base font-semibold text-foreground mb-1.5 line-clamp-1 ml-[42px]">{c.title}</h3>
+                          <p className="text-sm text-muted-foreground line-clamp-2 ml-[42px]">{c.summary}</p>
+                          <div className="flex items-center gap-3 mt-2 ml-[42px] text-xs text-muted-foreground">
+                            {c.tags.slice(0, 2).map(tag => (
+                              <span key={tag} className="text-primary/70">#{tag}</span>
+                            ))}
+                            <span>{c.views} 阅读</span>
+                            <span>{c.likes} 点赞</span>
+                          </div>
+                        </Link>
+                      </motion.div>
+                    );
+                  })}
+                </div>
+              </motion.div>
+            </div>
+          )}
         </div>
 
         {/* Right sidebar */}

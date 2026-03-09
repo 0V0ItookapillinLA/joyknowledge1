@@ -60,10 +60,11 @@ const TopNav = () => {
           AI 萃取
         </Link>
 
-        {/* Notifications */}
-        <button className="p-2 rounded-md hover:bg-accent text-muted-foreground transition-colors relative">
+        {/* Messages */}
+        <Link to="/messages" className="p-2 rounded-md hover:bg-accent text-muted-foreground transition-colors relative">
           <Bell className="w-4 h-4" />
-        </button>
+          <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-destructive" />
+        </Link>
 
         {/* Avatar */}
         <Link to="/profile" className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-medium text-sm shrink-0">
