@@ -156,7 +156,7 @@ const Index = () => {
     <AppLayout>
       <div className="flex max-w-[1400px] mx-auto">
         {/* Left sidebar */}
-        <aside className="w-[200px] shrink-0 border-r border-border p-4 hidden lg:flex flex-col sticky top-14 h-[calc(100vh-56px)] overflow-y-auto">
+        <aside className="w-[200px] shrink-0 border-r border-border p-4 hidden lg:flex flex-col sticky top-14 h-[calc(100vh-56px)] overflow-visible">
           <div className="mb-6">
             <p className="text-xs text-muted-foreground mb-2 px-3">发现</p>
             <div className="space-y-0.5">
