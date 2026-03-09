@@ -29,9 +29,18 @@ const DOMAINS = ["全部领域", "营销管理", "研发管理", "质量管理",
 
 const ExpertLibrary = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [selectedDomain, setSelectedDomain] = useState("全部领域");
   const [selectedExpert, setSelectedExpert] = useState<typeof MOCK_EXPERTS[0] | null>(null);
   const [sortBy, setSortBy] = useState("按热度排序");
+
+  useEffect(() => {
+    const expertId = searchParams.get("id");
+    if (expertId) {
+      const found = MOCK_EXPERTS.find(e => e.id === expertId || e.name === expertId);
+      if (found) setSelectedExpert(found);
+    }
+  }, [searchParams]);
 
   const filteredExperts = selectedDomain === "全部领域"
     ? MOCK_EXPERTS
