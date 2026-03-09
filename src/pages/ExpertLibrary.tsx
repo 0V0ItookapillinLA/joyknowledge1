@@ -4,6 +4,26 @@ import AppLayout from "@/components/AppLayout";
 import { MOCK_EXPERTS, MOCK_CASES } from "@/data/mockData";
 import { ArrowLeft, UserPlus, Mail, Calendar, Heart, MessageCircle, ChevronDown, Star } from "lucide-react";
 
+import samAvatar from "@/assets/avatars/sam.jpg";
+import ericAvatar from "@/assets/avatars/eric.jpg";
+import richardAvatar from "@/assets/avatars/richard.jpg";
+import sophieAvatar from "@/assets/avatars/sophie.jpg";
+import kevinAvatar from "@/assets/avatars/kevin.jpg";
+import amyAvatar from "@/assets/avatars/amy.jpg";
+import davidAvatar from "@/assets/avatars/david.jpg";
+import graceAvatar from "@/assets/avatars/grace.jpg";
+
+const AVATAR_MAP: Record<string, string> = {
+  "1": samAvatar,
+  "2": ericAvatar,
+  "3": richardAvatar,
+  "4": sophieAvatar,
+  "5": kevinAvatar,
+  "6": amyAvatar,
+  "7": davidAvatar,
+  "8": graceAvatar,
+};
+
 const DOMAINS = ["全部领域", "营销管理", "研发管理", "质量管理", "采购管理", "产品管理", "运营管理"];
 
 const ExpertLibrary = () => {
