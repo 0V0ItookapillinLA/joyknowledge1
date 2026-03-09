@@ -340,7 +340,7 @@ const KnowledgeList = () => {
 
           {/* Article list */}
           <div className="space-y-0">
-            {filteredCases.map((c, i) => (
+            {searchFiltered.map((c, i) => (
               <motion.div
                 key={c.id}
                 initial={{ opacity: 0, y: 6 }}
