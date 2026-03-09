@@ -223,22 +223,46 @@ const Index = () => {
 
         {/* Main content */}
         <div className="flex-1 min-w-0">
+          {/* Marquee recommendations */}
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-center py-8 px-6"
+            className="py-8 px-6 overflow-hidden"
           >
-            <h1 className="text-2xl font-semibold text-foreground mb-5">为你推荐</h1>
-            <div className="flex flex-wrap justify-center gap-2 max-w-2xl mx-auto">
-              {RECOMMENDED_TOPICS.map((topic) => (
-                <Link
-                  key={topic}
-                  to={`/case/1`}
-                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-md border border-border bg-card text-sm text-foreground hover:border-primary/40 hover:bg-primary/5 transition-colors"
-                >
-                  {topic}
-                </Link>
-              ))}
+            <h1 className="text-2xl font-semibold text-foreground mb-5 text-center">为你推荐</h1>
+
+            {/* Row 1 - scrolls left */}
+            <div className="relative mb-3 overflow-hidden">
+              <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-background to-transparent z-10" />
+              <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-background to-transparent z-10" />
+              <div className="flex gap-3 animate-marquee-left">
+                {[...RECOMMENDED_TOPICS_ROW1, ...RECOMMENDED_TOPICS_ROW1].map((topic, i) => (
+                  <Link
+                    key={`r1-${i}`}
+                    to={`/case/1`}
+                    className="inline-flex items-center shrink-0 px-4 py-2.5 rounded-md border border-border bg-card text-sm text-foreground hover:border-primary/40 hover:bg-primary/5 transition-colors whitespace-nowrap"
+                  >
+                    {topic}
+                  </Link>
+                ))}
+              </div>
+            </div>
+
+            {/* Row 2 - scrolls left (slower) */}
+            <div className="relative overflow-hidden">
+              <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-background to-transparent z-10" />
+              <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-background to-transparent z-10" />
+              <div className="flex gap-3 animate-marquee-left-slow">
+                {[...RECOMMENDED_TOPICS_ROW2, ...RECOMMENDED_TOPICS_ROW2].map((topic, i) => (
+                  <Link
+                    key={`r2-${i}`}
+                    to={`/case/1`}
+                    className="inline-flex items-center shrink-0 px-4 py-2.5 rounded-md border border-border bg-card text-sm text-foreground hover:border-primary/40 hover:bg-primary/5 transition-colors whitespace-nowrap"
+                  >
+                    {topic}
+                  </Link>
+                ))}
+              </div>
             </div>
           </motion.div>
 
