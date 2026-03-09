@@ -3,41 +3,41 @@ import { Home, Users, User, Sparkles, Search, BookOpen } from "lucide-react";
 import { NAV_ITEMS } from "@/data/mockData";
 
 const iconMap: Record<string, React.ReactNode> = {
-  Home: <Home className="w-5 h-5" />,
-  Users: <Users className="w-5 h-5" />,
-  User: <User className="w-5 h-5" />,
-  Sparkles: <Sparkles className="w-5 h-5" />,
+  Home: <Home className="w-[18px] h-[18px]" />,
+  Users: <Users className="w-[18px] h-[18px]" />,
+  User: <User className="w-[18px] h-[18px]" />,
+  Sparkles: <Sparkles className="w-[18px] h-[18px]" />,
 };
 
 const SideNav = () => {
   const location = useLocation();
 
   return (
-    <aside className="w-56 shrink-0 bg-sidebar border-r border-sidebar-border h-screen sticky top-0 flex flex-col">
-      <div className="p-5 border-b border-sidebar-border">
+    <aside className="w-52 shrink-0 bg-sidebar border-r border-sidebar-border h-screen sticky top-0 flex flex-col">
+      <div className="px-5 py-4 border-b border-sidebar-border">
         <div className="flex items-center gap-2">
-          <BookOpen className="w-6 h-6 text-primary" />
-          <span className="font-display font-bold text-lg text-foreground">知识平台</span>
+          <BookOpen className="w-5 h-5 text-primary" />
+          <span className="font-semibold text-base text-foreground">知识平台</span>
         </div>
       </div>
 
       <div className="p-3">
-        <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-secondary text-muted-foreground text-sm">
+        <div className="flex items-center gap-2 px-3 py-2 rounded-md bg-accent text-muted-foreground text-sm cursor-pointer hover:bg-accent/80 transition-colors">
           <Search className="w-4 h-4" />
-          <span>搜索知识案例...</span>
+          <span>搜索...</span>
         </div>
       </div>
 
-      <nav className="flex-1 p-3 space-y-1">
+      <nav className="flex-1 px-3 space-y-0.5">
         {NAV_ITEMS.map((item) => {
           const isActive = location.pathname === item.path;
           return (
             <Link
               key={item.path}
               to={item.path}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+              className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors ${
                 isActive
-                  ? "bg-primary/10 text-primary"
+                  ? "bg-primary/10 text-primary font-medium"
                   : "text-sidebar-foreground hover:bg-sidebar-accent"
               }`}
             >
@@ -51,7 +51,7 @@ const SideNav = () => {
       <div className="p-3 border-t border-sidebar-border">
         <Link
           to="/extract"
-          className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium ai-gradient-bg text-primary-foreground justify-center"
+          className="flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium bg-primary text-primary-foreground justify-center hover:bg-primary/90 transition-colors"
         >
           <Sparkles className="w-4 h-4" />
           AI 知识萃取
