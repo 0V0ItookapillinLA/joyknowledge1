@@ -4,6 +4,26 @@ import AppLayout from "@/components/AppLayout";
 import { MOCK_EXPERTS, MOCK_CASES } from "@/data/mockData";
 import { ArrowLeft, UserPlus, Mail, Calendar, Heart, MessageCircle, ChevronDown, Star } from "lucide-react";
 
+import samAvatar from "@/assets/avatars/sam.jpg";
+import ericAvatar from "@/assets/avatars/eric.jpg";
+import richardAvatar from "@/assets/avatars/richard.jpg";
+import sophieAvatar from "@/assets/avatars/sophie.jpg";
+import kevinAvatar from "@/assets/avatars/kevin.jpg";
+import amyAvatar from "@/assets/avatars/amy.jpg";
+import davidAvatar from "@/assets/avatars/david.jpg";
+import graceAvatar from "@/assets/avatars/grace.jpg";
+
+const AVATAR_MAP: Record<string, string> = {
+  "1": samAvatar,
+  "2": ericAvatar,
+  "3": richardAvatar,
+  "4": sophieAvatar,
+  "5": kevinAvatar,
+  "6": amyAvatar,
+  "7": davidAvatar,
+  "8": graceAvatar,
+};
+
 const DOMAINS = ["全部领域", "营销管理", "研发管理", "质量管理", "采购管理", "产品管理", "运营管理"];
 
 const ExpertLibrary = () => {
@@ -76,9 +96,11 @@ const ExpertLibrary = () => {
               className="text-center mb-8"
             >
               <div className="relative inline-block mb-4">
-                <div className="w-24 h-24 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center text-primary font-bold text-3xl mx-auto border-4 border-card shadow-md">
-                  {selectedExpert.name[0]}
-                </div>
+                <img
+                  src={AVATAR_MAP[selectedExpert.id]}
+                  alt={selectedExpert.name}
+                  className="w-24 h-24 rounded-full object-cover mx-auto border-4 border-card shadow-md"
+                />
                 <div className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-amber-400 flex items-center justify-center shadow-sm">
                   <Star className="w-4 h-4 text-white fill-white" />
                 </div>
@@ -246,9 +268,11 @@ const ExpertLibrary = () => {
               >
                 {/* Top row: Avatar + EXPERT badge */}
                 <div className="flex items-start justify-between mb-4">
-                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center text-primary font-bold text-2xl border-2 border-card shadow-sm">
-                    {expert.name[0]}
-                  </div>
+                  <img
+                    src={AVATAR_MAP[expert.id]}
+                    alt={expert.name}
+                    className="w-16 h-16 rounded-full object-cover border-2 border-card shadow-sm"
+                  />
                   <span className="px-2 py-0.5 rounded text-xs font-bold tracking-wider text-primary">
                     EXPERT
                   </span>
