@@ -32,20 +32,29 @@ const NAV_ITEMS = [
   { label: "关注", icon: Users },
 ];
 
-const BGBU_ITEMS = [
-  { label: "AI中台", matchDept: "AI中台" },
-  { label: "数据平台", matchDept: "数据平台" },
-  { label: "研发效能", matchDept: "研发效能" },
-  { label: "项目管理", matchDept: "项目管理部" },
-];
-
-const DOMAIN_ITEMS = [
-  { label: "营销管理", icon: "📣", matchTags: ["客户案例"] },
-  { label: "研发管理", icon: "💻", matchTags: ["技术架构"] },
-  { label: "质量管理", icon: "✅", matchTags: ["流程优化"] },
-  { label: "采购管理", icon: "🛒", matchTags: ["数据分析"] },
-  { label: "产品管理", icon: "📦", matchTags: ["产品设计"] },
-  { label: "运营管理", icon: "📈", matchTags: ["最佳实践"] },
+const BGBU_SECTIONS = [
+  {
+    title: "BGBU专区",
+    items: [
+      { label: "AI中台", matchDept: "AI中台" },
+      { label: "数据平台", matchDept: "数据平台" },
+      { label: "研发效能", matchDept: "研发效能" },
+      { label: "项目管理", matchDept: "项目管理部" },
+      { label: "UX设计", matchDept: "UX设计" },
+      { label: "基础设施", matchDept: "基础设施" },
+    ],
+  },
+  {
+    title: "领域专区",
+    items: [
+      { label: "营销管理", matchTags: ["客户案例"] },
+      { label: "研发管理", matchTags: ["技术架构"] },
+      { label: "质量管理", matchTags: ["流程优化"] },
+      { label: "采购管理", matchTags: ["数据分析"] },
+      { label: "产品管理", matchTags: ["产品设计"] },
+      { label: "运营管理", matchTags: ["最佳实践"] },
+    ],
+  },
 ];
 
 const DATE_OPTIONS = ["全部时间", "最近一周", "最近一月", "最近三月"];
@@ -54,24 +63,26 @@ const Index = () => {
   const [activeZone, setActiveZone] = useState<string | null>(null);
   const [activeNav, setActiveNav] = useState("推荐");
 
-  const [activeBGBU, setActiveBGBU] = useState<string | null>(null);
-  const [activeDomain, setActiveDomain] = useState<string | null>(null);
+  const [activeSection, setActiveSection] = useState<string | null>(null);
+  const [hoveredSection, setHoveredSection] = useState<string | null>(null);
   const [dateFilter, setDateFilter] = useState("全部时间");
   const [showDateDropdown, setShowDateDropdown] = useState(false);
 
   const activeZoneObj = HOT_ZONES.find(z => z.label === activeZone);
-  const activeDomainObj = DOMAIN_ITEMS.find(d => d.label === activeDomain);
-  const activeBGBUObj = BGBU_ITEMS.find(b => b.label === activeBGBU);
+
+  const allSectionItems: Array<{ label: string; matchDept?: string; matchTags?: string[] }> = BGBU_SECTIONS.flatMap(s => s.items as Array<{ label: string; matchDept?: string; matchTags?: string[] }>);
+  const activeItem = allSectionItems.find(i => i.label === activeSection);
 
   let filteredCases = MOCK_CASES;
   if (activeZoneObj) {
     filteredCases = filteredCases.filter((c) => c.tags.some(t => activeZoneObj.matchTags.includes(t)));
   }
-  if (activeDomainObj) {
-    filteredCases = filteredCases.filter((c) => c.tags.some(t => activeDomainObj.matchTags.includes(t)));
-  }
-  if (activeBGBUObj) {
-    filteredCases = filteredCases.filter((c) => c.department === activeBGBUObj.matchDept);
+  if (activeItem) {
+    if ('matchDept' in activeItem) {
+      filteredCases = filteredCases.filter((c) => c.department === activeItem.matchDept);
+    } else if ('matchTags' in activeItem) {
+      filteredCases = filteredCases.filter((c) => c.tags.some(t => (activeItem as any).matchTags.includes(t)));
+    }
   }
 
   const trendingItems = [
@@ -106,44 +117,33 @@ const Index = () => {
             </div>
           </div>
 
-          <div>
-            <p className="text-xs text-muted-foreground mb-2 px-3">BGBU专区</p>
-            <div className="space-y-0.5">
-              {BGBU_ITEMS.map((item) => (
-                <button
-                  key={item.label}
-                  onClick={() => { setActiveBGBU(activeBGBU === item.label ? null : item.label); setActiveDomain(null); }}
-                  className={`flex items-center gap-2.5 w-full px-3 py-2 rounded-md text-sm transition-colors ${
-                    activeBGBU === item.label
-                      ? "bg-primary/10 text-primary font-medium"
-                      : "text-muted-foreground hover:text-foreground hover:bg-accent"
-                  }`}
-                >
-                  {item.label}
-                </button>
-              ))}
+          {BGBU_SECTIONS.map((section) => (
+            <div
+              key={section.title}
+              className="mb-4"
+              onMouseEnter={() => setHoveredSection(section.title)}
+              onMouseLeave={() => setHoveredSection(null)}
+            >
+              <p className="text-sm font-semibold text-foreground mb-2 px-3">{section.title}</p>
+              <div className={`grid grid-cols-2 gap-x-1 gap-y-0.5 transition-all duration-200 ${
+                hoveredSection === section.title ? "bg-accent/50 rounded-lg p-1" : ""
+              }`}>
+                {section.items.map((item) => (
+                  <button
+                    key={item.label}
+                    onClick={() => setActiveSection(activeSection === item.label ? null : item.label)}
+                    className={`text-left px-2 py-1.5 rounded text-sm transition-colors ${
+                      activeSection === item.label
+                        ? "text-primary font-medium bg-primary/10"
+                        : "text-muted-foreground hover:text-primary hover:underline"
+                    }`}
+                  >
+                    {item.label}
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
-
-          <div>
-            <p className="text-xs text-muted-foreground mb-2 px-3">领域专区</p>
-            <div className="space-y-0.5">
-              {DOMAIN_ITEMS.map((item) => (
-                <button
-                  key={item.label}
-                  onClick={() => { setActiveDomain(activeDomain === item.label ? null : item.label); setActiveBGBU(null); }}
-                  className={`flex items-center gap-2.5 w-full px-3 py-2 rounded-md text-sm transition-colors ${
-                    activeDomain === item.label
-                      ? "bg-primary/10 text-primary font-medium"
-                      : "text-muted-foreground hover:text-foreground hover:bg-accent"
-                  }`}
-                >
-                  <span>{item.icon}</span>
-                  {item.label}
-                </button>
-              ))}
-            </div>
-          </div>
+          ))}
 
           {/* Date filter */}
           <div className="mt-auto pt-4 border-t border-border">
