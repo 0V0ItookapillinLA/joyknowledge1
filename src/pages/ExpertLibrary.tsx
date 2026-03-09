@@ -45,11 +45,63 @@ const ExpertLibrary = () => {
       name: d.length > 4 ? d.slice(0, 4) : d,
       score: 95 - i * 7,
     }));
-    // Add extra items from skills
-    expert.skills.slice(0, Math.max(0, 4 - abilities.length)).forEach((s, i) => {
+    expert.skills.slice(0, Math.max(0, 6 - abilities.length)).forEach((s, i) => {
       abilities.push({ name: s.length > 4 ? s.slice(0, 4) : s, score: 88 - i * 5 });
     });
-    return abilities.slice(0, 4);
+    // Ensure at least 5 points for a good radar shape
+    while (abilities.length < 5) {
+      abilities.push({ name: "综合", score: 75 });
+    }
+    return abilities.slice(0, 6);
+  };
+
+  // SVG radar chart helper
+  const renderRadarChart = (data: { name: string; score: number }[]) => {
+    const cx = 120, cy = 120, maxR = 90;
+    const n = data.length;
+    const angles = data.map((_, i) => (Math.PI * 2 * i) / n - Math.PI / 2);
+
+    const getPoint = (angle: number, r: number) => ({
+      x: cx + r * Math.cos(angle),
+      y: cy + r * Math.sin(angle),
+    });
+
+    const levels = [0.25, 0.5, 0.75, 1];
+    const dataPoints = data.map((d, i) => getPoint(angles[i], (d.score / 100) * maxR));
+    const dataPath = dataPoints.map((p, i) => `${i === 0 ? "M" : "L"}${p.x},${p.y}`).join(" ") + " Z";
+
+    return (
+      <svg viewBox="0 0 240 240" className="w-full max-w-[240px] mx-auto">
+        {/* Grid levels */}
+        {levels.map((level) => {
+          const pts = angles.map((a) => getPoint(a, maxR * level));
+          const path = pts.map((p, i) => `${i === 0 ? "M" : "L"}${p.x},${p.y}`).join(" ") + " Z";
+          return <path key={level} d={path} fill="none" stroke="hsl(var(--border))" strokeWidth="1" />;
+        })}
+        {/* Axis lines */}
+        {angles.map((angle, i) => {
+          const end = getPoint(angle, maxR);
+          return <line key={i} x1={cx} y1={cy} x2={end.x} y2={end.y} stroke="hsl(var(--border))" strokeWidth="1" />;
+        })}
+        {/* Data fill */}
+        <path d={dataPath} fill="hsl(var(--primary) / 0.15)" stroke="hsl(var(--primary))" strokeWidth="2" />
+        {/* Data points */}
+        {dataPoints.map((p, i) => (
+          <circle key={i} cx={p.x} cy={p.y} r="4" fill="hsl(var(--primary))" stroke="hsl(var(--card))" strokeWidth="2" />
+        ))}
+        {/* Labels */}
+        {data.map((d, i) => {
+          const labelR = maxR + 18;
+          const pos = getPoint(angles[i], labelR);
+          const anchor = pos.x < cx - 5 ? "end" : pos.x > cx + 5 ? "start" : "middle";
+          return (
+            <text key={i} x={pos.x} y={pos.y} textAnchor={anchor} dominantBaseline="central" className="fill-foreground text-[11px]">
+              {d.name}
+            </text>
+          );
+        })}
+      </svg>
+    );
   };
 
   // ========== Detail View ==========
