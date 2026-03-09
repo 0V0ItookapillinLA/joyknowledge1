@@ -4,7 +4,7 @@ import { Flame, Users, Sparkles, BookOpen, ArrowRight, Bookmark, Eye, Heart, Mes
 import { motion } from "framer-motion";
 import AppLayout from "@/components/AppLayout";
 import CaseCard from "@/components/CaseCard";
-import TagChip from "@/components/TagChip";
+
 import { MOCK_CASES, MOCK_TAGS, MOCK_EXPERTS } from "@/data/mockData";
 
 const TOPIC_TAGS = [
