@@ -1,173 +1,284 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import AppLayout from "@/components/AppLayout";
-import CaseCard from "@/components/CaseCard";
 import { MOCK_EXPERTS, MOCK_CASES } from "@/data/mockData";
-import { Mail, Calendar, UserPlus, Search } from "lucide-react";
+import { ArrowLeft, UserPlus, Mail, Calendar, Heart, MessageCircle, ChevronDown, Star } from "lucide-react";
 
-const DOMAIN_TREE = [
-  { label: "AI 与大模型", children: ["自然语言处理", "大模型应用", "智能客服"] },
-  { label: "项目管理", children: ["敏捷方法", "跨部门协作", "风险管理"] },
-  { label: "数据与架构", children: ["知识图谱", "数据治理", "数据架构"] },
-  { label: "设计与体验", children: ["用户体验", "交互设计", "设计系统"] },
-];
+const DOMAINS = ["全部领域", "营销管理", "研发管理", "质量管理", "采购管理", "产品管理", "运营管理"];
 
 const ExpertLibrary = () => {
-  const [selectedDomain, setSelectedDomain] = useState<string | null>(null);
-  const [selectedExpert, setSelectedExpert] = useState(MOCK_EXPERTS[0]);
+  const [selectedDomain, setSelectedDomain] = useState("全部领域");
+  const [selectedExpert, setSelectedExpert] = useState<typeof MOCK_EXPERTS[0] | null>(null);
+  const [sortBy, setSortBy] = useState("按热度排序");
 
-  const filteredExperts = selectedDomain
-    ? MOCK_EXPERTS.filter((e) => e.domains.includes(selectedDomain))
-    : MOCK_EXPERTS;
+  const filteredExperts = selectedDomain === "全部领域"
+    ? MOCK_EXPERTS
+    : MOCK_EXPERTS.filter((e) => e.domains.some(d => d.includes(selectedDomain.replace("管理", ""))));
 
-  const expertCases = MOCK_CASES.filter((c) => c.author === selectedExpert.name);
+  const expertCases = selectedExpert
+    ? MOCK_CASES.filter((c) => c.author === selectedExpert.name)
+    : [];
 
+  // Ability radar data for detail view
+  const getAbilityData = (expert: typeof MOCK_EXPERTS[0]) => {
+    const abilities = expert.domains.map((d, i) => ({
+      name: d.length > 4 ? d.slice(0, 4) : d,
+      score: 95 - i * 7,
+    }));
+    // Add extra items from skills
+    expert.skills.slice(0, Math.max(0, 4 - abilities.length)).forEach((s, i) => {
+      abilities.push({ name: s.length > 4 ? s.slice(0, 4) : s, score: 88 - i * 5 });
+    });
+    return abilities.slice(0, 4);
+  };
+
+  // ========== Detail View ==========
+  if (selectedExpert) {
+    const abilities = getAbilityData(selectedExpert);
+
+    return (
+      <AppLayout>
+        <div className="flex">
+          {/* Left sidebar */}
+          <aside className="w-[220px] shrink-0 border-r border-border p-5 hidden lg:block sticky top-14 h-[calc(100vh-56px)] overflow-y-auto">
+            <button
+              onClick={() => setSelectedExpert(null)}
+              className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors"
+            >
+              <ArrowLeft className="w-4 h-4" /> 返回专家库
+            </button>
+
+            <h3 className="font-semibold text-sm text-foreground mb-3">专家领域</h3>
+            <div className="space-y-1">
+              {DOMAINS.slice(1).map((d) => (
+                <button key={d} className="block w-full text-left px-3 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
+                  {d}
+                </button>
+              ))}
+            </div>
+
+            <div className="mt-8">
+              <h3 className="font-semibold text-sm text-foreground mb-3">技能专长</h3>
+              <div className="flex flex-wrap gap-1.5">
+                {selectedExpert.skills.map((s) => (
+                  <span key={s} className="px-2.5 py-1 rounded-md bg-accent text-secondary-foreground text-xs">{s}</span>
+                ))}
+              </div>
+            </div>
+          </aside>
+
+          {/* Center: Profile + Cases */}
+          <div className="flex-1 min-w-0 p-6">
+            {/* Profile hero */}
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-center mb-8"
+            >
+              <div className="relative inline-block mb-4">
+                <div className="w-24 h-24 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center text-primary font-bold text-3xl mx-auto border-4 border-card shadow-md">
+                  {selectedExpert.name[0]}
+                </div>
+                <div className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-amber-400 flex items-center justify-center shadow-sm">
+                  <Star className="w-4 h-4 text-white fill-white" />
+                </div>
+              </div>
+              <h1 className="text-xl font-semibold text-foreground">{selectedExpert.name}</h1>
+              <p className="text-sm text-muted-foreground mt-1">
+                {selectedExpert.title} @ {selectedExpert.department}
+              </p>
+
+              {/* Action buttons */}
+              <div className="flex items-center justify-center gap-3 mt-5">
+                <button className="inline-flex items-center gap-2 px-6 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors">
+                  <UserPlus className="w-4 h-4" /> 关注专家
+                </button>
+                <button className="inline-flex items-center gap-2 px-6 py-2 rounded-lg border border-border text-sm text-foreground hover:border-primary/40 hover:text-primary transition-colors">
+                  <Mail className="w-4 h-4" /> 发私信
+                </button>
+              </div>
+
+              {/* Stats row */}
+              <div className="flex items-center justify-center gap-12 mt-8">
+                <div className="text-center">
+                  <p className="text-2xl font-semibold text-foreground">15</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">从业年限</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-2xl font-semibold text-foreground">{selectedExpert.caseCount}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">发布案例</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-2xl font-semibold text-foreground">4.9</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">专家评分</p>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Cases */}
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="font-semibold text-base text-foreground">已发布案例</h2>
+                <button className="text-sm text-primary hover:underline">查看全部</button>
+              </div>
+
+              <div className="space-y-4">
+                {(expertCases.length > 0 ? expertCases : MOCK_CASES.slice(0, 3)).map((c, i) => (
+                  <motion.div
+                    key={c.id}
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.05 }}
+                    className="card-base p-5"
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="px-2 py-0.5 rounded bg-primary/10 text-primary text-xs font-medium">{c.category}</span>
+                      <span className="text-xs text-muted-foreground">{c.createdAt}</span>
+                    </div>
+                    <h3 className="font-semibold text-sm text-foreground mb-2">{c.title}</h3>
+                    <p className="text-sm text-muted-foreground line-clamp-2 mb-3">{c.summary}</p>
+                    <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                      <span className="flex items-center gap-1"><Heart className="w-3.5 h-3.5" /> {c.likes}</span>
+                      <span className="flex items-center gap-1"><MessageCircle className="w-3.5 h-3.5" /> {c.comments}</span>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Right: Ability radar + Consult CTA */}
+          <aside className="w-[280px] shrink-0 border-l border-border p-5 hidden xl:block sticky top-14 h-[calc(100vh-56px)] overflow-y-auto space-y-5">
+            {/* Ability radar */}
+            <div>
+              <h3 className="font-semibold text-sm text-foreground mb-4">能力雷达</h3>
+              <div className="space-y-3">
+                {abilities.map((a) => (
+                  <div key={a.name}>
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-sm text-foreground">{a.name}</span>
+                      <span className="text-sm font-semibold text-primary">{a.score}%</span>
+                    </div>
+                    <div className="w-full h-2 rounded-full bg-accent overflow-hidden">
+                      <motion.div
+                        initial={{ width: 0 }}
+                        animate={{ width: `${a.score}%` }}
+                        transition={{ duration: 0.8, delay: 0.2 }}
+                        className="h-full rounded-full bg-primary"
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Consult CTA */}
+            <div className="rounded-xl bg-foreground p-5 text-card">
+              <h4 className="font-semibold text-sm text-card mb-1">专家咨询</h4>
+              <p className="text-xs text-card/70 mb-4">
+                预约与 {selectedExpert.name} 的 1 对 1 交流，解决您的技术难题。
+              </p>
+              <button className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-card text-foreground text-sm font-medium hover:bg-card/90 transition-colors">
+                <Calendar className="w-4 h-4" /> 立即预约
+              </button>
+            </div>
+          </aside>
+        </div>
+      </AppLayout>
+    );
+  }
+
+  // ========== List View ==========
   return (
     <AppLayout>
       <div className="flex">
-        {/* Domain tree */}
-        <aside className="w-[200px] shrink-0 border-r border-border p-4 hidden lg:block sticky top-14 h-[calc(100vh-56px)] overflow-y-auto">
-          <div className="mb-3">
-            <div className="flex items-center gap-2 px-3 py-2 rounded-md border border-border bg-card text-sm">
-              <Search className="w-3.5 h-3.5 text-muted-foreground" />
-              <input placeholder="搜索专家..." className="flex-1 bg-transparent text-foreground placeholder:text-muted-foreground outline-none text-sm" />
-            </div>
-          </div>
-          <p className="text-xs text-muted-foreground mb-2 px-3">领域分类</p>
-          <div className="space-y-2">
-            <button
-              onClick={() => setSelectedDomain(null)}
-              className={`block w-full text-left px-3 py-1.5 rounded-md text-sm transition-colors ${
-                !selectedDomain ? "bg-primary/10 text-primary font-medium" : "text-muted-foreground hover:text-foreground hover:bg-accent"
-              }`}
-            >
-              全部领域
-            </button>
-            {DOMAIN_TREE.map((domain) => (
-              <div key={domain.label}>
-                <p className="px-3 text-xs font-medium text-muted-foreground mt-2 mb-1">{domain.label}</p>
-                {domain.children.map((child) => (
-                  <button
-                    key={child}
-                    onClick={() => setSelectedDomain(child)}
-                    className={`block w-full text-left px-3 py-1.5 rounded-md text-sm transition-colors ${
-                      selectedDomain === child ? "bg-primary/10 text-primary font-medium" : "text-muted-foreground hover:text-foreground hover:bg-accent"
-                    }`}
-                  >
-                    {child}
-                  </button>
-                ))}
-              </div>
+        {/* Left sidebar */}
+        <aside className="w-[220px] shrink-0 border-r border-border p-5 hidden lg:block sticky top-14 h-[calc(100vh-56px)] overflow-y-auto">
+          <h3 className="font-semibold text-sm text-foreground mb-3">专家领域</h3>
+          <div className="space-y-1">
+            {DOMAINS.map((d) => (
+              <button
+                key={d}
+                onClick={() => setSelectedDomain(d)}
+                className={`block w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
+                  selectedDomain === d
+                    ? "bg-primary/10 text-primary font-medium"
+                    : "text-muted-foreground hover:text-foreground hover:bg-accent"
+                }`}
+              >
+                {d}
+              </button>
             ))}
           </div>
         </aside>
 
         {/* Main */}
         <div className="flex-1 min-w-0 p-6">
-          <h1 className="text-xl font-semibold text-foreground mb-1">专家书房</h1>
-          <p className="text-sm text-muted-foreground mb-6">发现领域专家，学习他们的实践经验</p>
+          {/* Header */}
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h1 className="text-xl font-semibold text-foreground">
+                企业专家库
+                <span className="text-sm font-normal text-muted-foreground ml-3">共 42 位认证专家</span>
+              </h1>
+            </div>
+            <button className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-border text-sm text-muted-foreground hover:text-foreground transition-colors">
+              {sortBy}
+              <ChevronDown className="w-4 h-4" />
+            </button>
+          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-8">
-            {filteredExperts.map((expert) => (
+          {/* Expert grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {filteredExperts.map((expert, i) => (
               <motion.button
                 key={expert.id}
                 onClick={() => setSelectedExpert(expert)}
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
-                className={`card-base p-5 text-left w-full transition-all ${
-                  selectedExpert.id === expert.id ? "border-primary" : ""
-                }`}
+                transition={{ delay: i * 0.05 }}
+                className="card-base p-6 text-left w-full"
               >
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="w-11 h-11 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold text-base">
+                {/* Top row: Avatar + EXPERT badge */}
+                <div className="flex items-start justify-between mb-4">
+                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center text-primary font-bold text-2xl border-2 border-card shadow-sm">
                     {expert.name[0]}
                   </div>
-                  <div className="flex-1">
-                    <p className="font-medium text-foreground">{expert.name}</p>
-                    <p className="text-xs text-muted-foreground">{expert.title} · {expert.department}</p>
-                  </div>
-                  <button className="px-3 py-1 rounded-md border border-border text-xs text-muted-foreground hover:border-primary hover:text-primary transition-colors">
-                    <UserPlus className="w-3.5 h-3.5 inline mr-1" />关注
-                  </button>
+                  <span className="px-2 py-0.5 rounded text-xs font-bold tracking-wider text-primary">
+                    EXPERT
+                  </span>
                 </div>
-                <p className="text-sm text-muted-foreground mb-3">{expert.bio}</p>
-                <div className="flex flex-wrap gap-1.5 mb-3">
-                  {expert.domains.slice(0, 3).map(d => (
-                    <span key={d} className="px-2 py-0.5 rounded bg-primary/10 text-primary text-xs">{d}</span>
+
+                {/* Name + title */}
+                <h3 className="font-semibold text-base text-foreground">{expert.name}</h3>
+                <p className="text-sm text-muted-foreground mt-0.5">
+                  {expert.title} | {expert.department}
+                </p>
+
+                {/* Domain tags */}
+                <div className="flex flex-wrap gap-1.5 mt-3">
+                  {expert.domains.slice(0, 2).map(d => (
+                    <span key={d} className="px-2.5 py-0.5 rounded border border-primary/20 text-primary text-xs">{d}</span>
                   ))}
                 </div>
-                <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                  <span>{expert.caseCount} 案例</span>
-                  <span>{expert.followers} 关注者</span>
+
+                {/* Stats */}
+                <div className="flex items-center gap-8 mt-5 pt-4 border-t border-border">
+                  <div className="text-center flex-1">
+                    <p className="text-lg font-semibold text-foreground">{expert.caseCount}</p>
+                    <p className="text-xs text-muted-foreground">案例数</p>
+                  </div>
+                  <div className="text-center flex-1">
+                    <p className="text-lg font-semibold text-foreground">
+                      {expert.followers >= 1000 ? (expert.followers / 1000).toFixed(1) + "k" : expert.followers}
+                    </p>
+                    <p className="text-xs text-muted-foreground">获赞数</p>
+                  </div>
                 </div>
               </motion.button>
             ))}
           </div>
-
-          <div>
-            <h2 className="font-semibold text-base text-foreground mb-4">{selectedExpert.name} 的案例</h2>
-            {expertCases.length > 0 ? (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-                {expertCases.map((c) => (
-                  <CaseCard key={c.id} caseItem={c} />
-                ))}
-              </div>
-            ) : (
-              <p className="text-sm text-muted-foreground">该专家暂无公开案例</p>
-            )}
-          </div>
         </div>
-
-        {/* Right panel */}
-        <aside className="w-[260px] shrink-0 border-l border-border p-5 hidden xl:block sticky top-14 h-[calc(100vh-56px)] overflow-y-auto">
-          {/* Selected expert detail */}
-          <div className="text-center mb-5">
-            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-2xl mx-auto mb-3">
-              {selectedExpert.name[0]}
-            </div>
-            <p className="font-semibold text-foreground">{selectedExpert.name}</p>
-            <p className="text-xs text-muted-foreground">{selectedExpert.title}</p>
-          </div>
-
-          <div className="flex gap-2 mb-5">
-            <button className="flex-1 inline-flex items-center justify-center gap-1 px-3 py-2 rounded-md border border-border text-xs text-foreground hover:border-primary hover:text-primary transition-colors">
-              <Mail className="w-3.5 h-3.5" /> 私信
-            </button>
-            <button className="flex-1 inline-flex items-center justify-center gap-1 px-3 py-2 rounded-md border border-border text-xs text-foreground hover:border-primary hover:text-primary transition-colors">
-              <Calendar className="w-3.5 h-3.5" /> 预约
-            </button>
-          </div>
-
-          <div className="space-y-4">
-            <div>
-              <p className="text-xs text-muted-foreground mb-2">擅长领域</p>
-              <div className="flex flex-wrap gap-1.5">
-                {selectedExpert.domains.map((d) => (
-                  <span key={d} className="px-2 py-0.5 rounded bg-primary/10 text-primary text-xs">{d}</span>
-                ))}
-              </div>
-            </div>
-            <div>
-              <p className="text-xs text-muted-foreground mb-2">技能标签</p>
-              <div className="flex flex-wrap gap-1.5">
-                {selectedExpert.skills.map((s) => (
-                  <span key={s} className="px-2 py-0.5 rounded bg-accent text-secondary-foreground text-xs">{s}</span>
-                ))}
-              </div>
-            </div>
-            <div className="pt-3 border-t border-border space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">案例</span>
-                <span className="font-medium text-foreground">{selectedExpert.caseCount}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">关注者</span>
-                <span className="font-medium text-foreground">{selectedExpert.followers}</span>
-              </div>
-            </div>
-          </div>
-        </aside>
       </div>
     </AppLayout>
   );
