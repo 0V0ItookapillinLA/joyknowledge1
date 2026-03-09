@@ -1,48 +1,27 @@
 import { useState } from "react";
-import { useSearchParams, Link, useNavigate } from "react-router-dom";
+import { useSearchParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ChevronDown, ChevronUp, ArrowLeft, Search, Eye, ThumbsUp } from "lucide-react";
+import { ChevronDown, ChevronUp, ArrowLeft, Search, Eye, ThumbsUp, Layers, Building2, TrendingUp, Code2, CheckCircle2, CreditCard, Lightbulb, BarChart3, X } from "lucide-react";
 import AppLayout from "@/components/AppLayout";
 import { MOCK_CASES } from "@/data/mockData";
 
 const DATE_OPTIONS = ["全部时间", "最近一周", "最近一月", "最近三月"];
 const CONTENT_TYPES = ["案例", "文档", "视频", "问答"];
 
-const BGBU_TREE = [
-  {
-    label: "京东职能体系",
-    children: ["人力资源", "财务管理", "法务合规", "行政后勤"],
-  },
-  {
-    label: "京东零售",
-    children: ["平台业务", "自营业务", "全渠道", "市场营销"],
-  },
-  {
-    label: "京东物流",
-    children: ["仓储管理", "配送网络", "供应链", "冷链物流"],
-  },
-  {
-    label: "京东科技",
-    children: ["AI中台", "数据平台", "云计算", "区块链"],
-  },
+const DOMAIN_ITEMS = [
+  { label: "全部领域", icon: Layers },
+  { label: "营销管理", icon: TrendingUp },
+  { label: "研发管理", icon: Code2 },
+  { label: "质量管理", icon: CheckCircle2 },
+  { label: "采购管理", icon: CreditCard },
+  { label: "产品管理", icon: Lightbulb },
+  { label: "运营管理", icon: BarChart3 },
 ];
 
-const DOMAIN_TREE = [
+const ORG_TREE = [
   {
-    label: "营销管理",
-    children: ["品牌营销", "数字营销", "内容运营", "渠道管理"],
-  },
-  {
-    label: "研发管理",
-    children: ["技术架构", "研发效能", "代码质量", "DevOps"],
-  },
-  {
-    label: "质量管理",
-    children: ["流程优化", "质量体系", "测试管理", "标准认证"],
-  },
-  {
-    label: "产品管理",
-    children: ["产品设计", "用户研究", "需求管理", "产品运营"],
+    label: "京东职能体系",
+    children: ["京东职能", "京东零售", "京东物流", "京东科技", "京东健康", "京东工业", "京东产发", "京东保险"],
   },
 ];
 
@@ -54,17 +33,15 @@ const KnowledgeList = () => {
   const filterValue = searchParams.get("value") || "";
   const filterLabel = searchParams.get("label") || filterValue;
 
-  const [viewTab, setViewTab] = useState<"domain" | "bgbu">(filterType === "dept" ? "bgbu" : "domain");
-  const [expandedGroups, setExpandedGroups] = useState<string[]>([filterLabel]);
-  const [selectedFilters, setSelectedFilters] = useState<string[]>([filterLabel]);
+  const [expandedGroups, setExpandedGroups] = useState<string[]>(["京东职能体系"]);
+  const [selectedFilters, setSelectedFilters] = useState<string[]>(filterLabel ? [filterLabel] : []);
+  const [selectedDomain, setSelectedDomain] = useState("全部领域");
   const [dateFilter, setDateFilter] = useState("全部时间");
   const [showDateDropdown, setShowDateDropdown] = useState(false);
   const [selectedContentTypes, setSelectedContentTypes] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState("综合排序");
   const [showSortDropdown, setShowSortDropdown] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-
-  const tree = viewTab === "bgbu" ? BGBU_TREE : DOMAIN_TREE;
 
   const toggleGroup = (label: string) => {
     setExpandedGroups((prev) =>
@@ -78,40 +55,44 @@ const KnowledgeList = () => {
     );
   };
 
+  const removeFilter = (label: string) => {
+    setSelectedFilters((prev) => prev.filter((f) => f !== label));
+  };
+
   const toggleContentType = (t: string) => {
     setSelectedContentTypes((prev) =>
       prev.includes(t) ? prev.filter((x) => x !== t) : [...prev, t]
     );
   };
 
-  // Filter cases based on selected filters (multi-select)
+  // Filter logic
   let filteredCases = MOCK_CASES;
-  
-  // If we have selected filters from the tree, apply them
+
   if (selectedFilters.length > 0) {
-    filteredCases = filteredCases.filter((c) => {
-      // Match against department, tags, or category
-      return selectedFilters.some((f) => 
-        c.department.includes(f) || 
-        c.tags.some(t => t.includes(f)) || 
+    const filtered = filteredCases.filter((c) =>
+      selectedFilters.some((f) =>
+        c.department.includes(f) ||
+        c.tags.some(t => t.includes(f)) ||
         c.category.includes(f) ||
         f.includes(c.department)
-      );
-    });
-    // If strict filtering yields nothing, show all (graceful fallback)
-    if (filteredCases.length === 0) {
-      filteredCases = MOCK_CASES;
-    }
+      )
+    );
+    if (filtered.length > 0) filteredCases = filtered;
   }
 
-  // Content type filter
+  if (selectedDomain !== "全部领域") {
+    const filtered = filteredCases.filter((c) =>
+      c.tags.some(t => t.includes(selectedDomain)) || c.category.includes(selectedDomain)
+    );
+    if (filtered.length > 0) filteredCases = filtered;
+  }
+
   if (selectedContentTypes.length > 0) {
     filteredCases = filteredCases.filter((c) =>
       selectedContentTypes.some((t) => c.category.includes(t))
     );
   }
 
-  // Search filter
   const searchFiltered = searchQuery
     ? filteredCases.filter((c) =>
         c.title.includes(searchQuery) || c.summary.includes(searchQuery)
@@ -123,55 +104,76 @@ const KnowledgeList = () => {
       <div className="max-w-[1400px] mx-auto flex">
         {/* Left sidebar */}
         <aside className="w-[260px] shrink-0 border-r border-border p-5 hidden lg:flex flex-col sticky top-14 h-[calc(100vh-56px)] overflow-y-auto">
-          <Link
-            to="/"
-            className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground mb-5 transition-colors"
-          >
-            <ArrowLeft className="w-4 h-4" /> 返回首页
-          </Link>
+          {/* Selected filters at top */}
+          {selectedFilters.length > 0 && (
+            <div className="mb-5 p-3 rounded-lg bg-accent/50">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-medium text-foreground">已选条件</span>
+                <button
+                  onClick={() => setSelectedFilters([])}
+                  className="text-xs text-primary hover:text-primary/80"
+                >
+                  清空
+                </button>
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                {selectedFilters.map((f) => (
+                  <span
+                    key={f}
+                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md border border-primary/20 bg-primary/5 text-primary text-xs font-medium"
+                  >
+                    {f}
+                    <button onClick={() => removeFilter(f)} className="hover:text-primary/70">
+                      <X className="w-3 h-3" />
+                    </button>
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
 
-          {/* View tabs */}
-          <div className="flex rounded-lg border border-border mb-5 overflow-hidden">
-            <button
-              onClick={() => setViewTab("domain")}
-              className={`flex-1 py-2 text-sm font-medium transition-colors ${
-                viewTab === "domain"
-                  ? "bg-primary/10 text-primary"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              领域视图
-            </button>
-            <button
-              onClick={() => setViewTab("bgbu")}
-              className={`flex-1 py-2 text-sm font-medium transition-colors ${
-                viewTab === "bgbu"
-                  ? "bg-primary/10 text-primary"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              BGBU视图
-            </button>
+          {/* Domain section */}
+          <div className="mb-5">
+            <div className="flex items-center gap-2 mb-3">
+              <Layers className="w-4 h-4 text-primary" />
+              <span className="text-sm font-semibold text-foreground">知识领域</span>
+            </div>
+            <div className="space-y-0.5">
+              {DOMAIN_ITEMS.map((item) => {
+                const IconComp = item.icon;
+                const isActive = selectedDomain === item.label;
+                return (
+                  <button
+                    key={item.label}
+                    onClick={() => setSelectedDomain(item.label)}
+                    className={`flex items-center gap-2.5 w-full px-3 py-2 rounded-md text-sm transition-colors ${
+                      isActive
+                        ? "bg-primary/10 text-primary font-medium"
+                        : "text-muted-foreground hover:text-foreground hover:bg-accent"
+                    }`}
+                  >
+                    <IconComp className="w-4 h-4" strokeWidth={1.5} />
+                    {item.label}
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
           {/* Org tree */}
           <div className="mb-5">
-            <p className="text-xs text-muted-foreground mb-2">
-              {viewTab === "bgbu" ? "组织架构" : "领域分类"}
-            </p>
-            <div className="space-y-1">
-              {tree.map((group) => {
+            <div className="flex items-center gap-2 mb-3">
+              <Building2 className="w-4 h-4 text-primary" />
+              <span className="text-sm font-semibold text-foreground">组织架构</span>
+            </div>
+            <div className="space-y-0.5">
+              {ORG_TREE.map((group) => {
                 const isExpanded = expandedGroups.includes(group.label);
-                const isGroupSelected = selectedFilters.includes(group.label);
                 return (
                   <div key={group.label}>
                     <button
                       onClick={() => toggleGroup(group.label)}
-                      className={`flex items-center justify-between w-full px-3 py-2 rounded-md text-sm transition-colors ${
-                        isGroupSelected
-                          ? "text-primary font-medium"
-                          : "text-foreground hover:bg-accent"
-                      }`}
+                      className="flex items-center justify-between w-full px-3 py-2 rounded-md text-sm font-medium text-foreground hover:bg-accent transition-colors"
                     >
                       {group.label}
                       {isExpanded ? (
@@ -181,7 +183,7 @@ const KnowledgeList = () => {
                       )}
                     </button>
                     {isExpanded && (
-                      <div className="ml-4 space-y-0.5 mt-0.5">
+                      <div className="ml-3 space-y-0.5 mt-0.5 border-l-2 border-border pl-3">
                         {group.children.map((child) => {
                           const isSelected = selectedFilters.includes(child);
                           return (
@@ -205,75 +207,19 @@ const KnowledgeList = () => {
               })}
             </div>
           </div>
-
-          {/* Filters at bottom */}
-          <div className="mt-auto pt-4 border-t border-border space-y-4">
-            <p className="text-sm font-semibold text-foreground">筛选条件</p>
-
-            <div>
-              <p className="text-xs text-muted-foreground mb-1">发布时间</p>
-              <div className="relative">
-                <button
-                  onClick={() => setShowDateDropdown(!showDateDropdown)}
-                  className="flex items-center justify-between w-full px-3 py-2 rounded-md border border-border text-sm text-foreground hover:border-primary/40 transition-colors"
-                >
-                  {dateFilter}
-                  <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${showDateDropdown ? "rotate-180" : ""}`} />
-                </button>
-                {showDateDropdown && (
-                  <div className="absolute left-0 right-0 top-full mt-1 bg-card border border-border rounded-md shadow-md z-10">
-                    {DATE_OPTIONS.map((opt) => (
-                      <button
-                        key={opt}
-                        onClick={() => { setDateFilter(opt); setShowDateDropdown(false); }}
-                        className={`block w-full text-left px-3 py-2 text-sm transition-colors ${
-                          dateFilter === opt ? "text-primary bg-primary/5" : "text-foreground hover:bg-accent"
-                        }`}
-                      >
-                        {opt}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <div>
-              <p className="text-xs text-muted-foreground mb-2">内容类型</p>
-              <div className="flex flex-wrap gap-2">
-                {CONTENT_TYPES.map((t) => {
-                  const isActive = selectedContentTypes.includes(t);
-                  return (
-                    <button
-                      key={t}
-                      onClick={() => toggleContentType(t)}
-                      className={`px-3 py-1.5 rounded-md text-sm transition-colors ${
-                        isActive
-                          ? "bg-foreground text-card font-medium"
-                          : "bg-accent text-foreground hover:bg-accent/80"
-                      }`}
-                    >
-                      {t}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
         </aside>
 
         {/* Main content */}
         <div className="flex-1 min-w-0 p-6">
-          {/* Header */}
-          <div className="flex items-start justify-between mb-6">
-            <div>
-              <h1 className="text-xl font-semibold text-foreground">{filterLabel}</h1>
-              <p className="text-sm text-muted-foreground mt-1">
-                正在浏览 {filterLabel} 相关内容
-              </p>
-            </div>
+          {/* Header bar */}
+          <div className="flex items-center justify-between mb-4">
+            <Link
+              to="/"
+              className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <ArrowLeft className="w-4 h-4" /> 返回首页
+            </Link>
             <div className="flex items-center gap-3">
-              {/* Search */}
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <input
@@ -284,7 +230,6 @@ const KnowledgeList = () => {
                   className="pl-9 pr-4 py-2 rounded-md border border-border bg-card text-sm text-foreground placeholder:text-muted-foreground w-[200px] focus:outline-none focus:border-primary/40"
                 />
               </div>
-              {/* Sort */}
               <div className="relative">
                 <button
                   onClick={() => setShowSortDropdown(!showSortDropdown)}
@@ -312,31 +257,54 @@ const KnowledgeList = () => {
             </div>
           </div>
 
-          {/* Selected filters */}
+          {/* Active filter tags in content area */}
           {selectedFilters.length > 0 && (
-            <div className="flex flex-wrap gap-2 mb-5">
+            <div className="flex flex-wrap items-center gap-2 mb-5 pb-4 border-b border-border">
+              <span className="text-xs text-muted-foreground mr-1">筛选:</span>
               {selectedFilters.map((f) => (
                 <span
                   key={f}
-                  className="inline-flex items-center gap-1 px-3 py-1 rounded-md bg-primary/10 text-primary text-xs font-medium"
+                  className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium"
                 >
                   {f}
-                  <button
-                    onClick={() => toggleFilter(f)}
-                    className="hover:text-primary/70 ml-1"
-                  >
-                    ×
+                  <button onClick={() => removeFilter(f)} className="hover:text-primary/70">
+                    <X className="w-3 h-3" />
                   </button>
                 </span>
               ))}
               <button
                 onClick={() => setSelectedFilters([])}
-                className="text-xs text-muted-foreground hover:text-foreground"
+                className="text-xs text-muted-foreground hover:text-foreground ml-1"
               >
                 清除全部
               </button>
             </div>
           )}
+
+          {/* Content type tabs */}
+          <div className="flex items-center gap-2 mb-5">
+            {CONTENT_TYPES.map((t) => {
+              const isActive = selectedContentTypes.includes(t);
+              return (
+                <button
+                  key={t}
+                  onClick={() => toggleContentType(t)}
+                  className={`px-4 py-1.5 rounded-full text-sm transition-colors ${
+                    isActive
+                      ? "bg-primary text-primary-foreground font-medium"
+                      : "bg-accent text-foreground hover:bg-accent/80"
+                  }`}
+                >
+                  {t}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Results count */}
+          <p className="text-xs text-muted-foreground mb-4">
+            共 {searchFiltered.length} 条结果
+          </p>
 
           {/* Article list */}
           <div className="space-y-0">
@@ -353,7 +321,6 @@ const KnowledgeList = () => {
                 >
                   <div className="flex gap-5">
                     <div className="flex-1 min-w-0">
-                      {/* Category + time */}
                       <div className="flex items-center gap-2 mb-2">
                         <span className="px-2 py-0.5 rounded text-xs font-medium bg-primary/10 text-primary">
                           {c.category}
@@ -361,18 +328,12 @@ const KnowledgeList = () => {
                         <span className="text-xs text-muted-foreground">{c.createdAt}</span>
                         <span className="text-xs text-muted-foreground">· {c.department}</span>
                       </div>
-
-                      {/* Title */}
                       <h3 className="text-base font-semibold text-foreground mb-2 line-clamp-1">
                         {c.title}
                       </h3>
-
-                      {/* Summary */}
                       <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
                         {c.summary}
                       </p>
-
-                      {/* Author + stats + tags */}
                       <div className="flex items-center gap-4 text-xs text-muted-foreground">
                         <span className="flex items-center gap-1.5">
                           <span className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center text-primary text-[10px] font-bold">
@@ -391,8 +352,6 @@ const KnowledgeList = () => {
                         ))}
                       </div>
                     </div>
-
-                    {/* Thumbnail for some items */}
                     {i % 3 === 0 && (
                       <div className="w-[160px] h-[100px] rounded-lg bg-accent shrink-0 overflow-hidden">
                         <div className="w-full h-full bg-gradient-to-br from-primary/5 to-primary/15 flex items-center justify-center text-primary/30 text-xs">

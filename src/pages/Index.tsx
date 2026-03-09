@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Flame, Users, Sparkles, MessageSquare, Home as HomeIcon, ChevronDown, ChevronRight } from "lucide-react";
+import { Flame, Users, Sparkles, MessageSquare, Home as HomeIcon, ChevronDown, ChevronRight, Briefcase, ShoppingCart, Truck, Cpu, Heart, Factory, Building2, Shield, TrendingUp, Code2, CheckCircle2, CreditCard, Lightbulb, BarChart3 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import AppLayout from "@/components/AppLayout";
 import CaseCard from "@/components/CaseCard";
@@ -40,45 +40,47 @@ const NAV_ITEMS = [
   { label: "关注", icon: Users },
 ];
 
-interface SectionItem {
+interface BGBUItem {
   label: string;
-  matchDept?: string;
-  matchTags?: string[];
+  icon: typeof Briefcase;
+  posts: number;
 }
 
 interface SidebarSection {
   title: string;
-  items: SectionItem[];
+  items: BGBUItem[];
 }
 
 const BGBU_SECTION: SidebarSection = {
   title: "BGBU专区",
   items: [
-    { label: "京东零售", matchDept: "AI中台" },
-    { label: "京东物流", matchDept: "数据平台" },
-    { label: "京东科技", matchDept: "研发效能" },
-    { label: "京东健康", matchDept: "项目管理部" },
-    { label: "京东工业", matchDept: "UX设计" },
-    { label: "京东产发", matchDept: "基础设施" },
+    { label: "京东职能", icon: Briefcase, posts: 1005 },
+    { label: "京东零售", icon: ShoppingCart, posts: 5499 },
+    { label: "京东物流", icon: Truck, posts: 8688 },
+    { label: "京东科技", icon: Cpu, posts: 1411 },
+    { label: "京东健康", icon: Heart, posts: 546 },
+    { label: "京东工业", icon: Factory, posts: 135 },
+    { label: "京东产发", icon: Building2, posts: 337 },
+    { label: "京东保险", icon: Shield, posts: 190 },
   ],
 };
 
 const DOMAIN_SECTION: SidebarSection = {
   title: "领域专区",
   items: [
-    { label: "营销管理", matchTags: ["客户案例"] },
-    { label: "研发管理", matchTags: ["技术架构"] },
-    { label: "质量管理", matchTags: ["流程优化"] },
-    { label: "采购管理", matchTags: ["数据分析"] },
-    { label: "产品管理", matchTags: ["产品设计"] },
-    { label: "运营管理", matchTags: ["最佳实践"] },
+    { label: "营销管理", icon: TrendingUp, posts: 2340 },
+    { label: "研发管理", icon: Code2, posts: 1890 },
+    { label: "质量管理", icon: CheckCircle2, posts: 1256 },
+    { label: "采购管理", icon: CreditCard, posts: 987 },
+    { label: "产品管理", icon: Lightbulb, posts: 1654 },
+    { label: "运营管理", icon: BarChart3, posts: 1123 },
   ],
 };
 
 const DATE_OPTIONS = ["全部时间", "最近一周", "最近一月", "最近三月"];
 
-// Hover popover section component
-const SidebarSectionWithPopover = ({ section }: { section: SidebarSection }) => {
+// Hover popover section component - matches reference image with icon grid
+const SidebarSectionWithPopover = ({ section, sectionType }: { section: SidebarSection; sectionType: "bgbu" | "domain" }) => {
   const [hovered, setHovered] = useState(false);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const navigate = useNavigate();
@@ -91,15 +93,17 @@ const SidebarSectionWithPopover = ({ section }: { section: SidebarSection }) => 
     timeoutRef.current = setTimeout(() => setHovered(false), 200);
   };
 
-  const navigateToList = (item: SectionItem) => {
-    const type = item.matchDept ? "dept" : "tags";
-    const value = item.matchDept || (item.matchTags || []).join(",");
+  const navigateToList = (item: BGBUItem) => {
+    const type = sectionType === "bgbu" ? "dept" : "tags";
+    const value = item.label;
     navigate(`/knowledge?type=${type}&value=${encodeURIComponent(value)}&label=${encodeURIComponent(item.label)}`);
   };
 
+  const totalPosts = section.items.reduce((sum, item) => sum + item.posts, 0);
+
   return (
     <div
-      className="relative mb-3"
+      className="relative mb-1"
       onMouseEnter={handleEnter}
       onMouseLeave={handleLeave}
     >
@@ -108,6 +112,19 @@ const SidebarSectionWithPopover = ({ section }: { section: SidebarSection }) => 
         <ChevronRight className="w-3.5 h-3.5 text-muted-foreground" />
       </button>
 
+      {/* Show first few items inline */}
+      <div className="space-y-0.5 mb-1">
+        {section.items.slice(0, 4).map((item) => (
+          <button
+            key={item.label}
+            onClick={() => navigateToList(item)}
+            className="flex items-center gap-2 w-full px-3 py-1.5 rounded-md text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+          >
+            {item.label}
+          </button>
+        ))}
+      </div>
+
       <AnimatePresence>
         {hovered && (
           <motion.div
@@ -115,24 +132,34 @@ const SidebarSectionWithPopover = ({ section }: { section: SidebarSection }) => 
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -4 }}
             transition={{ duration: 0.15 }}
-            className="absolute left-full top-0 ml-1 w-[280px] bg-card border border-border rounded-lg shadow-lg z-50 p-4"
+            className="absolute left-full top-0 ml-1 w-[420px] bg-card border border-border rounded-lg shadow-lg z-50 p-5"
             onMouseEnter={handleEnter}
             onMouseLeave={handleLeave}
           >
-            <p className="text-sm font-semibold text-foreground mb-3">{section.title}</p>
-            <div className="grid grid-cols-2 gap-2">
-              {section.items.map((item) => (
-                <button
-                  key={item.label}
-                  onClick={() => navigateToList(item)}
-                  className="flex items-center gap-2 px-3 py-2.5 rounded-md text-sm text-foreground hover:bg-primary/5 hover:text-primary transition-colors text-left"
-                >
-                  <span className="w-8 h-8 rounded-md bg-primary/10 flex items-center justify-center text-primary text-xs font-bold shrink-0">
-                    {item.label.slice(0, 2)}
-                  </span>
-                  <span>{item.label}</span>
-                </button>
-              ))}
+            {/* Header */}
+            <div className="flex items-baseline gap-3 mb-4">
+              <p className="text-base font-semibold text-foreground">{section.title}</p>
+              <span className="text-xs text-muted-foreground">共收录 {totalPosts.toLocaleString()} 条内容</span>
+            </div>
+
+            {/* Icon grid */}
+            <div className="grid grid-cols-4 gap-4">
+              {section.items.map((item) => {
+                const IconComp = item.icon;
+                return (
+                  <button
+                    key={item.label}
+                    onClick={() => navigateToList(item)}
+                    className="flex flex-col items-center gap-2 p-3 rounded-lg hover:bg-accent transition-colors group"
+                  >
+                    <span className="w-11 h-11 rounded-lg bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary/15 transition-colors">
+                      <IconComp className="w-5 h-5" strokeWidth={1.5} />
+                    </span>
+                    <span className="text-sm text-foreground font-medium">{item.label}</span>
+                    <span className="text-xs text-muted-foreground">帖子 {item.posts}</span>
+                  </button>
+                );
+              })}
             </div>
           </motion.div>
         )}
@@ -146,6 +173,8 @@ const Index = () => {
   const [activeNav, setActiveNav] = useState("推荐");
   const [dateFilter, setDateFilter] = useState("全部时间");
   const [showDateDropdown, setShowDateDropdown] = useState(false);
+  const [marqueeRow1Paused, setMarqueeRow1Paused] = useState(false);
+  const [marqueeRow2Paused, setMarqueeRow2Paused] = useState(false);
 
   const activeZoneObj = HOT_ZONES.find(z => z.label === activeZone);
 
@@ -166,8 +195,7 @@ const Index = () => {
       <div className="flex max-w-[1400px] mx-auto">
         {/* Left sidebar */}
         <aside className="w-[200px] shrink-0 border-r border-border p-4 hidden lg:flex flex-col sticky top-14 h-[calc(100vh-56px)] overflow-visible">
-          <div className="mb-6">
-            <p className="text-xs text-muted-foreground mb-2 px-3">发现</p>
+          <div className="mb-4">
             <div className="space-y-0.5">
               {NAV_ITEMS.map((item) => (
                 <button
@@ -187,13 +215,12 @@ const Index = () => {
           </div>
 
           {/* BGBU & Domain sections with hover popover */}
-          <SidebarSectionWithPopover section={BGBU_SECTION} />
-          <SidebarSectionWithPopover section={DOMAIN_SECTION} />
+          <SidebarSectionWithPopover section={BGBU_SECTION} sectionType="bgbu" />
+          <SidebarSectionWithPopover section={DOMAIN_SECTION} sectionType="domain" />
 
           {/* Date filter at bottom */}
           <div className="mt-auto pt-4 border-t border-border">
-            <p className="text-xs text-muted-foreground mb-2 px-3">筛选条件</p>
-            <p className="text-xs text-muted-foreground px-3 mb-1">发布时间</p>
+            <p className="text-xs text-muted-foreground mb-1 px-3">发布时间</p>
             <div className="relative px-3">
               <button
                 onClick={() => setShowDateDropdown(!showDateDropdown)}
@@ -232,10 +259,17 @@ const Index = () => {
             <h1 className="text-2xl font-semibold text-foreground mb-5 text-center">为你推荐</h1>
 
             {/* Row 1 - scrolls left */}
-            <div className="relative mb-3 overflow-hidden">
+            <div
+              className="relative mb-3 overflow-hidden"
+              onMouseEnter={() => setMarqueeRow1Paused(true)}
+              onMouseLeave={() => setMarqueeRow1Paused(false)}
+            >
               <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-background to-transparent z-10" />
               <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-background to-transparent z-10" />
-              <div className="flex gap-3 animate-marquee-left">
+              <div
+                className="flex gap-3 animate-marquee-left"
+                style={marqueeRow1Paused ? { animationPlayState: "paused" } : undefined}
+              >
                 {[...RECOMMENDED_TOPICS_ROW1, ...RECOMMENDED_TOPICS_ROW1].map((topic, i) => (
                   <Link
                     key={`r1-${i}`}
@@ -249,10 +283,17 @@ const Index = () => {
             </div>
 
             {/* Row 2 - scrolls left (slower) */}
-            <div className="relative overflow-hidden">
+            <div
+              className="relative overflow-hidden"
+              onMouseEnter={() => setMarqueeRow2Paused(true)}
+              onMouseLeave={() => setMarqueeRow2Paused(false)}
+            >
               <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-background to-transparent z-10" />
               <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-background to-transparent z-10" />
-              <div className="flex gap-3 animate-marquee-left-slow">
+              <div
+                className="flex gap-3 animate-marquee-left-slow"
+                style={marqueeRow2Paused ? { animationPlayState: "paused" } : undefined}
+              >
                 {[...RECOMMENDED_TOPICS_ROW2, ...RECOMMENDED_TOPICS_ROW2].map((topic, i) => (
                   <Link
                     key={`r2-${i}`}
