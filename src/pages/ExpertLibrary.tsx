@@ -221,22 +221,13 @@ const ExpertLibrary = () => {
           <aside className="w-[280px] shrink-0 border-l border-border p-5 hidden xl:block sticky top-14 h-[calc(100vh-56px)] overflow-y-auto space-y-5">
             {/* Ability radar */}
             <div>
-              <h3 className="font-semibold text-sm text-foreground mb-4">能力雷达</h3>
-              <div className="space-y-3">
+              <h3 className="font-semibold text-sm text-foreground mb-3">能力图谱</h3>
+              {renderRadarChart(abilities)}
+              <div className="grid grid-cols-2 gap-2 mt-3">
                 {abilities.map((a) => (
-                  <div key={a.name}>
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="text-sm text-foreground">{a.name}</span>
-                      <span className="text-sm font-semibold text-primary">{a.score}%</span>
-                    </div>
-                    <div className="w-full h-2 rounded-full bg-accent overflow-hidden">
-                      <motion.div
-                        initial={{ width: 0 }}
-                        animate={{ width: `${a.score}%` }}
-                        transition={{ duration: 0.8, delay: 0.2 }}
-                        className="h-full rounded-full bg-primary"
-                      />
-                    </div>
+                  <div key={a.name} className="flex items-center justify-between text-xs">
+                    <span className="text-muted-foreground">{a.name}</span>
+                    <span className="font-medium text-foreground">{a.score}</span>
                   </div>
                 ))}
               </div>
