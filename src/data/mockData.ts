@@ -57,10 +57,14 @@ export const MOCK_CASES: CaseItem[] = [
 ];
 
 export const MOCK_EXPERTS: Expert[] = [
-  { id: "1", name: "张明", title: "AI技术专家", department: "AI中台", avatar: "", domains: ["自然语言处理", "大模型应用", "智能客服"], skills: ["Prompt Engineering", "RAG", "LangChain", "向量数据库"], caseCount: 12, followers: 386, bio: "10年AI领域经验，专注于大模型在企业场景的落地应用。" },
-  { id: "2", name: "李芳", title: "高级项目经理", department: "项目管理部", avatar: "", domains: ["项目管理", "敏捷方法", "跨部门协作"], skills: ["OKR", "Scrum", "风险管理", "干系人管理"], caseCount: 8, followers: 245, bio: "PMP认证，擅长复杂项目的全生命周期管理。" },
-  { id: "3", name: "王磊", title: "数据架构师", department: "数据平台", avatar: "", domains: ["知识图谱", "数据架构", "数据治理"], skills: ["Neo4j", "数据建模", "ETL", "数据质量"], caseCount: 15, followers: 512, bio: "深耕企业数据平台建设，知识图谱领域技术专家。" },
-  { id: "4", name: "孙婷", title: "UX设计负责人", department: "UX设计", avatar: "", domains: ["用户体验", "交互设计", "设计系统"], skills: ["Figma", "用户研究", "可用性测试", "设计规范"], caseCount: 6, followers: 189, bio: "关注B端产品的用户体验提升，推动设计系统建设。" },
+  { id: "1", name: "Sam Chen", title: "首席架构师", department: "技术委员会", avatar: "", domains: ["云架构", "微服务", "DevOps"], skills: ["Java", "Python", "React", "DevOps", "Agile"], caseCount: 128, followers: 2360, bio: "15年技术架构经验，主导多个企业级平台从0到1建设。" },
+  { id: "2", name: "Eric Wang", title: "AI技术专家", department: "AI中台", avatar: "", domains: ["自然语言处理", "大模型应用", "智能客服"], skills: ["Prompt Engineering", "RAG", "LangChain", "向量数据库"], caseCount: 42, followers: 1580, bio: "10年AI领域经验，专注于大模型在企业场景的落地应用。" },
+  { id: "3", name: "Richard Li", title: "数据架构师", department: "数据平台", avatar: "", domains: ["知识图谱", "数据架构", "数据治理"], skills: ["Neo4j", "数据建模", "ETL", "Spark"], caseCount: 35, followers: 1120, bio: "深耕企业数据平台建设，知识图谱领域技术专家。" },
+  { id: "4", name: "Sophie Zhang", title: "高级项目经理", department: "项目管理部", avatar: "", domains: ["项目管理", "敏捷方法", "跨部门协作"], skills: ["OKR", "Scrum", "风险管理", "干系人管理"], caseCount: 18, followers: 890, bio: "PMP认证，擅长复杂项目的全生命周期管理。" },
+  { id: "5", name: "Kevin Liu", title: "产品总监", department: "产品部", avatar: "", domains: ["产品设计", "用户增长", "商业化"], skills: ["用户研究", "数据分析", "A/B测试", "商业模型"], caseCount: 23, followers: 760, bio: "从0到1打造过多款百万级用户产品，擅长增长策略。" },
+  { id: "6", name: "Amy Wu", title: "UX设计负责人", department: "UX设计", avatar: "", domains: ["用户体验", "交互设计", "设计系统"], skills: ["Figma", "用户研究", "可用性测试", "设计规范"], caseCount: 14, followers: 530, bio: "关注B端产品的用户体验提升，推动设计系统建设。" },
+  { id: "7", name: "David Zhao", title: "运维架构师", department: "基础设施", avatar: "", domains: ["云原生", "SRE", "安全合规"], skills: ["Kubernetes", "Terraform", "监控告警", "CI/CD"], caseCount: 20, followers: 680, bio: "主导企业云原生转型，构建高可用基础设施体系。" },
+  { id: "8", name: "Grace Lin", title: "市场营销总监", department: "市场部", avatar: "", domains: ["品牌营销", "数字营销", "内容运营"], skills: ["SEO", "社媒运营", "营销自动化", "数据驱动"], caseCount: 11, followers: 420, bio: "深耕B2B营销领域，擅长品效合一的增长打法。" },
 ];
 
 export const NAV_ITEMS = [
