@@ -268,9 +268,11 @@ const ExpertLibrary = () => {
               >
                 {/* Top row: Avatar + EXPERT badge */}
                 <div className="flex items-start justify-between mb-4">
-                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center text-primary font-bold text-2xl border-2 border-card shadow-sm">
-                    {expert.name[0]}
-                  </div>
+                  <img
+                    src={AVATAR_MAP[expert.id]}
+                    alt={expert.name}
+                    className="w-16 h-16 rounded-full object-cover border-2 border-card shadow-sm"
+                  />
                   <span className="px-2 py-0.5 rounded text-xs font-bold tracking-wider text-primary">
                     EXPERT
                   </span>
