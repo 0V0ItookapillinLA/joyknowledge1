@@ -19,7 +19,7 @@ const TopNav = () => {
           <div className="w-7 h-7 rounded-lg bg-primary flex items-center justify-center">
             <span className="text-primary-foreground font-bold text-sm">J</span>
           </div>
-          <span className="font-semibold text-base text-foreground">JoyKnowledge>
+          <span className="font-semibold text-base text-foreground">JoyKnowledge</span>
         </Link>
 
         {/* Nav links */}
