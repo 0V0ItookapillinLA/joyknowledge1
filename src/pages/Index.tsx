@@ -266,7 +266,7 @@ const Index = () => {
                 animate={{ opacity: 1, y: 0 }}
                 className="py-8 px-6 overflow-hidden"
               >
-                <h1 className="text-2xl font-semibold text-foreground mb-5 text-center">为你推荐</h1>
+                <h1 className="text-2xl font-semibold text-foreground mb-5 text-center">你可能需要</h1>
 
                 {/* Row 1 */}
                 <div
