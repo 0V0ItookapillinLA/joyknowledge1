@@ -191,7 +191,7 @@ const ExpertLibrary = () => {
   // ========== List View ==========
   return (
     <AppLayout>
-      <div className="flex">
+       <div className="flex max-w-[1400px] mx-auto">
         {/* Left sidebar */}
         <aside className="w-[220px] shrink-0 border-r border-border p-5 hidden lg:block sticky top-14 h-[calc(100vh-56px)] overflow-y-auto">
           <h3 className="font-semibold text-sm text-foreground mb-3">专家领域</h3>
