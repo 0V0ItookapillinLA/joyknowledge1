@@ -246,7 +246,10 @@ const ExpertLibrary = () => {
               <p className="text-xs text-card/70 mb-4 text-center">
                 与 {selectedExpert.name} 1 对 1 交流，解决您的技术难题。
               </p>
-              <button className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-card text-foreground text-sm font-medium hover:bg-card/90 transition-colors">
+              <button
+                onClick={() => navigate(`/messages?to=${encodeURIComponent(selectedExpert.name)}`)}
+                className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-card text-foreground text-sm font-medium hover:bg-card/90 transition-colors"
+              >
                 <MessageCircle className="w-4 h-4" /> 咨询一下
               </button>
             </div>
