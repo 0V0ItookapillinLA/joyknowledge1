@@ -17,13 +17,13 @@ const RECOMMENDED_TOPICS = [
 ];
 
 const HOT_ZONES = [
-  { label: "数字化转型", emoji: "🚀" },
-  { label: "降本增效", emoji: "📊" },
-  { label: "客户案例", emoji: "🤝" },
-  { label: "项目复盘", emoji: "📋" },
-  { label: "创新实践", emoji: "💡" },
-  { label: "供应链优化", emoji: "🏗️" },
-  { label: "敏捷开发", emoji: "⚡" },
+  { label: "AI应用", emoji: "🚀", matchTags: ["AI应用"] },
+  { label: "降本增效", emoji: "📊", matchTags: ["流程优化", "数据分析"] },
+  { label: "客户案例", emoji: "🤝", matchTags: ["客户案例"] },
+  { label: "项目复盘", emoji: "📋", matchTags: ["项目复盘"] },
+  { label: "创新实践", emoji: "💡", matchTags: ["最佳实践", "产品设计"] },
+  { label: "技术架构", emoji: "🏗️", matchTags: ["技术架构"] },
+  { label: "团队管理", emoji: "⚡", matchTags: ["团队管理"] },
 ];
 
 const NAV_ITEMS = [
