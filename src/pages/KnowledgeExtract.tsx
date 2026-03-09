@@ -183,10 +183,12 @@ const KnowledgeExtract = () => {
   /* ───── Mode entry ───── */
   const enterWorkspace = (mode: ExtractMode) => {
     setExtractMode(mode);
+    if (mode === "quick") {
+      setAppMode("quick-upload");
+      return;
+    }
     setAppMode("workspace");
-    const welcome: ChatMessage = mode === "deep"
-      ? { id: "1", role: "assistant", content: "你好！我将通过苏格拉底式提问来帮你挖掘**隐性知识** 🧠\n\n我已解析了你的文件，首先想问：\n\n在推动这个研发效能项目时，**最初的动机是什么**？是来自上级要求，还是你自己观察到了某些痛点？" }
-      : { id: "1", role: "assistant", content: "你好！我已完成文件解析 📄\n\n**已识别到的核心内容：**\n- 🔧 研发效能提升（DevOps 流水线优化）\n- 📊 关键指标变化（发布周期缩短 40%）\n- 🎯 团队协作改进\n\n你可以补充更多信息，也可以直接在右侧选择工具后点击「开始生成」。" };
+    const welcome: ChatMessage = { id: "1", role: "assistant", content: "你好！我将通过苏格拉底式提问来帮你挖掘**隐性知识** 🧠\n\n我已解析了你的文件，首先想问：\n\n在推动这个研发效能项目时，**最初的动机是什么**？是来自上级要求，还是你自己观察到了某些痛点？" };
     setChatMessages([
       { id: "sys", role: "system", content: `已自动解析 ${sources.filter(s => s.selected).length} 个来源文件` },
       welcome,
