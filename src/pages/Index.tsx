@@ -54,10 +54,25 @@ const Index = () => {
   const [activeZone, setActiveZone] = useState<string | null>(null);
   const [activeNav, setActiveNav] = useState("推荐");
 
+  const [activeBGBU, setActiveBGBU] = useState<string | null>(null);
+  const [activeDomain, setActiveDomain] = useState<string | null>(null);
+  const [dateFilter, setDateFilter] = useState("全部时间");
+  const [showDateDropdown, setShowDateDropdown] = useState(false);
+
   const activeZoneObj = HOT_ZONES.find(z => z.label === activeZone);
-  const filteredCases = activeZoneObj
-    ? MOCK_CASES.filter((c) => c.tags.some(t => activeZoneObj.matchTags.includes(t)))
-    : MOCK_CASES;
+  const activeDomainObj = DOMAIN_ITEMS.find(d => d.label === activeDomain);
+  const activeBGBUObj = BGBU_ITEMS.find(b => b.label === activeBGBU);
+
+  let filteredCases = MOCK_CASES;
+  if (activeZoneObj) {
+    filteredCases = filteredCases.filter((c) => c.tags.some(t => activeZoneObj.matchTags.includes(t)));
+  }
+  if (activeDomainObj) {
+    filteredCases = filteredCases.filter((c) => c.tags.some(t => activeDomainObj.matchTags.includes(t)));
+  }
+  if (activeBGBUObj) {
+    filteredCases = filteredCases.filter((c) => c.department === activeBGBUObj.matchDept);
+  }
 
   const trendingItems = [
     { title: "如何利用 AI 工具优化供应链效率", views: "1.2k" },
