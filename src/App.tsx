@@ -29,6 +29,7 @@ const App = () => (
           <Route path="/extract" element={<KnowledgeExtract />} />
           <Route path="/knowledge" element={<KnowledgeList />} />
           <Route path="/community" element={<Community />} />
+          <Route path="/messages" element={<Messages />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

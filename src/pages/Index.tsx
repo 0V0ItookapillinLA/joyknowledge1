@@ -5,7 +5,21 @@ import { Flame, Users, Sparkles, MessageSquare, Home as HomeIcon, ChevronDown, C
 import { motion, AnimatePresence } from "framer-motion";
 import AppLayout from "@/components/AppLayout";
 import CaseCard from "@/components/CaseCard";
-import { MOCK_CASES } from "@/data/mockData";
+import { MOCK_CASES, MOCK_EXPERTS } from "@/data/mockData";
+
+import samAvatar from "@/assets/avatars/sam.jpg";
+import ericAvatar from "@/assets/avatars/eric.jpg";
+import richardAvatar from "@/assets/avatars/richard.jpg";
+import sophieAvatar from "@/assets/avatars/sophie.jpg";
+import kevinAvatar from "@/assets/avatars/kevin.jpg";
+import amyAvatar from "@/assets/avatars/amy.jpg";
+import davidAvatar from "@/assets/avatars/david.jpg";
+import graceAvatar from "@/assets/avatars/grace.jpg";
+
+const AVATAR_MAP: Record<string, string> = {
+  "1": samAvatar, "2": ericAvatar, "3": richardAvatar, "4": sophieAvatar,
+  "5": kevinAvatar, "6": amyAvatar, "7": davidAvatar, "8": graceAvatar,
+};
 
 const RECOMMENDED_TOPICS_ROW1 = [
   "重塑护城河：AI 时代业务壁垒从\u201C数据孤岛\u201D到\u201C智能模型\u201D的跃迁",
