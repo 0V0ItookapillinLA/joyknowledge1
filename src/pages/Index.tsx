@@ -25,13 +25,13 @@ const RECOMMENDED_TOPICS_ROW2 = [
 ];
 
 const HOT_ZONES = [
-  { label: "AI应用", emoji: "🚀", matchTags: ["AI应用"] },
-  { label: "降本增效", emoji: "📊", matchTags: ["流程优化", "数据分析"] },
-  { label: "客户案例", emoji: "🤝", matchTags: ["客户案例"] },
-  { label: "项目复盘", emoji: "📋", matchTags: ["项目复盘"] },
-  { label: "创新实践", emoji: "💡", matchTags: ["最佳实践", "产品设计"] },
-  { label: "技术架构", emoji: "🏗️", matchTags: ["技术架构"] },
-  { label: "团队管理", emoji: "⚡", matchTags: ["团队管理"] },
+  { label: "HR管理", emoji: "👥", navDomain: "HR管理", navFilters: [] },
+  { label: "领导力", emoji: "🎯", navDomain: "HR管理", navFilters: ["领导力发展"] },
+  { label: "绩效管理", emoji: "📊", navDomain: "HR管理", navFilters: ["绩效管理"] },
+  { label: "组织发展", emoji: "🏢", navDomain: "HR管理", navFilters: ["组织发展"] },
+  { label: "人才招聘", emoji: "🤝", navDomain: "HR管理", navFilters: ["人才招聘"] },
+  { label: "培训赋能", emoji: "📚", navDomain: "HR管理", navFilters: ["培训赋能"] },
+  { label: "AI应用", emoji: "🚀", navDomain: "全部领域", navFilters: [] },
 ];
 
 const NAV_ITEMS = [
@@ -169,19 +169,12 @@ const SidebarSectionWithPopover = ({ section, sectionType }: { section: SidebarS
 };
 
 const Index = () => {
-  const [activeZone, setActiveZone] = useState<string | null>(null);
   const [activeNav, setActiveNav] = useState("推荐");
   const [dateFilter, setDateFilter] = useState("全部时间");
   const [showDateDropdown, setShowDateDropdown] = useState(false);
   const [marqueeRow1Paused, setMarqueeRow1Paused] = useState(false);
   const [marqueeRow2Paused, setMarqueeRow2Paused] = useState(false);
-
-  const activeZoneObj = HOT_ZONES.find(z => z.label === activeZone);
-
-  let filteredCases = MOCK_CASES;
-  if (activeZoneObj) {
-    filteredCases = filteredCases.filter((c) => c.tags.some(t => activeZoneObj.matchTags.includes(t)));
-  }
+  const navigate = useNavigate();
 
   const trendingItems = [
     { title: "如何利用 AI 工具优化供应链效率", views: "1.2k" },
@@ -316,12 +309,11 @@ const Index = () => {
               {HOT_ZONES.map((zone) => (
                 <button
                   key={zone.label}
-                  onClick={() => setActiveZone(activeZone === zone.label ? null : zone.label)}
-                  className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-md border text-sm transition-colors ${
-                    activeZone === zone.label
-                      ? "border-primary bg-primary/5 text-primary"
-                      : "border-border bg-card text-foreground hover:border-primary/40"
-                  }`}
+                  onClick={() => {
+                    const filters = zone.navFilters.length > 0 ? zone.navFilters.join(",") : "";
+                    navigate(`/knowledge?type=domain&value=${encodeURIComponent(zone.navDomain)}&label=${encodeURIComponent(zone.label)}${filters ? `&filters=${encodeURIComponent(filters)}` : ""}`);
+                  }}
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-md border border-border bg-card text-sm text-foreground hover:border-primary/40 hover:bg-primary/5 transition-colors"
                 >
                   <span>{zone.emoji}</span>
                   {zone.label}
@@ -332,7 +324,7 @@ const Index = () => {
 
           <div className="px-6 pb-8">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {filteredCases.slice(0, 4).map((c, i) => (
+              {MOCK_CASES.slice(0, 4).map((c, i) => (
                 <motion.div
                   key={c.id}
                   initial={{ opacity: 0, y: 8 }}
@@ -344,9 +336,9 @@ const Index = () => {
               ))}
             </div>
 
-            {filteredCases.length > 4 && (
+            {MOCK_CASES.length > 4 && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                {filteredCases.slice(4, 8).map((c, i) => (
+                {MOCK_CASES.slice(4, 8).map((c, i) => (
                   <motion.div
                     key={c.id}
                     initial={{ opacity: 0, y: 8 }}
