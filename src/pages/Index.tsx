@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Flame, Users, Sparkles, ArrowRight, MessageSquare, Home as HomeIcon, TrendingUp, Search } from "lucide-react";
+import { Flame, Users, Sparkles, ArrowRight, MessageSquare, Home as HomeIcon, TrendingUp, Search, ChevronDown } from "lucide-react";
 import { motion } from "framer-motion";
 import AppLayout from "@/components/AppLayout";
 import CaseCard from "@/components/CaseCard";
@@ -32,14 +32,23 @@ const NAV_ITEMS = [
   { label: "关注", icon: Users },
 ];
 
-const CATEGORY_ITEMS = [
-  { label: "营销管理", icon: "📣" },
-  { label: "研发管理", icon: "💻" },
-  { label: "质量管理", icon: "✅" },
-  { label: "采购管理", icon: "🛒" },
-  { label: "产品管理", icon: "📦" },
-  { label: "运营管理", icon: "📈" },
+const BGBU_ITEMS = [
+  { label: "AI中台", matchDept: "AI中台" },
+  { label: "数据平台", matchDept: "数据平台" },
+  { label: "研发效能", matchDept: "研发效能" },
+  { label: "项目管理", matchDept: "项目管理部" },
 ];
+
+const DOMAIN_ITEMS = [
+  { label: "营销管理", icon: "📣", matchTags: ["客户案例"] },
+  { label: "研发管理", icon: "💻", matchTags: ["技术架构"] },
+  { label: "质量管理", icon: "✅", matchTags: ["流程优化"] },
+  { label: "采购管理", icon: "🛒", matchTags: ["数据分析"] },
+  { label: "产品管理", icon: "📦", matchTags: ["产品设计"] },
+  { label: "运营管理", icon: "📈", matchTags: ["最佳实践"] },
+];
+
+const DATE_OPTIONS = ["全部时间", "最近一周", "最近一月", "最近三月"];
 
 const Index = () => {
   const [activeZone, setActiveZone] = useState<string | null>(null);
