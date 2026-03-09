@@ -169,19 +169,12 @@ const SidebarSectionWithPopover = ({ section, sectionType }: { section: SidebarS
 };
 
 const Index = () => {
-  const [activeZone, setActiveZone] = useState<string | null>(null);
   const [activeNav, setActiveNav] = useState("推荐");
   const [dateFilter, setDateFilter] = useState("全部时间");
   const [showDateDropdown, setShowDateDropdown] = useState(false);
   const [marqueeRow1Paused, setMarqueeRow1Paused] = useState(false);
   const [marqueeRow2Paused, setMarqueeRow2Paused] = useState(false);
-
-  const activeZoneObj = HOT_ZONES.find(z => z.label === activeZone);
-
-  let filteredCases = MOCK_CASES;
-  if (activeZoneObj) {
-    filteredCases = filteredCases.filter((c) => c.tags.some(t => activeZoneObj.matchTags.includes(t)));
-  }
+  const navigate = useNavigate();
 
   const trendingItems = [
     { title: "如何利用 AI 工具优化供应链效率", views: "1.2k" },
