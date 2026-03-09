@@ -25,13 +25,13 @@ const RECOMMENDED_TOPICS_ROW2 = [
 ];
 
 const HOT_ZONES = [
-  { label: "AI应用", emoji: "🚀", matchTags: ["AI应用"] },
-  { label: "降本增效", emoji: "📊", matchTags: ["流程优化", "数据分析"] },
-  { label: "客户案例", emoji: "🤝", matchTags: ["客户案例"] },
-  { label: "项目复盘", emoji: "📋", matchTags: ["项目复盘"] },
-  { label: "创新实践", emoji: "💡", matchTags: ["最佳实践", "产品设计"] },
-  { label: "技术架构", emoji: "🏗️", matchTags: ["技术架构"] },
-  { label: "团队管理", emoji: "⚡", matchTags: ["团队管理"] },
+  { label: "HR管理", emoji: "👥", navDomain: "HR管理", navFilters: [] },
+  { label: "领导力", emoji: "🎯", navDomain: "HR管理", navFilters: ["领导力发展"] },
+  { label: "绩效管理", emoji: "📊", navDomain: "HR管理", navFilters: ["绩效管理"] },
+  { label: "组织发展", emoji: "🏢", navDomain: "HR管理", navFilters: ["组织发展"] },
+  { label: "人才招聘", emoji: "🤝", navDomain: "HR管理", navFilters: ["人才招聘"] },
+  { label: "培训赋能", emoji: "📚", navDomain: "HR管理", navFilters: ["培训赋能"] },
+  { label: "AI应用", emoji: "🚀", navDomain: "全部领域", navFilters: [] },
 ];
 
 const NAV_ITEMS = [
