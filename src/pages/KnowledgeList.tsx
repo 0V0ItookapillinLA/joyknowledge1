@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ChevronDown, ChevronUp, ArrowLeft, Search, Eye, ThumbsUp, Layers, Building2, TrendingUp, Code2, CheckCircle2, CreditCard, Lightbulb, BarChart3, Users, Target, Briefcase, GraduationCap, UserPlus, X } from "lucide-react";
+import { ChevronDown, ChevronUp, ArrowLeft, Search, Eye, ThumbsUp, Layers, Building2, TrendingUp, Code2, CheckCircle2, CreditCard, Lightbulb, BarChart3, Users, X } from "lucide-react";
 import AppLayout from "@/components/AppLayout";
 import { MOCK_CASES } from "@/data/mockData";
 
-const DATE_OPTIONS = ["\u5168\u90e8\u65f6\u95f4", "\u6700\u8fd1\u4e00\u5468", "\u6700\u8fd1\u4e00\u6708", "\u6700\u8fd1\u4e09\u6708"];
-const CONTENT_TYPES = ["\u6848\u4f8b", "\u6587\u6863", "\u89c6\u9891", "\u95ee\u7b54"];
+const DATE_OPTIONS = ["全部时间", "最近一周", "最近一月", "最近三月"];
+const CONTENT_TYPES = ["案例", "文档", "视频", "问答"];
 
 interface DomainItem {
   label: string;
@@ -15,28 +15,28 @@ interface DomainItem {
 }
 
 const DOMAIN_ITEMS: DomainItem[] = [
-  { label: "\u5168\u90e8\u9886\u57df", icon: Layers },
-  { label: "\u8425\u9500\u7ba1\u7406", icon: TrendingUp },
-  { label: "\u7814\u53d1\u7ba1\u7406", icon: Code2 },
-  { label: "\u8d28\u91cf\u7ba1\u7406", icon: CheckCircle2 },
-  { label: "\u91c7\u8d2d\u7ba1\u7406", icon: CreditCard },
-  { label: "\u4ea7\u54c1\u7ba1\u7406", icon: Lightbulb },
-  { label: "\u8fd0\u8425\u7ba1\u7406", icon: BarChart3 },
+  { label: "全部领域", icon: Layers },
+  { label: "营销管理", icon: TrendingUp },
+  { label: "研发管理", icon: Code2 },
+  { label: "质量管理", icon: CheckCircle2 },
+  { label: "采购管理", icon: CreditCard },
+  { label: "产品管理", icon: Lightbulb },
+  { label: "运营管理", icon: BarChart3 },
   {
-    label: "HR\u7ba1\u7406",
+    label: "HR管理",
     icon: Users,
-    children: ["\u9886\u5bfc\u529b\u53d1\u5c55", "\u7ee9\u6548\u7ba1\u7406", "\u7ec4\u7ec7\u53d1\u5c55", "\u4eba\u624d\u62db\u8058", "\u57f9\u8bad\u8d4b\u80fd", "\u85aa\u916c\u798f\u5229"],
+    children: ["领导力发展", "绩效管理", "组织发展", "人才招聘", "培训赋能", "薪酬福利"],
   },
 ];
 
 const ORG_TREE = [
   {
-    label: "\u4eac\u4e1c\u804c\u80fd\u4f53\u7cfb",
-    children: ["\u4eac\u4e1c\u804c\u80fd", "\u4eac\u4e1c\u96f6\u552e", "\u4eac\u4e1c\u7269\u6d41", "\u4eac\u4e1c\u79d1\u6280", "\u4eac\u4e1c\u5065\u5eb7", "\u4eac\u4e1c\u5de5\u4e1a", "\u4eac\u4e1c\u4ea7\u53d1", "\u4eac\u4e1c\u4fdd\u9669"],
+    label: "京东职能体系",
+    children: ["京东职能", "京东零售", "京东物流", "京东科技", "京东健康", "京东工业", "京东产发", "京东保险"],
   },
 ];
 
-const SORT_OPTIONS = ["\u7efc\u5408\u6392\u5e8f", "\u6700\u65b0\u53d1\u5e03", "\u6700\u591a\u6d4f\u89c8", "\u6700\u591a\u70b9\u8d5e"];
+const SORT_OPTIONS = ["综合排序", "最新发布", "最多浏览", "最多点赞"];
 
 const KnowledgeList = () => {
   const [searchParams] = useSearchParams();
@@ -45,20 +45,20 @@ const KnowledgeList = () => {
   const filterLabel = searchParams.get("label") || filterValue;
   const initialFilters = searchParams.get("filters")?.split(",").filter(Boolean) || [];
 
-  const [expandedGroups, setExpandedGroups] = useState<string[]>(["\u4eac\u4e1c\u804c\u80fd\u4f53\u7cfb"]);
+  const [expandedGroups, setExpandedGroups] = useState<string[]>(["京东职能体系"]);
   const [expandedDomains, setExpandedDomains] = useState<string[]>(
-    filterType === "domain" && filterValue === "HR\u7ba1\u7406" ? ["HR\u7ba1\u7406"] : []
+    filterType === "domain" && filterValue === "HR管理" ? ["HR管理"] : []
   );
   const [selectedFilters, setSelectedFilters] = useState<string[]>(
     initialFilters.length > 0 ? initialFilters : (filterLabel && filterLabel !== filterValue ? [filterLabel] : [])
   );
   const [selectedDomain, setSelectedDomain] = useState(
-    filterType === "domain" ? filterValue : "\u5168\u90e8\u9886\u57df"
+    filterType === "domain" ? filterValue : "全部领域"
   );
-  const [dateFilter, setDateFilter] = useState("\u5168\u90e8\u65f6\u95f4");
+  const [dateFilter, setDateFilter] = useState("全部时间");
   const [showDateDropdown, setShowDateDropdown] = useState(false);
   const [selectedContentTypes, setSelectedContentTypes] = useState<string[]>([]);
-  const [sortBy, setSortBy] = useState("\u7efc\u5408\u6392\u5e8f");
+  const [sortBy, setSortBy] = useState("综合排序");
   const [showSortDropdown, setShowSortDropdown] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -105,7 +105,7 @@ const KnowledgeList = () => {
     if (filtered.length > 0) filteredCases = filtered;
   }
 
-  if (selectedDomain !== "\u5168\u90e8\u9886\u57df") {
+  if (selectedDomain !== "全部领域") {
     const filtered = filteredCases.filter((c) =>
       c.tags.some(t => t.includes(selectedDomain)) || c.category.includes(selectedDomain)
     );
@@ -133,12 +133,12 @@ const KnowledgeList = () => {
           {selectedFilters.length > 0 && (
             <div className="mb-5 p-3 rounded-lg bg-accent/50">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-medium text-foreground">\u5df2\u9009\u6761\u4ef6</span>
+                <span className="text-xs font-medium text-foreground">已选条件</span>
                 <button
                   onClick={() => setSelectedFilters([])}
                   className="text-xs text-primary hover:text-primary/80"
                 >
-                  \u6e05\u7a7a
+                  清空
                 </button>
               </div>
               <div className="flex flex-wrap gap-1.5">
@@ -161,7 +161,7 @@ const KnowledgeList = () => {
           <div className="mb-5">
             <div className="flex items-center gap-2 mb-3">
               <Layers className="w-4 h-4 text-primary" />
-              <span className="text-sm font-semibold text-foreground">\u77e5\u8bc6\u9886\u57df</span>
+              <span className="text-sm font-semibold text-foreground">知识领域</span>
             </div>
             <div className="space-y-0.5">
               {DOMAIN_ITEMS.map((item) => {
@@ -222,7 +222,7 @@ const KnowledgeList = () => {
           <div className="mb-5">
             <div className="flex items-center gap-2 mb-3">
               <Building2 className="w-4 h-4 text-primary" />
-              <span className="text-sm font-semibold text-foreground">\u7ec4\u7ec7\u67b6\u6784</span>
+              <span className="text-sm font-semibold text-foreground">组织架构</span>
             </div>
             <div className="space-y-0.5">
               {ORG_TREE.map((group) => {
@@ -265,6 +265,61 @@ const KnowledgeList = () => {
               })}
             </div>
           </div>
+
+          {/* Date & content type filters */}
+          <div className="mt-auto pt-4 border-t border-border space-y-4">
+            <p className="text-sm font-semibold text-foreground">筛选条件</p>
+
+            <div>
+              <p className="text-xs text-muted-foreground mb-1">发布时间</p>
+              <div className="relative">
+                <button
+                  onClick={() => setShowDateDropdown(!showDateDropdown)}
+                  className="flex items-center justify-between w-full px-3 py-2 rounded-md border border-border text-sm text-foreground hover:border-primary/40 transition-colors"
+                >
+                  {dateFilter}
+                  <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${showDateDropdown ? "rotate-180" : ""}`} />
+                </button>
+                {showDateDropdown && (
+                  <div className="absolute left-0 right-0 top-full mt-1 bg-card border border-border rounded-md shadow-md z-10">
+                    {DATE_OPTIONS.map((opt) => (
+                      <button
+                        key={opt}
+                        onClick={() => { setDateFilter(opt); setShowDateDropdown(false); }}
+                        className={`block w-full text-left px-3 py-2 text-sm transition-colors ${
+                          dateFilter === opt ? "text-primary bg-primary/5" : "text-foreground hover:bg-accent"
+                        }`}
+                      >
+                        {opt}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div>
+              <p className="text-xs text-muted-foreground mb-2">内容类型</p>
+              <div className="flex flex-wrap gap-2">
+                {CONTENT_TYPES.map((t) => {
+                  const isActive = selectedContentTypes.includes(t);
+                  return (
+                    <button
+                      key={t}
+                      onClick={() => toggleContentType(t)}
+                      className={`px-3 py-1.5 rounded-md text-sm transition-colors ${
+                        isActive
+                          ? "bg-primary text-primary-foreground font-medium"
+                          : "bg-accent text-foreground hover:bg-accent/80"
+                      }`}
+                    >
+                      {t}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
         </aside>
 
         {/* Main content */}
@@ -275,14 +330,14 @@ const KnowledgeList = () => {
               to="/"
               className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
-              <ArrowLeft className="w-4 h-4" /> \u8fd4\u56de\u9996\u9875
+              <ArrowLeft className="w-4 h-4" /> 返回首页
             </Link>
             <div className="flex items-center gap-3">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <input
                   type="text"
-                  placeholder="\u5728\u7ed3\u679c\u4e2d\u641c\u7d22..."
+                  placeholder="在结果中搜索..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-9 pr-4 py-2 rounded-md border border-border bg-card text-sm text-foreground placeholder:text-muted-foreground w-[200px] focus:outline-none focus:border-primary/40"
@@ -318,7 +373,7 @@ const KnowledgeList = () => {
           {/* Active filter tags in content area */}
           {selectedFilters.length > 0 && (
             <div className="flex flex-wrap items-center gap-2 mb-5 pb-4 border-b border-border">
-              <span className="text-xs text-muted-foreground mr-1">\u7b5b\u9009:</span>
+              <span className="text-xs text-muted-foreground mr-1">筛选:</span>
               {selectedFilters.map((f) => (
                 <span
                   key={f}
@@ -334,34 +389,14 @@ const KnowledgeList = () => {
                 onClick={() => setSelectedFilters([])}
                 className="text-xs text-muted-foreground hover:text-foreground ml-1"
               >
-                \u6e05\u9664\u5168\u90e8
+                清除全部
               </button>
             </div>
           )}
 
-          {/* Content type tabs */}
-          <div className="flex items-center gap-2 mb-5">
-            {CONTENT_TYPES.map((t) => {
-              const isActive = selectedContentTypes.includes(t);
-              return (
-                <button
-                  key={t}
-                  onClick={() => toggleContentType(t)}
-                  className={`px-4 py-1.5 rounded-full text-sm transition-colors ${
-                    isActive
-                      ? "bg-primary text-primary-foreground font-medium"
-                      : "bg-accent text-foreground hover:bg-accent/80"
-                  }`}
-                >
-                  {t}
-                </button>
-              );
-            })}
-          </div>
-
           {/* Results count */}
           <p className="text-xs text-muted-foreground mb-4">
-            \u5171 {searchFiltered.length} \u6761\u7ed3\u679c
+            共 {searchFiltered.length} 条结果
           </p>
 
           {/* Article list */}
@@ -384,7 +419,7 @@ const KnowledgeList = () => {
                           {c.category}
                         </span>
                         <span className="text-xs text-muted-foreground">{c.createdAt}</span>
-                        <span className="text-xs text-muted-foreground">\u00b7 {c.department}</span>
+                        <span className="text-xs text-muted-foreground">· {c.department}</span>
                       </div>
                       <h3 className="text-base font-semibold text-foreground mb-2 line-clamp-1">
                         {c.title}
@@ -413,7 +448,7 @@ const KnowledgeList = () => {
                     {i % 3 === 0 && (
                       <div className="w-[160px] h-[100px] rounded-lg bg-accent shrink-0 overflow-hidden">
                         <div className="w-full h-full bg-gradient-to-br from-primary/5 to-primary/15 flex items-center justify-center text-primary/30 text-xs">
-                          \u5c01\u9762\u56fe
+                          封面图
                         </div>
                       </div>
                     )}
@@ -425,7 +460,7 @@ const KnowledgeList = () => {
 
           {searchFiltered.length === 0 && (
             <div className="text-center py-20">
-              <p className="text-muted-foreground">\u6682\u65e0\u76f8\u5173\u77e5\u8bc6\u5185\u5bb9</p>
+              <p className="text-muted-foreground">暂无相关知识内容</p>
             </div>
           )}
         </div>
