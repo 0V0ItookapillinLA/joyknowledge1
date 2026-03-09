@@ -8,6 +8,7 @@ import CaseDetail from "./pages/CaseDetail";
 import ExpertLibrary from "./pages/ExpertLibrary";
 import PersonalZone from "./pages/PersonalZone";
 import KnowledgeExtract from "./pages/KnowledgeExtract";
+import KnowledgeList from "./pages/KnowledgeList";
 import Community from "./pages/Community";
 import NotFound from "./pages/NotFound";
 
