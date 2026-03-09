@@ -45,8 +45,9 @@ const Index = () => {
   const [activeZone, setActiveZone] = useState<string | null>(null);
   const [activeNav, setActiveNav] = useState("推荐");
 
-  const filteredCases = activeZone
-    ? MOCK_CASES.filter((c) => c.tags.some(t => t.includes(activeZone)))
+  const activeZoneObj = HOT_ZONES.find(z => z.label === activeZone);
+  const filteredCases = activeZoneObj
+    ? MOCK_CASES.filter((c) => c.tags.some(t => activeZoneObj.matchTags.includes(t)))
     : MOCK_CASES;
 
   const trendingItems = [
