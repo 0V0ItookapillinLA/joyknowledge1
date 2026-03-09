@@ -1,13 +1,22 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Flame, Users, Sparkles, BookOpen, ArrowRight, Bookmark, Eye, Heart, MessageSquare, Home as HomeIcon, TrendingUp } from "lucide-react";
+import { Flame, Users, Sparkles, ArrowRight, MessageSquare, Home as HomeIcon, TrendingUp, Search } from "lucide-react";
 import { motion } from "framer-motion";
 import AppLayout from "@/components/AppLayout";
 import CaseCard from "@/components/CaseCard";
 
-import { MOCK_CASES, MOCK_TAGS, MOCK_EXPERTS } from "@/data/mockData";
+import { MOCK_CASES, MOCK_TAGS } from "@/data/mockData";
 
-const TOPIC_TAGS = [
+const RECOMMENDED_TOPICS = [
+  "人资团队管理的最佳实践指南",
+  "2025年企业人力资源平台建设路线总图",
+  "如何利用 AI 工具优化 HR 招聘流程",
+  "Q3季度研发效能提升专项行动总结",
+  "企业级混合云架构落地实践指南",
+  "敏捷开发在大型项目中的应用案例",
+];
+
+const HOT_ZONES = [
   { label: "数字化转型", emoji: "🚀" },
   { label: "降本增效", emoji: "📊" },
   { label: "客户案例", emoji: "🤝" },
@@ -33,11 +42,11 @@ const CATEGORY_ITEMS = [
 ];
 
 const Index = () => {
-  const [activeTag, setActiveTag] = useState<string | null>(null);
+  const [activeZone, setActiveZone] = useState<string | null>(null);
   const [activeNav, setActiveNav] = useState("推荐");
 
-  const filteredCases = activeTag
-    ? MOCK_CASES.filter((c) => c.tags.some(t => t.includes(activeTag)))
+  const filteredCases = activeZone
+    ? MOCK_CASES.filter((c) => c.tags.some(t => t.includes(activeZone)))
     : MOCK_CASES;
 
   const trendingItems = [
@@ -90,39 +99,53 @@ const Index = () => {
 
         {/* Main content */}
         <div className="flex-1 min-w-0">
-          {/* Hero search */}
+          {/* Personalized recommendation topics */}
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-center py-10 px-6"
+            className="text-center py-8 px-6"
           >
-            <h1 className="text-2xl font-semibold text-foreground mb-6">您想探索什么主题？</h1>
+            <h1 className="text-2xl font-semibold text-foreground mb-5">为你推荐</h1>
             <div className="flex flex-wrap justify-center gap-2 max-w-2xl mx-auto">
-              {TOPIC_TAGS.map((tag) => (
-                <button
-                  key={tag.label}
-                  onClick={() => setActiveTag(tag.label)}
-                  className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-md border text-sm transition-colors ${
-                    activeTag === tag.label
-                      ? "border-primary bg-primary/5 text-primary"
-                      : "border-border bg-card text-foreground hover:border-primary/40"
-                  }`}
+              {RECOMMENDED_TOPICS.map((topic) => (
+                <Link
+                  key={topic}
+                  to={`/case/1`}
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-md border border-border bg-card text-sm text-foreground hover:border-primary/40 hover:bg-primary/5 transition-colors"
                 >
-                  <span>{tag.emoji}</span>
-                  {tag.label}
-                </button>
+                  {topic}
+                </Link>
               ))}
             </div>
           </motion.div>
 
-          {/* Content */}
-          <div className="px-6 pb-8">
-            <div className="mb-2">
-              <h2 className="text-lg font-semibold text-foreground">精选推荐</h2>
+          {/* Hot zones */}
+          <div className="px-6 pb-4">
+            <div className="mb-4">
+              <h2 className="text-lg font-semibold text-foreground">热门专区</h2>
               <p className="text-sm text-muted-foreground">来自专业人士的精选观点与洞察</p>
             </div>
+            <div className="flex flex-wrap gap-2 mb-4">
+              {HOT_ZONES.map((zone) => (
+                <button
+                  key={zone.label}
+                  onClick={() => setActiveZone(activeZone === zone.label ? null : zone.label)}
+                  className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-md border text-sm transition-colors ${
+                    activeZone === zone.label
+                      ? "border-primary bg-primary/5 text-primary"
+                      : "border-border bg-card text-foreground hover:border-primary/40"
+                  }`}
+                >
+                  <span>{zone.emoji}</span>
+                  {zone.label}
+                </button>
+              ))}
+            </div>
+          </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+          {/* Recommended knowledge cards */}
+          <div className="px-6 pb-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {filteredCases.slice(0, 4).map((c, i) => (
                 <motion.div
                   key={c.id}
