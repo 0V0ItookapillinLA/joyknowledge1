@@ -7,8 +7,8 @@ const TopNav = () => {
   const navItems = [
     { label: "首页", path: "/", icon: Home },
     { label: "专家书房", path: "/experts", icon: Users },
-    { label: "个人专区", path: "/profile", icon: User },
     { label: "社区", path: "/community", icon: MessageSquare },
+    { label: "个人专区", path: "/profile", icon: User },
   ];
 
   return (
