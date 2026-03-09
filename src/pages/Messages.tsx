@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, useMemo } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, Send, Search, MoreHorizontal, Phone, Video, Smile, Paperclip, Check, CheckCheck } from "lucide-react";
 import AppLayout from "@/components/AppLayout";
@@ -65,7 +65,19 @@ const MESSAGES_MAP: Record<string, Message[]> = {
 };
 
 const Messages = () => {
-  const [selectedConv, setSelectedConv] = useState<string>("1");
+  const [searchParams] = useSearchParams();
+  const toName = searchParams.get("to") || "";
+
+  // Find matching conversation by name param
+  const initialConv = useMemo(() => {
+    if (toName) {
+      const match = CONVERSATIONS.find(c => c.name === toName);
+      if (match) return match.id;
+    }
+    return "1";
+  }, [toName]);
+
+  const [selectedConv, setSelectedConv] = useState<string>(initialConv);
   const [inputValue, setInputValue] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
 

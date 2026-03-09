@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import AppLayout from "@/components/AppLayout";
 import { MOCK_EXPERTS, MOCK_CASES } from "@/data/mockData";
@@ -27,6 +28,7 @@ const AVATAR_MAP: Record<string, string> = {
 const DOMAINS = ["全部领域", "营销管理", "研发管理", "质量管理", "采购管理", "产品管理", "运营管理"];
 
 const ExpertLibrary = () => {
+  const navigate = useNavigate();
   const [selectedDomain, setSelectedDomain] = useState("全部领域");
   const [selectedExpert, setSelectedExpert] = useState<typeof MOCK_EXPERTS[0] | null>(null);
   const [sortBy, setSortBy] = useState("按热度排序");
@@ -244,7 +246,10 @@ const ExpertLibrary = () => {
               <p className="text-xs text-card/70 mb-4 text-center">
                 与 {selectedExpert.name} 1 对 1 交流，解决您的技术难题。
               </p>
-              <button className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-card text-foreground text-sm font-medium hover:bg-card/90 transition-colors">
+              <button
+                onClick={() => navigate(`/messages?to=${encodeURIComponent(selectedExpert.name)}`)}
+                className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-card text-foreground text-sm font-medium hover:bg-card/90 transition-colors"
+              >
                 <MessageCircle className="w-4 h-4" /> 咨询一下
               </button>
             </div>
