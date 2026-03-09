@@ -722,7 +722,7 @@ const KnowledgeExtract = () => {
           >
             <div className="flex items-center gap-3">
               <button
-                onClick={() => setAppMode("workspace")}
+                onClick={() => setAppMode(extractMode === "quick" ? "quick-extract" : "workspace")}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
               >
                 <ChevronLeft className="w-4 h-4" /> 返回继续编辑
