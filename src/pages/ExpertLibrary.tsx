@@ -96,9 +96,11 @@ const ExpertLibrary = () => {
               className="text-center mb-8"
             >
               <div className="relative inline-block mb-4">
-                <div className="w-24 h-24 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center text-primary font-bold text-3xl mx-auto border-4 border-card shadow-md">
-                  {selectedExpert.name[0]}
-                </div>
+                <img
+                  src={AVATAR_MAP[selectedExpert.id]}
+                  alt={selectedExpert.name}
+                  className="w-24 h-24 rounded-full object-cover mx-auto border-4 border-card shadow-md"
+                />
                 <div className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-amber-400 flex items-center justify-center shadow-sm">
                   <Star className="w-4 h-4 text-white fill-white" />
                 </div>
