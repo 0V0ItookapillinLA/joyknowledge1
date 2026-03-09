@@ -156,6 +156,8 @@ const KnowledgeExtract = () => {
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [chatInput, setChatInput] = useState("");
   const [showAddSource, setShowAddSource] = useState(false);
+  const [quickTitle, setQuickTitle] = useState("Q3季度研发效能提升专项总结");
+  const [quickStep, setQuickStep] = useState(0); // 0=extracting, 1=naming
   const [isAiTyping, setIsAiTyping] = useState(false);
   const [webSearchQuery, setWebSearchQuery] = useState("");
   const [socraticIndex, setSocraticIndex] = useState(0);
