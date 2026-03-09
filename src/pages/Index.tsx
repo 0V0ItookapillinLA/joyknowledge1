@@ -32,20 +32,29 @@ const NAV_ITEMS = [
   { label: "关注", icon: Users },
 ];
 
-const BGBU_ITEMS = [
-  { label: "AI中台", matchDept: "AI中台" },
-  { label: "数据平台", matchDept: "数据平台" },
-  { label: "研发效能", matchDept: "研发效能" },
-  { label: "项目管理", matchDept: "项目管理部" },
-];
-
-const DOMAIN_ITEMS = [
-  { label: "营销管理", icon: "📣", matchTags: ["客户案例"] },
-  { label: "研发管理", icon: "💻", matchTags: ["技术架构"] },
-  { label: "质量管理", icon: "✅", matchTags: ["流程优化"] },
-  { label: "采购管理", icon: "🛒", matchTags: ["数据分析"] },
-  { label: "产品管理", icon: "📦", matchTags: ["产品设计"] },
-  { label: "运营管理", icon: "📈", matchTags: ["最佳实践"] },
+const BGBU_SECTIONS = [
+  {
+    title: "BGBU专区",
+    items: [
+      { label: "AI中台", matchDept: "AI中台" },
+      { label: "数据平台", matchDept: "数据平台" },
+      { label: "研发效能", matchDept: "研发效能" },
+      { label: "项目管理", matchDept: "项目管理部" },
+      { label: "UX设计", matchDept: "UX设计" },
+      { label: "基础设施", matchDept: "基础设施" },
+    ],
+  },
+  {
+    title: "领域专区",
+    items: [
+      { label: "营销管理", matchTags: ["客户案例"] },
+      { label: "研发管理", matchTags: ["技术架构"] },
+      { label: "质量管理", matchTags: ["流程优化"] },
+      { label: "采购管理", matchTags: ["数据分析"] },
+      { label: "产品管理", matchTags: ["产品设计"] },
+      { label: "运营管理", matchTags: ["最佳实践"] },
+    ],
+  },
 ];
 
 const DATE_OPTIONS = ["全部时间", "最近一周", "最近一月", "最近三月"];
