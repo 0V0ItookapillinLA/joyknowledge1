@@ -8,6 +8,7 @@ import CaseDetail from "./pages/CaseDetail";
 import ExpertLibrary from "./pages/ExpertLibrary";
 import PersonalZone from "./pages/PersonalZone";
 import KnowledgeExtract from "./pages/KnowledgeExtract";
+import Community from "./pages/Community";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -24,6 +25,7 @@ const App = () => (
           <Route path="/experts" element={<ExpertLibrary />} />
           <Route path="/profile" element={<PersonalZone />} />
           <Route path="/extract" element={<KnowledgeExtract />} />
+          <Route path="/community" element={<Community />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

@@ -1,133 +1,205 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Flame, Users, Sparkles, BookOpen, ArrowRight } from "lucide-react";
+import { Flame, Users, Sparkles, BookOpen, ArrowRight, Bookmark, Eye, Heart, MessageSquare, Home as HomeIcon, TrendingUp } from "lucide-react";
 import { motion } from "framer-motion";
 import AppLayout from "@/components/AppLayout";
 import CaseCard from "@/components/CaseCard";
-import TagChip from "@/components/TagChip";
+
 import { MOCK_CASES, MOCK_TAGS, MOCK_EXPERTS } from "@/data/mockData";
+
+const TOPIC_TAGS = [
+  { label: "数字化转型", emoji: "🚀" },
+  { label: "降本增效", emoji: "📊" },
+  { label: "客户案例", emoji: "🤝" },
+  { label: "项目复盘", emoji: "📋" },
+  { label: "创新实践", emoji: "💡" },
+  { label: "供应链优化", emoji: "🏗️" },
+  { label: "敏捷开发", emoji: "⚡" },
+];
+
+const NAV_ITEMS = [
+  { label: "推荐", icon: HomeIcon, active: true },
+  { label: "热门", icon: Flame },
+  { label: "关注", icon: Users },
+];
+
+const CATEGORY_ITEMS = [
+  { label: "营销管理", icon: "📣" },
+  { label: "研发管理", icon: "💻" },
+  { label: "质量管理", icon: "✅" },
+  { label: "采购管理", icon: "🛒" },
+  { label: "产品管理", icon: "📦" },
+  { label: "运营管理", icon: "📈" },
+];
 
 const Index = () => {
   const [activeTag, setActiveTag] = useState<string | null>(null);
+  const [activeNav, setActiveNav] = useState("推荐");
 
   const filteredCases = activeTag
-    ? MOCK_CASES.filter((c) => c.tags.includes(activeTag))
+    ? MOCK_CASES.filter((c) => c.tags.some(t => t.includes(activeTag)))
     : MOCK_CASES;
+
+  const trendingItems = [
+    { title: "如何利用 AI 工具优化供应链效率", views: "1.2k" },
+    { title: "远程团队管理的最佳实践指南", views: "1.2k" },
+    { title: "2024年企业数字化转型路线图", views: "1.2k" },
+    { title: "敏捷开发在大型项目中的应用", views: "980" },
+  ];
 
   return (
     <AppLayout>
       <div className="flex">
-        {/* Main content */}
-        <div className="flex-1 min-w-0 p-6 space-y-6">
-          {/* Topics / Tags */}
-          <motion.section initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
-            <h1 className="text-xl font-semibold text-foreground mb-1">发现知识</h1>
-            <p className="text-sm text-muted-foreground mb-4">探索来自团队的最新案例与实践</p>
-            <div className="flex flex-wrap gap-2">
-              <TagChip
-                tag={{ label: "全部", emoji: "📋" }}
-                isActive={activeTag === null}
-                onClick={() => setActiveTag(null)}
-              />
-              {MOCK_TAGS.map((tag) => (
-                <TagChip
-                  key={tag.label}
-                  tag={tag}
-                  isActive={activeTag === tag.label}
-                  onClick={() => setActiveTag(tag.label)}
-                />
-              ))}
-            </div>
-          </motion.section>
-
-          {/* Nearby Cases */}
-          <section>
-            <div className="flex items-center gap-2 mb-3">
-              <Users className="w-4 h-4 text-primary" />
-              <h2 className="font-semibold text-base text-foreground">身边案例</h2>
-            </div>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-              {filteredCases.slice(0, 4).map((c, i) => (
-                <motion.div key={c.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }}>
-                  <CaseCard caseItem={c} />
-                </motion.div>
-              ))}
-            </div>
-          </section>
-
-          {/* Hot Cases */}
-          <section>
-            <div className="flex items-center gap-2 mb-3">
-              <Flame className="w-4 h-4 text-primary" />
-              <h2 className="font-semibold text-base text-foreground">热门专区</h2>
-            </div>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-              {[...MOCK_CASES].sort((a, b) => b.views - a.views).slice(0, 4).map((c, i) => (
-                <motion.div key={c.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }}>
-                  <CaseCard caseItem={c} />
-                </motion.div>
-              ))}
-            </div>
-          </section>
-        </div>
-
-        {/* Right sidebar */}
-        <aside className="w-64 shrink-0 border-l border-border p-5 space-y-6 hidden xl:block sticky top-0 h-screen overflow-y-auto">
-          {/* Quick entries */}
-          <div>
-            <h3 className="font-semibold text-sm text-foreground mb-3">快捷入口</h3>
-            <div className="space-y-1.5">
-              <Link to="/experts" className="flex items-center gap-3 px-3 py-2.5 rounded-md hover:bg-accent transition-colors">
-                <BookOpen className="w-4 h-4 text-primary" />
-                <span className="text-sm text-foreground">专家书房</span>
-                <ArrowRight className="w-3.5 h-3.5 ml-auto text-muted-foreground" />
-              </Link>
-              <Link to="/profile" className="flex items-center gap-3 px-3 py-2.5 rounded-md hover:bg-accent transition-colors">
-                <Users className="w-4 h-4 text-primary" />
-                <span className="text-sm text-foreground">个人专区</span>
-                <ArrowRight className="w-3.5 h-3.5 ml-auto text-muted-foreground" />
-              </Link>
-              <Link to="/extract" className="flex items-center gap-3 px-3 py-2.5 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors">
-                <Sparkles className="w-4 h-4" />
-                <span className="text-sm font-medium">AI 知识萃取</span>
-                <ArrowRight className="w-3.5 h-3.5 ml-auto opacity-70" />
-              </Link>
-            </div>
-          </div>
-
-          {/* Trending tags */}
-          <div>
-            <h3 className="font-semibold text-sm text-foreground mb-3">热门标签</h3>
-            <div className="space-y-1">
-              {MOCK_TAGS.slice(0, 6).map((tag, i) => (
+        {/* Left sidebar */}
+        <aside className="w-[200px] shrink-0 border-r border-border p-4 hidden lg:block sticky top-14 h-[calc(100vh-56px)] overflow-y-auto">
+          <div className="mb-6">
+            <p className="text-xs text-muted-foreground mb-2 px-3">发现</p>
+            <div className="space-y-0.5">
+              {NAV_ITEMS.map((item) => (
                 <button
-                  key={tag.label}
-                  onClick={() => setActiveTag(tag.label)}
-                  className="flex items-center gap-2 w-full px-3 py-2 rounded-md hover:bg-accent transition-colors text-sm"
+                  key={item.label}
+                  onClick={() => setActiveNav(item.label)}
+                  className={`flex items-center gap-2.5 w-full px-3 py-2 rounded-md text-sm transition-colors ${
+                    activeNav === item.label
+                      ? "text-primary font-medium"
+                      : "text-muted-foreground hover:text-foreground hover:bg-accent"
+                  }`}
                 >
-                  <span className="text-muted-foreground font-medium w-4 text-xs">{i + 1}</span>
-                  <span>{tag.emoji}</span>
-                  <span className="text-foreground">{tag.label}</span>
-                  <span className="ml-auto text-xs text-muted-foreground">{tag.count}</span>
+                  <item.icon className="w-4 h-4" />
+                  {item.label}
                 </button>
               ))}
             </div>
           </div>
 
-          {/* Top experts */}
           <div>
-            <h3 className="font-semibold text-sm text-foreground mb-3">推荐专家</h3>
+            <p className="text-xs text-muted-foreground mb-2 px-3">专题</p>
+            <div className="space-y-0.5">
+              {CATEGORY_ITEMS.map((item) => (
+                <button
+                  key={item.label}
+                  className="flex items-center gap-2.5 w-full px-3 py-2 rounded-md text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+                >
+                  <span>{item.icon}</span>
+                  {item.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        </aside>
+
+        {/* Main content */}
+        <div className="flex-1 min-w-0">
+          {/* Hero search */}
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center py-10 px-6"
+          >
+            <h1 className="text-2xl font-semibold text-foreground mb-6">您想探索什么主题？</h1>
+            <div className="flex flex-wrap justify-center gap-2 max-w-2xl mx-auto">
+              {TOPIC_TAGS.map((tag) => (
+                <button
+                  key={tag.label}
+                  onClick={() => setActiveTag(tag.label)}
+                  className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-md border text-sm transition-colors ${
+                    activeTag === tag.label
+                      ? "border-primary bg-primary/5 text-primary"
+                      : "border-border bg-card text-foreground hover:border-primary/40"
+                  }`}
+                >
+                  <span>{tag.emoji}</span>
+                  {tag.label}
+                </button>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* Content */}
+          <div className="px-6 pb-8">
+            <div className="mb-2">
+              <h2 className="text-lg font-semibold text-foreground">精选推荐</h2>
+              <p className="text-sm text-muted-foreground">来自专业人士的精选观点与洞察</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+              {filteredCases.slice(0, 4).map((c, i) => (
+                <motion.div
+                  key={c.id}
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.05 }}
+                >
+                  <CaseCard caseItem={c} />
+                </motion.div>
+              ))}
+            </div>
+
+            {filteredCases.length > 4 && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                {filteredCases.slice(4, 8).map((c, i) => (
+                  <motion.div
+                    key={c.id}
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.05 }}
+                  >
+                    <CaseCard caseItem={c} />
+                  </motion.div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Right sidebar */}
+        <aside className="w-[280px] shrink-0 p-5 space-y-5 hidden xl:block sticky top-14 h-[calc(100vh-56px)] overflow-y-auto">
+          {/* AI CTA Card */}
+          <div className="rounded-xl bg-primary p-5 text-primary-foreground">
+            <div className="flex items-center gap-2 mb-3">
+              <Sparkles className="w-5 h-5" />
+            </div>
+            <p className="font-semibold text-base mb-1">分享您的知识</p>
+            <p className="text-sm opacity-90 mb-4">使用 AI 在几分钟内将您的经验转化为结构化案例。</p>
+            <Link
+              to="/extract"
+              className="block text-center py-2 rounded-lg bg-card text-primary font-medium text-sm hover:bg-card/90 transition-colors"
+            >
+              开始创作
+            </Link>
+          </div>
+
+          {/* Quick entries */}
+          <div>
+            <h3 className="font-semibold text-sm text-foreground mb-3">快捷入口</h3>
+            <div className="space-y-1">
+              <Link to="/experts" className="flex items-center gap-3 px-3 py-2.5 rounded-md hover:bg-accent transition-colors">
+                <Users className="w-4 h-4 text-muted-foreground" />
+                <span className="text-sm text-foreground">专家库</span>
+              </Link>
+              <Link to="/community" className="flex items-center gap-3 px-3 py-2.5 rounded-md hover:bg-accent transition-colors">
+                <MessageSquare className="w-4 h-4 text-muted-foreground" />
+                <span className="text-sm text-foreground">问答社区</span>
+              </Link>
+            </div>
+          </div>
+
+          {/* Trending */}
+          <div>
+            <h3 className="font-semibold text-sm text-foreground mb-3">实时趋势</h3>
             <div className="space-y-3">
-              {MOCK_EXPERTS.slice(0, 3).map((expert) => (
-                <Link key={expert.id} to={`/experts?id=${expert.id}`} className="flex items-center gap-3 group">
-                  <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-medium text-sm">
-                    {expert.name[0]}
-                  </div>
+              {trendingItems.map((item, i) => (
+                <div key={item.title} className="flex gap-3">
+                  <span className={`text-lg font-bold shrink-0 w-6 ${
+                    i < 3 ? "text-primary" : "text-muted-foreground"
+                  }`}>
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
                   <div className="min-w-0">
-                    <p className="text-sm font-medium text-foreground group-hover:text-primary transition-colors">{expert.name}</p>
-                    <p className="text-xs text-muted-foreground truncate">{expert.title} · {expert.department}</p>
+                    <p className="text-sm text-foreground line-clamp-2 leading-snug">{item.title}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">{item.views} 阅读</p>
                   </div>
-                </Link>
+                </div>
               ))}
             </div>
           </div>

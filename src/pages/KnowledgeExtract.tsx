@@ -1,36 +1,41 @@
-import { useState, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState } from "react";
+import { motion } from "framer-motion";
 import {
-  Sparkles, ArrowRight, ArrowLeft, FileText, Tag, Send, Wand2,
-  CheckCircle2, Upload, Link2, ClipboardPaste, Search, Globe, Zap,
-  X, File, ChevronDown
+  Sparkles, Send, Wand2, FileText, Tag, Upload, Link2, ClipboardPaste,
+  X, File, CheckCircle2, Plus, Search, Mic, Video, GitBranch, BarChart3,
+  ChevronRight, MessageCircle
 } from "lucide-react";
 import AppLayout from "@/components/AppLayout";
-import { CASE_CATEGORIES } from "@/data/mockData";
 
 interface Source {
   id: string;
   name: string;
-  type: "file" | "url" | "text";
+  type: "file" | "url" | "text" | "case";
   status: "ready" | "processing";
 }
 
+interface ChatMessage {
+  id: string;
+  role: "user" | "assistant";
+  content: string;
+}
+
 const KnowledgeExtract = () => {
-  const [sources, setSources] = useState<Source[]>([]);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [showWizard, setShowWizard] = useState(false);
-  const [step, setStep] = useState(0);
-  const [selectedType, setSelectedType] = useState<string | null>(null);
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
-  const [aiGenerating, setAiGenerating] = useState(false);
-  const [aiResult, setAiResult] = useState<{
-    title: string; summary: string; tags: string[]; sections: string[];
-  } | null>(null);
+  const [sources, setSources] = useState<Source[]>([
+    { id: "1", name: "Q3季度研发效能报告.pdf", type: "file", status: "ready" },
+    { id: "2", name: "项目复盘会议纪要.docx", type: "file", status: "ready" },
+  ]);
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
+    {
+      id: "1",
+      role: "assistant",
+      content: "你好！我已经分析了你上传的 2 个来源文件。你可以问我关于这些内容的任何问题，或者让我帮你生成结构化的知识案例。\n\n以下是一些建议：\n- 📝 帮我生成案例摘要\n- 🏷️ 推荐合适的标签\n- 📊 提取关键数据指标\n- 📋 生成章节结构",
+    },
+  ]);
+  const [chatInput, setChatInput] = useState("");
+  const [showAddSource, setShowAddSource] = useState(false);
 
-  const STEPS = ["选择类型", "输入信息", "编辑发布"];
-
-  const addSource = useCallback((type: Source["type"], name: string) => {
+  const addSource = (type: Source["type"], name: string) => {
     const newSource: Source = {
       id: Date.now().toString(),
       name,
@@ -38,428 +43,229 @@ const KnowledgeExtract = () => {
       status: "processing",
     };
     setSources(prev => [...prev, newSource]);
+    setShowAddSource(false);
     setTimeout(() => {
       setSources(prev => prev.map(s => s.id === newSource.id ? { ...s, status: "ready" } : s));
     }, 1500);
-  }, []);
+  };
 
   const removeSource = (id: string) => {
     setSources(prev => prev.filter(s => s.id !== id));
   };
 
-  const handleAIGenerate = () => {
-    setAiGenerating(true);
+  const handleSend = () => {
+    if (!chatInput.trim()) return;
+    const userMsg: ChatMessage = { id: Date.now().toString(), role: "user", content: chatInput };
+    setChatMessages(prev => [...prev, userMsg]);
+    setChatInput("");
+
+    // Simulate AI response
     setTimeout(() => {
-      setAiResult({
-        title: title || "基于实践的知识萃取方法论",
-        summary: "本文从实际项目出发，总结了在特定场景下的方法论和关键经验，为团队后续类似工作提供参考。",
-        tags: ["最佳实践", "项目复盘", "流程优化"],
-        sections: ["背景与挑战", "解决方案", "实施过程", "成果与反思"],
-      });
-      setAiGenerating(false);
-    }, 1500);
+      const aiMsg: ChatMessage = {
+        id: (Date.now() + 1).toString(),
+        role: "assistant",
+        content: "基于你上传的来源文件，我为你生成了以下内容：\n\n**标题建议**：Q3季度研发效能提升专项行动总结\n\n**摘要**：通过引入DevOps流水线和自动化测试，发布周期缩短了40%。详细拆解了从需求管理到代码发布的优化路径。\n\n**推荐标签**：研发效能、DevOps、自动化测试、流程优化\n\n需要我进一步完善某个部分吗？",
+      };
+      setChatMessages(prev => [...prev, aiMsg]);
+    }, 1200);
   };
 
-  const handleStartExtract = () => {
-    setShowWizard(true);
-    setStep(0);
-  };
+  const studioTools = [
+    { icon: Mic, label: "音频概览", desc: "生成播客式讲解", color: "text-orange-500" },
+    { icon: Video, label: "视频概览", desc: "生成视频演示", color: "text-blue-500" },
+    { icon: GitBranch, label: "思维导图", desc: "可视化知识结构", color: "text-green-500" },
+    { icon: BarChart3, label: "数据报告", desc: "生成数据图表", color: "text-purple-500" },
+    { icon: Tag, label: "生成标签", desc: "AI 推荐标签", color: "text-primary" },
+    { icon: FileText, label: "生成案例", desc: "输出结构化案例", color: "text-primary" },
+  ];
 
-  // NotebookLM-style landing when no wizard
-  if (!showWizard) {
-    return (
-      <AppLayout>
-        <div className="flex-1 min-w-0 flex flex-col items-center justify-start pt-12 px-6 pb-12">
-          {/* Hero */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center max-w-2xl mx-auto mb-10"
-          >
-            <h1 className="text-3xl font-semibold text-foreground mb-2">
-              AI 知识萃取
-            </h1>
-            <p className="text-base text-muted-foreground">
-              从<span className="text-primary font-medium">你的素材</span>中提炼结构化知识案例
-            </p>
-          </motion.div>
-
-          {/* Search bar */}
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="w-full max-w-2xl mb-6"
-          >
-            <div className="card-base px-4 py-3 flex items-center gap-3">
-              <Search className="w-5 h-5 text-muted-foreground shrink-0" />
-              <input
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="搜索已有知识或输入主题..."
-                className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none"
-              />
-              <div className="flex items-center gap-2 shrink-0">
-                <button className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-border text-xs text-muted-foreground hover:bg-accent transition-colors">
-                  <Globe className="w-3.5 h-3.5" /> 知识库
-                  <ChevronDown className="w-3 h-3" />
-                </button>
-                <button className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-border text-xs text-muted-foreground hover:bg-accent transition-colors">
-                  <Zap className="w-3.5 h-3.5" /> 快速萃取
-                  <ChevronDown className="w-3 h-3" />
-                </button>
-              </div>
-              <button className="w-8 h-8 rounded-full bg-accent flex items-center justify-center hover:bg-primary/10 transition-colors">
-                <ArrowRight className="w-4 h-4 text-muted-foreground" />
+  return (
+    <AppLayout>
+      <div className="flex h-[calc(100vh-56px)]">
+        {/* Left: Sources panel */}
+        <aside className="w-[260px] shrink-0 border-r border-border flex flex-col bg-accent/30">
+          <div className="p-4 border-b border-border">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="font-semibold text-sm text-foreground">来源</h3>
+              <button
+                onClick={() => setShowAddSource(!showAddSource)}
+                className="p-1 rounded-md hover:bg-accent text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <Plus className="w-4 h-4" />
               </button>
             </div>
-          </motion.div>
 
-          {/* Upload area */}
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="w-full max-w-2xl"
-          >
-            <div className="rounded-xl border-2 border-dashed border-border bg-secondary/30 p-10 flex flex-col items-center justify-center min-h-[240px]">
-              {sources.length === 0 ? (
-                <>
-                  <p className="text-base text-foreground mb-1">拖拽素材到此处</p>
-                  <p className="text-sm text-muted-foreground mb-8">
-                    文档、笔记、会议纪要、项目总结…
-                    <button className="text-primary hover:underline ml-1">支持格式</button>
-                  </p>
-                  <div className="flex items-center gap-3">
-                    <button
-                      onClick={() => addSource("file", "项目总结文档.docx")}
-                      className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-border bg-card text-sm text-foreground hover:border-primary/40 hover:bg-accent transition-all"
-                    >
-                      <Upload className="w-4 h-4" /> 上传文件
-                    </button>
-                    <button
-                      onClick={() => addSource("url", "https://wiki.company.com/project-review")}
-                      className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-border bg-card text-sm text-foreground hover:border-primary/40 hover:bg-accent transition-all"
-                    >
-                      <Link2 className="w-4 h-4" /> 网页链接
-                    </button>
-                    <button
-                      onClick={() => addSource("text", "粘贴的经验笔记")}
-                      className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-border bg-card text-sm text-foreground hover:border-primary/40 hover:bg-accent transition-all"
-                    >
-                      <ClipboardPaste className="w-4 h-4" /> 粘贴文本
-                    </button>
-                  </div>
-                </>
-              ) : (
-                <div className="w-full space-y-2">
-                  <div className="flex items-center justify-between mb-4">
-                    <p className="text-sm font-medium text-foreground">
-                      已添加 {sources.length} 个素材
-                    </p>
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => addSource("file", `素材_${sources.length + 1}.pdf`)}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-border text-xs text-muted-foreground hover:bg-accent transition-colors"
-                      >
-                        <Upload className="w-3.5 h-3.5" /> 添加更多
-                      </button>
-                    </div>
-                  </div>
-                  {sources.map((source) => (
-                    <div
-                      key={source.id}
-                      className="flex items-center gap-3 px-4 py-3 rounded-lg bg-card border border-border"
-                    >
-                      <File className="w-4 h-4 text-primary shrink-0" />
-                      <span className="text-sm text-foreground flex-1 truncate">{source.name}</span>
-                      {source.status === "processing" ? (
-                        <span className="text-xs text-muted-foreground animate-pulse">处理中...</span>
-                      ) : (
-                        <CheckCircle2 className="w-4 h-4 text-green-500 shrink-0" />
-                      )}
-                      <button
-                        onClick={() => removeSource(source.id)}
-                        className="p-1 rounded hover:bg-accent text-muted-foreground hover:text-foreground transition-colors"
-                      >
-                        <X className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
+            {/* Search */}
+            <div className="flex items-center gap-2 px-3 py-2 rounded-md border border-border bg-card text-sm">
+              <Search className="w-3.5 h-3.5 text-muted-foreground" />
+              <input
+                placeholder="搜索来源..."
+                className="flex-1 bg-transparent text-foreground placeholder:text-muted-foreground outline-none text-sm"
+              />
             </div>
+          </div>
 
-            {/* Progress bar */}
-            <div className="mt-4 flex items-center justify-between">
-              <span className="text-xs text-muted-foreground">{sources.length} / 300</span>
-            </div>
-          </motion.div>
-
-          {/* Start button */}
-          {sources.length > 0 && sources.every(s => s.status === "ready") && (
+          {/* Add source options */}
+          {showAddSource && (
             <motion.div
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="mt-8"
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              className="border-b border-border p-3 space-y-1"
             >
               <button
-                onClick={handleStartExtract}
-                className="inline-flex items-center gap-2 px-8 py-3 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors shadow-sm"
+                onClick={() => addSource("file", `文档_${sources.length + 1}.pdf`)}
+                className="flex items-center gap-2 w-full px-3 py-2 rounded-md text-sm text-foreground hover:bg-accent transition-colors"
               >
-                <Sparkles className="w-4 h-4" /> 开始萃取
+                <Upload className="w-4 h-4 text-muted-foreground" /> 上传文件
+              </button>
+              <button
+                onClick={() => addSource("url", "https://wiki.company.com/page")}
+                className="flex items-center gap-2 w-full px-3 py-2 rounded-md text-sm text-foreground hover:bg-accent transition-colors"
+              >
+                <Link2 className="w-4 h-4 text-muted-foreground" /> 网页链接
+              </button>
+              <button
+                onClick={() => addSource("text", "粘贴的文本笔记")}
+                className="flex items-center gap-2 w-full px-3 py-2 rounded-md text-sm text-foreground hover:bg-accent transition-colors"
+              >
+                <ClipboardPaste className="w-4 h-4 text-muted-foreground" /> 粘贴文本
+              </button>
+              <button
+                onClick={() => addSource("case", "已有案例引用")}
+                className="flex items-center gap-2 w-full px-3 py-2 rounded-md text-sm text-foreground hover:bg-accent transition-colors"
+              >
+                <FileText className="w-4 h-4 text-muted-foreground" /> 引用案例
               </button>
             </motion.div>
           )}
-        </div>
-      </AppLayout>
-    );
-  }
 
-  // 3-step wizard
-  return (
-    <AppLayout>
-      <div className="flex">
-        <div className="flex-1 min-w-0 p-6 max-w-3xl">
-          <div className="flex items-center gap-3 mb-1">
-            <button
-              onClick={() => setShowWizard(false)}
-              className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
-              <ArrowLeft className="w-4 h-4" /> 返回
-            </button>
-          </div>
-          <h1 className="text-xl font-semibold text-foreground mb-1 flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-primary" />
-            AI 知识萃取
-          </h1>
-          <p className="text-sm text-muted-foreground mb-6">
-            素材已就绪，{sources.length} 个来源 · 开始结构化整理
-          </p>
-
-          {/* Step indicator */}
-          <div className="flex items-center gap-2 mb-8">
-            {STEPS.map((s, i) => (
-              <div key={s} className="flex items-center gap-2">
-                <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-medium transition-colors ${
-                  i <= step ? "bg-primary text-primary-foreground" : "bg-accent text-muted-foreground"
-                }`}>
-                  {i < step ? <CheckCircle2 className="w-3.5 h-3.5" /> : i + 1}
-                </div>
-                <span className={`text-sm ${i <= step ? "text-foreground font-medium" : "text-muted-foreground"}`}>{s}</span>
-                {i < STEPS.length - 1 && <div className={`w-10 h-px ${i < step ? "bg-primary" : "bg-border"}`} />}
+          {/* Source list */}
+          <div className="flex-1 overflow-y-auto p-3 space-y-1">
+            {sources.map((source) => (
+              <div
+                key={source.id}
+                className="flex items-center gap-2.5 px-3 py-2.5 rounded-md bg-card border border-border group hover:border-primary/30 transition-colors"
+              >
+                <File className="w-4 h-4 text-primary shrink-0" />
+                <span className="text-sm text-foreground flex-1 truncate">{source.name}</span>
+                {source.status === "processing" ? (
+                  <span className="text-xs text-muted-foreground animate-pulse">...</span>
+                ) : (
+                  <CheckCircle2 className="w-3.5 h-3.5 text-green-500 shrink-0" />
+                )}
+                <button
+                  onClick={() => removeSource(source.id)}
+                  className="p-0.5 rounded opacity-0 group-hover:opacity-100 hover:bg-accent text-muted-foreground transition-all"
+                >
+                  <X className="w-3 h-3" />
+                </button>
               </div>
+            ))}
+
+            {sources.length === 0 && (
+              <div className="text-center py-8">
+                <p className="text-sm text-muted-foreground">还没有添加来源</p>
+                <p className="text-xs text-muted-foreground mt-1">点击上方 + 添加素材</p>
+              </div>
+            )}
+          </div>
+
+          <div className="p-3 border-t border-border">
+            <p className="text-xs text-muted-foreground text-center">{sources.length} 个来源</p>
+          </div>
+        </aside>
+
+        {/* Center: AI Chat */}
+        <div className="flex-1 min-w-0 flex flex-col">
+          {/* Chat header */}
+          <div className="px-6 py-3 border-b border-border flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-primary" />
+            <span className="font-semibold text-sm text-foreground">AI 知识萃取助手</span>
+            <span className="text-xs text-muted-foreground ml-2">基于 {sources.length} 个来源</span>
+          </div>
+
+          {/* Chat messages */}
+          <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
+            {chatMessages.map((msg) => (
+              <motion.div
+                key={msg.id}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
+              >
+                <div className={`max-w-[80%] rounded-lg px-4 py-3 text-sm leading-relaxed whitespace-pre-wrap ${
+                  msg.role === "user"
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-accent text-foreground"
+                }`}>
+                  {msg.content}
+                </div>
+              </motion.div>
             ))}
           </div>
 
-          <AnimatePresence mode="wait">
-            {step === 0 && (
-              <motion.div key="step0" initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }}>
-                <h2 className="font-semibold text-base text-foreground mb-4">选择沉淀类型</h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {CASE_CATEGORIES.map((cat) => (
-                    <button
-                      key={cat}
-                      onClick={() => setSelectedType(cat)}
-                      className={`card-base p-4 text-left transition-all ${
-                        selectedType === cat ? "border-primary bg-primary/5" : ""
-                      }`}
-                    >
-                      <p className="font-medium text-foreground text-sm">{cat}</p>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        {cat === "经验案例" && "记录个人或团队的实践经验"}
-                        {cat === "项目复盘" && "对已完成项目的系统回顾"}
-                        {cat === "问题解决" && "描述问题发现与解决过程"}
-                        {cat === "最佳实践" && "总结可复用的方法与流程"}
-                        {cat === "客户案例" && "记录客户合作的成功经验"}
-                      </p>
-                    </button>
-                  ))}
-                </div>
-                <div className="mt-6 flex justify-end">
-                  <button
-                    disabled={!selectedType}
-                    onClick={() => setStep(1)}
-                    className="inline-flex items-center gap-2 px-5 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium disabled:opacity-40 hover:bg-primary/90 transition-colors"
-                  >
-                    下一步 <ArrowRight className="w-4 h-4" />
-                  </button>
-                </div>
-              </motion.div>
-            )}
-
-            {step === 1 && (
-              <motion.div key="step1" initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }}>
-                <h2 className="font-semibold text-base text-foreground mb-4">输入原始信息</h2>
-                <div className="space-y-4">
-                  <div>
-                    <label className="text-sm font-medium text-foreground mb-1.5 block">标题（可选）</label>
-                    <input
-                      value={title}
-                      onChange={(e) => setTitle(e.target.value)}
-                      placeholder="输入案例标题，或留空让 AI 生成"
-                      className="w-full px-3 py-2 rounded-lg border border-input bg-card text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-primary focus:shadow-[0_0_0_2px_hsl(var(--primary)/0.1)] transition-all"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-foreground mb-1.5 block">原始内容 / 经验描述</label>
-                    <textarea
-                      value={content}
-                      onChange={(e) => setContent(e.target.value)}
-                      placeholder="把你的经验、想法、笔记粘贴到这里，AI 将帮你整理成结构化案例..."
-                      className="w-full px-3 py-2.5 rounded-lg border border-input bg-card text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-primary focus:shadow-[0_0_0_2px_hsl(var(--primary)/0.1)] transition-all min-h-[180px] resize-y"
-                    />
-                  </div>
-                  <button
-                    onClick={handleAIGenerate}
-                    disabled={aiGenerating}
-                    className="inline-flex items-center gap-2 px-5 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors disabled:opacity-60"
-                  >
-                    <Wand2 className="w-4 h-4" />
-                    {aiGenerating ? "AI 生成中..." : "AI 生成结构"}
-                  </button>
-
-                  {aiResult && (
-                    <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="rounded-lg border border-primary/20 bg-primary/5 p-5 space-y-3">
-                      <p className="text-xs font-medium text-primary flex items-center gap-1"><Sparkles className="w-3.5 h-3.5" /> AI 生成结果</p>
-                      <div>
-                        <p className="text-xs text-muted-foreground">标题</p>
-                        <p className="text-sm font-medium text-foreground">{aiResult.title}</p>
-                      </div>
-                      <div>
-                        <p className="text-xs text-muted-foreground">摘要</p>
-                        <p className="text-sm text-card-foreground">{aiResult.summary}</p>
-                      </div>
-                      <div>
-                        <p className="text-xs text-muted-foreground">推荐标签</p>
-                        <div className="flex flex-wrap gap-1.5 mt-1">
-                          {aiResult.tags.map((t) => (
-                            <span key={t} className="px-2 py-0.5 rounded bg-primary/10 text-primary text-xs">{t}</span>
-                          ))}
-                        </div>
-                      </div>
-                      <div>
-                        <p className="text-xs text-muted-foreground">章节结构</p>
-                        <div className="space-y-1 mt-1">
-                          {aiResult.sections.map((s, i) => (
-                            <p key={s} className="text-sm text-card-foreground">{i + 1}. {s}</p>
-                          ))}
-                        </div>
-                      </div>
-                    </motion.div>
-                  )}
-                </div>
-                <div className="mt-6 flex justify-between">
-                  <button onClick={() => setStep(0)} className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors">
-                    <ArrowLeft className="w-4 h-4" /> 上一步
-                  </button>
-                  <button
-                    onClick={() => setStep(2)}
-                    className="inline-flex items-center gap-2 px-5 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors"
-                  >
-                    下一步 <ArrowRight className="w-4 h-4" />
-                  </button>
-                </div>
-              </motion.div>
-            )}
-
-            {step === 2 && (
-              <motion.div key="step2" initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }}>
-                <h2 className="font-semibold text-base text-foreground mb-4">编辑完善 & 发布</h2>
-                <div className="space-y-4">
-                  <div>
-                    <label className="text-sm font-medium text-foreground mb-1.5 block">标题</label>
-                    <input
-                      defaultValue={aiResult?.title || title}
-                      className="w-full px-3 py-2 rounded-lg border border-input bg-card text-sm text-foreground outline-none focus:border-primary focus:shadow-[0_0_0_2px_hsl(var(--primary)/0.1)] transition-all"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-foreground mb-1.5 block">摘要</label>
-                    <textarea
-                      defaultValue={aiResult?.summary || ""}
-                      className="w-full px-3 py-2.5 rounded-lg border border-input bg-card text-sm text-foreground outline-none focus:border-primary focus:shadow-[0_0_0_2px_hsl(var(--primary)/0.1)] transition-all min-h-[80px] resize-y"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-foreground mb-1.5 block">正文</label>
-                    <textarea
-                      placeholder="在此编辑案例正文内容..."
-                      className="w-full px-3 py-2.5 rounded-lg border border-input bg-card text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-primary focus:shadow-[0_0_0_2px_hsl(var(--primary)/0.1)] transition-all min-h-[280px] resize-y"
-                    />
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <div className="flex-1">
-                      <label className="text-sm font-medium text-foreground mb-1.5 block">领域</label>
-                      <select className="w-full px-3 py-2 rounded-lg border border-input bg-card text-sm text-foreground outline-none focus:border-primary transition-all">
-                        <option>AI 与大模型</option>
-                        <option>项目管理</option>
-                        <option>数据与架构</option>
-                        <option>设计与体验</option>
-                      </select>
-                    </div>
-                    <div className="flex-1">
-                      <label className="text-sm font-medium text-foreground mb-1.5 block">可见范围</label>
-                      <select className="w-full px-3 py-2 rounded-lg border border-input bg-card text-sm text-foreground outline-none focus:border-primary transition-all">
-                        <option>全公司可见</option>
-                        <option>部门可见</option>
-                        <option>仅自己可见</option>
-                      </select>
-                    </div>
-                  </div>
-                </div>
-                <div className="mt-6 flex justify-between">
-                  <button onClick={() => setStep(1)} className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors">
-                    <ArrowLeft className="w-4 h-4" /> 上一步
-                  </button>
-                  <button className="inline-flex items-center gap-2 px-5 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors">
-                    <Send className="w-4 h-4" /> 发布案例
-                  </button>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-
-        {/* AI Copilot panel */}
-        <aside className="w-72 shrink-0 border-l border-border p-5 hidden xl:block sticky top-0 h-screen overflow-y-auto bg-secondary/30">
-          <div className="flex items-center gap-2 mb-4">
-            <Sparkles className="w-4 h-4 text-primary" />
-            <h3 className="font-semibold text-sm text-primary">AI Copilot</h3>
-          </div>
-          <div className="space-y-2">
-            {[
-              { icon: <Wand2 className="w-4 h-4" />, label: "润色文字", desc: "优化表达，提升可读性" },
-              { icon: <FileText className="w-4 h-4" />, label: "生成摘要", desc: "一键生成案例摘要" },
-              { icon: <Tag className="w-4 h-4" />, label: "推荐标签", desc: "智能推荐相关标签" },
-            ].map((tool) => (
+          {/* Suggested actions */}
+          <div className="px-6 pb-2 flex flex-wrap gap-2">
+            {["帮我生成案例摘要", "提取关键数据", "推荐标签", "生成章节结构"].map((suggestion) => (
               <button
-                key={tool.label}
-                className="w-full flex items-center gap-3 p-3 rounded-lg border border-border bg-card hover:border-primary/30 transition-colors text-left"
+                key={suggestion}
+                onClick={() => { setChatInput(suggestion); }}
+                className="px-3 py-1.5 rounded-md border border-border text-xs text-muted-foreground hover:text-foreground hover:border-primary/40 transition-colors"
               >
-                <div className="text-primary">{tool.icon}</div>
-                <div>
-                  <p className="text-sm font-medium text-foreground">{tool.label}</p>
-                  <p className="text-xs text-muted-foreground">{tool.desc}</p>
-                </div>
+                {suggestion}
               </button>
             ))}
           </div>
 
-          <div className="mt-6 p-4 rounded-lg border border-border bg-card">
-            <p className="text-xs text-muted-foreground mb-3">AI 助手</p>
-            <div className="p-3 rounded-lg bg-accent text-sm text-foreground">
-              👋 你好！我可以帮你把零散经验快速整理成结构化案例。试试上面的工具吧！
-            </div>
-            <div className="mt-3 flex gap-2">
+          {/* Chat input */}
+          <div className="px-6 pb-4">
+            <div className="flex items-center gap-2 px-4 py-3 rounded-lg border border-border bg-card">
               <input
-                placeholder="问我任何问题..."
-                className="flex-1 px-3 py-2 rounded-lg border border-input bg-card text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-primary transition-all"
+                value={chatInput}
+                onChange={(e) => setChatInput(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && handleSend()}
+                placeholder="输入你的问题，或让 AI 帮你生成内容..."
+                className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none"
               />
-              <button className="p-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors">
+              <button
+                onClick={handleSend}
+                disabled={!chatInput.trim()}
+                className="p-2 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors disabled:opacity-40"
+              >
                 <Send className="w-4 h-4" />
               </button>
             </div>
+          </div>
+        </div>
+
+        {/* Right: Studio panel */}
+        <aside className="w-[240px] shrink-0 border-l border-border flex flex-col bg-accent/30">
+          <div className="p-4 border-b border-border">
+            <h3 className="font-semibold text-sm text-foreground">Studio</h3>
+            <p className="text-xs text-muted-foreground mt-0.5">AI 工具箱</p>
+          </div>
+
+          <div className="flex-1 overflow-y-auto p-3 space-y-1.5">
+            {studioTools.map((tool) => (
+              <button
+                key={tool.label}
+                className="w-full flex items-center gap-3 px-3 py-3 rounded-md border border-border bg-card hover:border-primary/30 transition-colors text-left group"
+              >
+                <tool.icon className={`w-4 h-4 ${tool.color} shrink-0`} />
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-foreground">{tool.label}</p>
+                  <p className="text-xs text-muted-foreground">{tool.desc}</p>
+                </div>
+                <ChevronRight className="w-3.5 h-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+              </button>
+            ))}
+          </div>
+
+          {/* Publish button */}
+          <div className="p-3 border-t border-border">
+            <button className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-md bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors">
+              <Send className="w-4 h-4" /> 发布案例
+            </button>
           </div>
         </aside>
       </div>
