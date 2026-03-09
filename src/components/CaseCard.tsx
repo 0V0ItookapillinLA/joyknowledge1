@@ -14,18 +14,18 @@ const formatNumber = (n: number) => {
 
 const CaseCard = ({ caseItem }: CaseCardProps) => {
   return (
-    <Link to={`/case/${caseItem.id}`} className="block card-base p-5 group">
-      <div className="flex items-center justify-between mb-3">
-        <span className="text-xs font-medium text-muted-foreground">{caseItem.category}</span>
+    <Link to={`/case/${caseItem.id}`} className="block card-base p-4 group">
+      <div className="flex items-center justify-between mb-2">
+        <span className="text-xs text-muted-foreground">{caseItem.category}</span>
         <span className="text-xs text-muted-foreground">{caseItem.createdAt}</span>
       </div>
-      <h3 className="font-display font-semibold text-base text-card-foreground mb-2 group-hover:text-primary transition-colors line-clamp-2">
+      <h3 className="font-medium text-sm text-card-foreground mb-1.5 group-hover:text-primary transition-colors line-clamp-2">
         {caseItem.title}
       </h3>
       <p className="text-sm text-muted-foreground mb-3 line-clamp-2">{caseItem.summary}</p>
-      <div className="flex flex-wrap gap-1.5 mb-3">
+      <div className="flex flex-wrap gap-1 mb-3">
         {caseItem.tags.map((tag) => (
-          <span key={tag} className="px-2 py-0.5 rounded-full bg-secondary text-secondary-foreground text-xs">
+          <span key={tag} className="px-2 py-0.5 rounded bg-accent text-secondary-foreground text-xs">
             {tag}
           </span>
         ))}

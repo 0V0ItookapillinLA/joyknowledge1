@@ -12,8 +12,7 @@ export default {
     },
     extend: {
       fontFamily: {
-        display: ['Space Grotesk', 'Noto Sans SC', 'sans-serif'],
-        body: ['Noto Sans SC', 'sans-serif'],
+        body: ['-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Noto Sans SC', 'PingFang SC', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",

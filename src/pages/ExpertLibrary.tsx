@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import AppLayout from "@/components/AppLayout";
 import CaseCard from "@/components/CaseCard";
@@ -26,26 +25,26 @@ const ExpertLibrary = () => {
     <AppLayout>
       <div className="flex">
         {/* Domain tree */}
-        <aside className="w-52 shrink-0 border-r border-border p-4 hidden lg:block sticky top-0 h-screen overflow-y-auto">
-          <h3 className="font-display font-semibold text-sm text-foreground mb-3">领域分类</h3>
-          <div className="space-y-3">
+        <aside className="w-48 shrink-0 border-r border-border p-4 hidden lg:block sticky top-0 h-screen overflow-y-auto">
+          <h3 className="font-semibold text-sm text-foreground mb-3">领域分类</h3>
+          <div className="space-y-2">
             <button
               onClick={() => setSelectedDomain(null)}
-              className={`block w-full text-left px-3 py-1.5 rounded-lg text-sm transition-colors ${
-                !selectedDomain ? "bg-primary/10 text-primary font-medium" : "text-muted-foreground hover:text-foreground"
+              className={`block w-full text-left px-3 py-1.5 rounded-md text-sm transition-colors ${
+                !selectedDomain ? "bg-primary/10 text-primary font-medium" : "text-muted-foreground hover:text-foreground hover:bg-accent"
               }`}
             >
               全部领域
             </button>
             {DOMAIN_TREE.map((domain) => (
               <div key={domain.label}>
-                <p className="px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">{domain.label}</p>
+                <p className="px-3 text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1 mt-2">{domain.label}</p>
                 {domain.children.map((child) => (
                   <button
                     key={child}
                     onClick={() => setSelectedDomain(child)}
-                    className={`block w-full text-left px-3 py-1.5 rounded-lg text-sm transition-colors ${
-                      selectedDomain === child ? "bg-primary/10 text-primary font-medium" : "text-muted-foreground hover:text-foreground"
+                    className={`block w-full text-left px-3 py-1.5 rounded-md text-sm transition-colors ${
+                      selectedDomain === child ? "bg-primary/10 text-primary font-medium" : "text-muted-foreground hover:text-foreground hover:bg-accent"
                     }`}
                   >
                     {child}
@@ -58,31 +57,30 @@ const ExpertLibrary = () => {
 
         {/* Expert list + detail */}
         <div className="flex-1 min-w-0 p-6">
-          <h1 className="font-display text-2xl font-bold text-foreground mb-1">专家书房</h1>
+          <h1 className="text-xl font-semibold text-foreground mb-1">专家书房</h1>
           <p className="text-sm text-muted-foreground mb-6">发现领域专家，学习他们的实践经验</p>
 
-          {/* Expert cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-8">
             {filteredExperts.map((expert) => (
               <motion.button
                 key={expert.id}
                 onClick={() => setSelectedExpert(expert)}
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
-                className={`card-base p-5 text-left w-full transition-all ${
-                  selectedExpert.id === expert.id ? "ring-2 ring-primary" : ""
+                className={`card-base p-4 text-left w-full transition-all ${
+                  selectedExpert.id === expert.id ? "border-primary" : ""
                 }`}
               >
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-lg">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold text-base">
                     {expert.name[0]}
                   </div>
                   <div>
-                    <p className="font-display font-semibold text-foreground">{expert.name}</p>
+                    <p className="font-medium text-foreground">{expert.name}</p>
                     <p className="text-xs text-muted-foreground">{expert.title} · {expert.department}</p>
                   </div>
                 </div>
-                <p className="text-sm text-muted-foreground mb-3">{expert.bio}</p>
+                <p className="text-sm text-muted-foreground mb-2">{expert.bio}</p>
                 <div className="flex items-center gap-4 text-xs text-muted-foreground">
                   <span>{expert.caseCount} 案例</span>
                   <span>{expert.followers} 关注者</span>
@@ -91,11 +89,10 @@ const ExpertLibrary = () => {
             ))}
           </div>
 
-          {/* Selected expert's cases */}
           <div>
-            <h2 className="font-display font-semibold text-lg text-foreground mb-4">{selectedExpert.name} 的案例</h2>
+            <h2 className="font-semibold text-base text-foreground mb-4">{selectedExpert.name} 的案例</h2>
             {expertCases.length > 0 ? (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
                 {expertCases.map((c) => (
                   <CaseCard key={c.id} caseItem={c} />
                 ))}
@@ -107,14 +104,14 @@ const ExpertLibrary = () => {
         </div>
 
         {/* Right info panel */}
-        <aside className="w-64 shrink-0 border-l border-border p-5 hidden xl:block sticky top-0 h-screen overflow-y-auto">
-          <h3 className="font-display font-semibold text-sm text-foreground mb-3">专家能力</h3>
+        <aside className="w-60 shrink-0 border-l border-border p-5 hidden xl:block sticky top-0 h-screen overflow-y-auto">
+          <h3 className="font-semibold text-sm text-foreground mb-3">专家能力</h3>
           <div className="space-y-4">
             <div>
               <p className="text-xs text-muted-foreground mb-2">擅长领域</p>
               <div className="flex flex-wrap gap-1.5">
                 {selectedExpert.domains.map((d) => (
-                  <span key={d} className="px-2 py-1 rounded-full bg-primary/10 text-primary text-xs">{d}</span>
+                  <span key={d} className="px-2 py-0.5 rounded bg-primary/10 text-primary text-xs">{d}</span>
                 ))}
               </div>
             </div>
@@ -122,7 +119,7 @@ const ExpertLibrary = () => {
               <p className="text-xs text-muted-foreground mb-2">技能标签</p>
               <div className="flex flex-wrap gap-1.5">
                 {selectedExpert.skills.map((s) => (
-                  <span key={s} className="px-2 py-1 rounded-full bg-secondary text-secondary-foreground text-xs">{s}</span>
+                  <span key={s} className="px-2 py-0.5 rounded bg-accent text-secondary-foreground text-xs">{s}</span>
                 ))}
               </div>
             </div>
