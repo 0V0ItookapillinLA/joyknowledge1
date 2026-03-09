@@ -38,7 +38,7 @@ const ExpertLibrary = () => {
 
     return (
       <AppLayout>
-        <div className="flex">
+        <div className="flex max-w-[1400px] mx-auto">
           {/* Left sidebar */}
           <aside className="w-[220px] shrink-0 border-r border-border p-5 hidden lg:block sticky top-14 h-[calc(100vh-56px)] overflow-y-auto">
             <button
