@@ -14,8 +14,8 @@ const PersonalZone = () => {
 
   return (
     <AppLayout>
-      <div className="flex">
-        <div className="flex-1 min-w-0 p-6 max-w-4xl">
+      <div className="flex max-w-[1100px] mx-auto">
+        <div className="flex-1 min-w-0 p-6">
           <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
             {/* Profile header */}
             <div className="card-base p-6 mb-6">

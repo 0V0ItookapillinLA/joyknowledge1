@@ -324,7 +324,7 @@ const Index = () => {
 
           <div className="px-6 pb-8">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {filteredCases.slice(0, 4).map((c, i) => (
+              {MOCK_CASES.slice(0, 4).map((c, i) => (
                 <motion.div
                   key={c.id}
                   initial={{ opacity: 0, y: 8 }}
@@ -336,9 +336,9 @@ const Index = () => {
               ))}
             </div>
 
-            {filteredCases.length > 4 && (
+            {MOCK_CASES.length > 4 && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                {filteredCases.slice(4, 8).map((c, i) => (
+                {MOCK_CASES.slice(4, 8).map((c, i) => (
                   <motion.div
                     key={c.id}
                     initial={{ opacity: 0, y: 8 }}
