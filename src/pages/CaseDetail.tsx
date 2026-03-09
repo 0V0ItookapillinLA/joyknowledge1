@@ -161,7 +161,7 @@ const CaseDetail = () => {
               </div>
             </div>
             <Link
-              to={`/experts?id=${caseItem.author}`}
+              to={`/experts?id=${authorExpert?.id || caseItem.author}`}
               className="block w-full text-center py-2 rounded-md border border-border text-sm text-muted-foreground hover:text-primary hover:border-primary/40 transition-colors"
             >
               进入作者主页

@@ -423,7 +423,7 @@ const Index = () => {
                     {MOCK_EXPERTS.slice(0, 5).map((expert) => (
                       <Link
                         key={expert.id}
-                        to="/experts"
+                        to={`/experts?id=${expert.id}`}
                         className="flex flex-col items-center gap-2 shrink-0 group"
                       >
                         <img
