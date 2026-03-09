@@ -1,19 +1,18 @@
 import { ReactNode } from "react";
-import SideNav from "./SideNav";
-import AIBar from "./AIBar";
+import TopNav from "./TopNav";
 
 interface AppLayoutProps {
   children: ReactNode;
+  hideNav?: boolean;
 }
 
-const AppLayout = ({ children }: AppLayoutProps) => {
+const AppLayout = ({ children, hideNav }: AppLayoutProps) => {
   return (
-    <div className="flex min-h-screen">
-      <SideNav />
+    <div className="min-h-screen flex flex-col">
+      {!hideNav && <TopNav />}
       <main className="flex-1 min-w-0">
         {children}
       </main>
-      <AIBar />
     </div>
   );
 };
