@@ -117,44 +117,33 @@ const Index = () => {
             </div>
           </div>
 
-          <div>
-            <p className="text-xs text-muted-foreground mb-2 px-3">BGBU专区</p>
-            <div className="space-y-0.5">
-              {BGBU_ITEMS.map((item) => (
-                <button
-                  key={item.label}
-                  onClick={() => { setActiveBGBU(activeBGBU === item.label ? null : item.label); setActiveDomain(null); }}
-                  className={`flex items-center gap-2.5 w-full px-3 py-2 rounded-md text-sm transition-colors ${
-                    activeBGBU === item.label
-                      ? "bg-primary/10 text-primary font-medium"
-                      : "text-muted-foreground hover:text-foreground hover:bg-accent"
-                  }`}
-                >
-                  {item.label}
-                </button>
-              ))}
+          {BGBU_SECTIONS.map((section) => (
+            <div
+              key={section.title}
+              className="mb-4"
+              onMouseEnter={() => setHoveredSection(section.title)}
+              onMouseLeave={() => setHoveredSection(null)}
+            >
+              <p className="text-sm font-semibold text-foreground mb-2 px-3">{section.title}</p>
+              <div className={`grid grid-cols-2 gap-x-1 gap-y-0.5 transition-all duration-200 ${
+                hoveredSection === section.title ? "bg-accent/50 rounded-lg p-1" : ""
+              }`}>
+                {section.items.map((item) => (
+                  <button
+                    key={item.label}
+                    onClick={() => setActiveSection(activeSection === item.label ? null : item.label)}
+                    className={`text-left px-2 py-1.5 rounded text-sm transition-colors ${
+                      activeSection === item.label
+                        ? "text-primary font-medium bg-primary/10"
+                        : "text-muted-foreground hover:text-primary hover:underline"
+                    }`}
+                  >
+                    {item.label}
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
-
-          <div>
-            <p className="text-xs text-muted-foreground mb-2 px-3">领域专区</p>
-            <div className="space-y-0.5">
-              {DOMAIN_ITEMS.map((item) => (
-                <button
-                  key={item.label}
-                  onClick={() => { setActiveDomain(activeDomain === item.label ? null : item.label); setActiveBGBU(null); }}
-                  className={`flex items-center gap-2.5 w-full px-3 py-2 rounded-md text-sm transition-colors ${
-                    activeDomain === item.label
-                      ? "bg-primary/10 text-primary font-medium"
-                      : "text-muted-foreground hover:text-foreground hover:bg-accent"
-                  }`}
-                >
-                  <span>{item.icon}</span>
-                  {item.label}
-                </button>
-              ))}
-            </div>
-          </div>
+          ))}
 
           {/* Date filter */}
           <div className="mt-auto pt-4 border-t border-border">
