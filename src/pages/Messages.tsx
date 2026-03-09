@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, useMemo } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, Send, Search, MoreHorizontal, Phone, Video, Smile, Paperclip, Check, CheckCheck } from "lucide-react";
 import AppLayout from "@/components/AppLayout";
