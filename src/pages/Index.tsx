@@ -63,24 +63,27 @@ const Index = () => {
   const [activeZone, setActiveZone] = useState<string | null>(null);
   const [activeNav, setActiveNav] = useState("推荐");
 
-  const [activeBGBU, setActiveBGBU] = useState<string | null>(null);
-  const [activeDomain, setActiveDomain] = useState<string | null>(null);
+  const [activeSection, setActiveSection] = useState<string | null>(null);
+  const [hoveredSection, setHoveredSection] = useState<string | null>(null);
   const [dateFilter, setDateFilter] = useState("全部时间");
   const [showDateDropdown, setShowDateDropdown] = useState(false);
 
   const activeZoneObj = HOT_ZONES.find(z => z.label === activeZone);
-  const activeDomainObj = DOMAIN_ITEMS.find(d => d.label === activeDomain);
-  const activeBGBUObj = BGBU_ITEMS.find(b => b.label === activeBGBU);
+
+  // Find active item across all sections
+  const allSectionItems = BGBU_SECTIONS.flatMap(s => s.items);
+  const activeItem = allSectionItems.find(i => i.label === activeSection);
 
   let filteredCases = MOCK_CASES;
   if (activeZoneObj) {
     filteredCases = filteredCases.filter((c) => c.tags.some(t => activeZoneObj.matchTags.includes(t)));
   }
-  if (activeDomainObj) {
-    filteredCases = filteredCases.filter((c) => c.tags.some(t => activeDomainObj.matchTags.includes(t)));
-  }
-  if (activeBGBUObj) {
-    filteredCases = filteredCases.filter((c) => c.department === activeBGBUObj.matchDept);
+  if (activeItem) {
+    if ('matchDept' in activeItem) {
+      filteredCases = filteredCases.filter((c) => c.department === activeItem.matchDept);
+    } else if ('matchTags' in activeItem) {
+      filteredCases = filteredCases.filter((c) => c.tags.some(t => (activeItem as any).matchTags.includes(t)));
+    }
   }
 
   const trendingItems = [
