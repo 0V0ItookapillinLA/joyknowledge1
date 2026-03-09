@@ -176,7 +176,7 @@ const Index = () => {
         </div>
 
         {/* Right sidebar */}
-        <aside className="w-[280px] shrink-0 p-5 space-y-5 hidden xl:block sticky top-14 h-[calc(100vh-56px)] overflow-y-auto">
+        <aside className="w-[280px] shrink-0 p-5 space-y-5 hidden lg:block sticky top-14 h-[calc(100vh-56px)] overflow-y-auto border-l border-border">
           {/* AI CTA Card */}
           <div className="rounded-xl bg-primary p-5 text-primary-foreground">
             <div className="flex items-center gap-2 mb-3">
