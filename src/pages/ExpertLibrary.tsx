@@ -121,21 +121,17 @@ const ExpertLibrary = () => {
             </button>
 
             <h3 className="font-semibold text-sm text-foreground mb-3">专家领域</h3>
-            <div className="space-y-1">
-              {DOMAINS.slice(1).map((d) => (
-                <button key={d} className="block w-full text-left px-3 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
-                  {d}
-                </button>
+            <div className="flex flex-wrap gap-1.5 mb-6">
+              {selectedExpert.domains.map((d) => (
+                <span key={d} className="px-3 py-1.5 rounded-full border border-primary/20 bg-primary/5 text-primary text-xs font-medium">{d}</span>
               ))}
             </div>
 
-            <div className="mt-8">
-              <h3 className="font-semibold text-sm text-foreground mb-3">技能专长</h3>
-              <div className="flex flex-wrap gap-1.5">
-                {selectedExpert.skills.map((s) => (
-                  <span key={s} className="px-2.5 py-1 rounded-md bg-accent text-secondary-foreground text-xs">{s}</span>
-                ))}
-              </div>
+            <h3 className="font-semibold text-sm text-foreground mb-3">技能专长</h3>
+            <div className="flex flex-wrap gap-1.5">
+              {selectedExpert.skills.map((s) => (
+                <span key={s} className="px-2.5 py-1 rounded-md bg-accent text-secondary-foreground text-xs">{s}</span>
+              ))}
             </div>
           </aside>
 
