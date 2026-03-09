@@ -84,8 +84,39 @@ const KnowledgeList = () => {
     );
   };
 
-  // Simple filter: show all cases (mock data doesn't map perfectly to tree)
-  const filteredCases = MOCK_CASES;
+  // Filter cases based on selected filters (multi-select)
+  let filteredCases = MOCK_CASES;
+  
+  // If we have selected filters from the tree, apply them
+  if (selectedFilters.length > 0) {
+    filteredCases = filteredCases.filter((c) => {
+      // Match against department, tags, or category
+      return selectedFilters.some((f) => 
+        c.department.includes(f) || 
+        c.tags.some(t => t.includes(f)) || 
+        c.category.includes(f) ||
+        f.includes(c.department)
+      );
+    });
+    // If strict filtering yields nothing, show all (graceful fallback)
+    if (filteredCases.length === 0) {
+      filteredCases = MOCK_CASES;
+    }
+  }
+
+  // Content type filter
+  if (selectedContentTypes.length > 0) {
+    filteredCases = filteredCases.filter((c) =>
+      selectedContentTypes.some((t) => c.category.includes(t))
+    );
+  }
+
+  // Search filter
+  const searchFiltered = searchQuery
+    ? filteredCases.filter((c) =>
+        c.title.includes(searchQuery) || c.summary.includes(searchQuery)
+      )
+    : filteredCases;
 
   return (
     <AppLayout>
