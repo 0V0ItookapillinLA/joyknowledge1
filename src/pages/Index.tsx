@@ -1,3 +1,4 @@
+// Index page
 import { useState, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Flame, Users, Sparkles, MessageSquare, Home as HomeIcon, ChevronDown, ChevronRight, Briefcase, ShoppingCart, Truck, Cpu, Heart, Factory, Building2, Shield, TrendingUp, Code2, CheckCircle2, CreditCard, Lightbulb, BarChart3 } from "lucide-react";
