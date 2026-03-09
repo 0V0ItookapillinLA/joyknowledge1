@@ -21,7 +21,7 @@ const CaseDetail = () => {
 
   return (
     <AppLayout>
-      <div className="flex">
+      <div className="flex max-w-[1400px] mx-auto">
         {/* Main content */}
         <div className="flex-1 min-w-0 p-6 max-w-4xl">
           {/* Breadcrumb */}

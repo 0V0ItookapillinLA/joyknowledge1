@@ -61,7 +61,7 @@ const Community = () => {
 
   return (
     <AppLayout>
-      <div className="flex">
+      <div className="flex max-w-[1400px] mx-auto">
         {/* Left sidebar */}
         <aside className="w-[220px] shrink-0 border-r border-border p-5 hidden lg:block sticky top-14 h-[calc(100vh-56px)] overflow-y-auto">
           <button className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors mb-6">

@@ -17,13 +17,13 @@ const RECOMMENDED_TOPICS = [
 ];
 
 const HOT_ZONES = [
-  { label: "数字化转型", emoji: "🚀" },
-  { label: "降本增效", emoji: "📊" },
-  { label: "客户案例", emoji: "🤝" },
-  { label: "项目复盘", emoji: "📋" },
-  { label: "创新实践", emoji: "💡" },
-  { label: "供应链优化", emoji: "🏗️" },
-  { label: "敏捷开发", emoji: "⚡" },
+  { label: "AI应用", emoji: "🚀", matchTags: ["AI应用"] },
+  { label: "降本增效", emoji: "📊", matchTags: ["流程优化", "数据分析"] },
+  { label: "客户案例", emoji: "🤝", matchTags: ["客户案例"] },
+  { label: "项目复盘", emoji: "📋", matchTags: ["项目复盘"] },
+  { label: "创新实践", emoji: "💡", matchTags: ["最佳实践", "产品设计"] },
+  { label: "技术架构", emoji: "🏗️", matchTags: ["技术架构"] },
+  { label: "团队管理", emoji: "⚡", matchTags: ["团队管理"] },
 ];
 
 const NAV_ITEMS = [
@@ -45,8 +45,9 @@ const Index = () => {
   const [activeZone, setActiveZone] = useState<string | null>(null);
   const [activeNav, setActiveNav] = useState("推荐");
 
-  const filteredCases = activeZone
-    ? MOCK_CASES.filter((c) => c.tags.some(t => t.includes(activeZone)))
+  const activeZoneObj = HOT_ZONES.find(z => z.label === activeZone);
+  const filteredCases = activeZoneObj
+    ? MOCK_CASES.filter((c) => c.tags.some(t => activeZoneObj.matchTags.includes(t)))
     : MOCK_CASES;
 
   const trendingItems = [
@@ -58,7 +59,7 @@ const Index = () => {
 
   return (
     <AppLayout>
-      <div className="flex">
+      <div className="flex max-w-[1400px] mx-auto">
         {/* Left sidebar */}
         <aside className="w-[200px] shrink-0 border-r border-border p-4 hidden lg:block sticky top-14 h-[calc(100vh-56px)] overflow-y-auto">
           <div className="mb-6">
