@@ -406,7 +406,7 @@ const KnowledgeList = () => {
             ))}
           </div>
 
-          {filteredCases.length === 0 && (
+          {searchFiltered.length === 0 && (
             <div className="text-center py-20">
               <p className="text-muted-foreground">暂无相关知识内容</p>
             </div>
