@@ -33,7 +33,7 @@ interface ToolOption {
   color: string;
 }
 
-type AppMode = "select" | "workspace" | "generating" | "result";
+type AppMode = "select" | "workspace" | "generating" | "result" | "quick-upload" | "quick-extract";
 type ExtractMode = "quick" | "deep";
 
 /* ───── Mock Content ───── */
