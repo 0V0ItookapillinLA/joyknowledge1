@@ -201,6 +201,8 @@ const Index = () => {
   const [showDateDropdown, setShowDateDropdown] = useState(false);
   const [marqueeRow1Paused, setMarqueeRow1Paused] = useState(false);
   const [marqueeRow2Paused, setMarqueeRow2Paused] = useState(false);
+  const [deptFilter, setDeptFilter] = useState("全部部门");
+  const [showDeptDropdown, setShowDeptDropdown] = useState(false);
   const navigate = useNavigate();
 
   const trendingItems = [
