@@ -92,6 +92,18 @@ const DOMAIN_SECTION: SidebarSection = {
   ],
 };
 
+const DEPARTMENTS = [
+  { label: "全部部门", bgbu: "" },
+  { label: "产品创新部", bgbu: "京东零售" },
+  { label: "技术研发部", bgbu: "京东科技" },
+  { label: "供应链管理部", bgbu: "京东物流" },
+  { label: "市场营销部", bgbu: "京东零售" },
+  { label: "人力资源部", bgbu: "京东职能" },
+  { label: "数据平台部", bgbu: "京东科技" },
+  { label: "健康业务部", bgbu: "京东健康" },
+  { label: "基础设施部", bgbu: "京东科技" },
+];
+
 const DATE_OPTIONS = ["全部时间", "最近一周", "最近一月", "最近三月"];
 
 // Hover popover section component - matches reference image with icon grid
