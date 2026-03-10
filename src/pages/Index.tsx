@@ -353,6 +353,50 @@ const Index = () => {
                 </div>
               </div>
 
+              {/* Department filter bar */}
+              <div className="px-6 pb-3">
+                <div className="flex items-center gap-3 flex-wrap">
+                  <span className="text-sm text-muted-foreground shrink-0">部门筛选</span>
+                  <div className="relative">
+                    <button
+                      onClick={() => setShowDeptDropdown(!showDeptDropdown)}
+                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border text-sm transition-colors ${
+                        deptFilter !== "全部部门"
+                          ? "border-primary/40 bg-primary/5 text-primary"
+                          : "border-border text-foreground hover:border-primary/40"
+                      }`}
+                    >
+                      {deptFilter}
+                      <ChevronDown className={`w-3.5 h-3.5 transition-transform ${showDeptDropdown ? "rotate-180" : ""}`} />
+                    </button>
+                    {showDeptDropdown && (
+                      <div className="absolute left-0 top-full mt-1 w-48 bg-card border border-border rounded-lg shadow-lg z-20 py-1">
+                        {DEPARTMENTS.map((dept) => (
+                          <button
+                            key={dept.label}
+                            onClick={() => { setDeptFilter(dept.label); setShowDeptDropdown(false); }}
+                            className={`flex items-center justify-between w-full px-3 py-2 text-sm transition-colors ${
+                              deptFilter === dept.label ? "text-primary bg-primary/5" : "text-foreground hover:bg-accent"
+                            }`}
+                          >
+                            <span>{dept.label}</span>
+                            {dept.bgbu && <span className="text-xs text-muted-foreground">{dept.bgbu}</span>}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  {deptFilter !== "全部部门" && (
+                    <button
+                      onClick={() => setDeptFilter("全部部门")}
+                      className="inline-flex items-center gap-1 px-2 py-1 rounded text-xs text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      <X className="w-3 h-3" /> 清除
+                    </button>
+                  )}
+                </div>
+              </div>
+
               <div className="px-6 pb-8">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {MOCK_CASES.slice(0, 4).map((c, i) => (
