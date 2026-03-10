@@ -73,6 +73,8 @@ const KnowledgeList = () => {
   const [sortBy, setSortBy] = useState("综合排序");
   const [showSortDropdown, setShowSortDropdown] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [deptFilter, setDeptFilter] = useState("全部部门");
+  const [showDeptDropdown, setShowDeptDropdown] = useState(false);
 
   const toggleGroup = (label: string) => {
     setExpandedGroups((prev) =>
