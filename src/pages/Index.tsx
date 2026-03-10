@@ -1,7 +1,7 @@
 // Index page
 import { useState, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Flame, Users, Sparkles, MessageSquare, Home as HomeIcon, ChevronDown, ChevronRight, Briefcase, ShoppingCart, Truck, Cpu, Heart, Factory, Building2, Shield, TrendingUp, Code2, CheckCircle2, CreditCard, Lightbulb, BarChart3 } from "lucide-react";
+import { Flame, Users, Sparkles, MessageSquare, Home as HomeIcon, ChevronDown, ChevronRight, Briefcase, ShoppingCart, Truck, Cpu, Heart, Factory, Building2, Shield, TrendingUp, Code2, CheckCircle2, CreditCard, Lightbulb, BarChart3, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import AppLayout from "@/components/AppLayout";
 import CaseCard from "@/components/CaseCard";
@@ -91,6 +91,18 @@ const DOMAIN_SECTION: SidebarSection = {
     { label: "运营管理", icon: BarChart3, posts: 1123 },
   ],
 };
+
+const DEPARTMENTS = [
+  { label: "全部部门", bgbu: "" },
+  { label: "产品创新部", bgbu: "京东零售" },
+  { label: "技术研发部", bgbu: "京东科技" },
+  { label: "供应链管理部", bgbu: "京东物流" },
+  { label: "市场营销部", bgbu: "京东零售" },
+  { label: "人力资源部", bgbu: "京东职能" },
+  { label: "数据平台部", bgbu: "京东科技" },
+  { label: "健康业务部", bgbu: "京东健康" },
+  { label: "基础设施部", bgbu: "京东科技" },
+];
 
 const DATE_OPTIONS = ["全部时间", "最近一周", "最近一月", "最近三月"];
 
@@ -189,6 +201,8 @@ const Index = () => {
   const [showDateDropdown, setShowDateDropdown] = useState(false);
   const [marqueeRow1Paused, setMarqueeRow1Paused] = useState(false);
   const [marqueeRow2Paused, setMarqueeRow2Paused] = useState(false);
+  const [deptFilter, setDeptFilter] = useState("全部部门");
+  const [showDeptDropdown, setShowDeptDropdown] = useState(false);
   const navigate = useNavigate();
 
   const trendingItems = [
@@ -336,6 +350,50 @@ const Index = () => {
                       {zone.label}
                     </button>
                   ))}
+                </div>
+              </div>
+
+              {/* Department filter bar */}
+              <div className="px-6 pb-3">
+                <div className="flex items-center gap-3 flex-wrap">
+                  <span className="text-sm text-muted-foreground shrink-0">部门筛选</span>
+                  <div className="relative">
+                    <button
+                      onClick={() => setShowDeptDropdown(!showDeptDropdown)}
+                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border text-sm transition-colors ${
+                        deptFilter !== "全部部门"
+                          ? "border-primary/40 bg-primary/5 text-primary"
+                          : "border-border text-foreground hover:border-primary/40"
+                      }`}
+                    >
+                      {deptFilter}
+                      <ChevronDown className={`w-3.5 h-3.5 transition-transform ${showDeptDropdown ? "rotate-180" : ""}`} />
+                    </button>
+                    {showDeptDropdown && (
+                      <div className="absolute left-0 top-full mt-1 w-48 bg-card border border-border rounded-lg shadow-lg z-20 py-1">
+                        {DEPARTMENTS.map((dept) => (
+                          <button
+                            key={dept.label}
+                            onClick={() => { setDeptFilter(dept.label); setShowDeptDropdown(false); }}
+                            className={`flex items-center justify-between w-full px-3 py-2 text-sm transition-colors ${
+                              deptFilter === dept.label ? "text-primary bg-primary/5" : "text-foreground hover:bg-accent"
+                            }`}
+                          >
+                            <span>{dept.label}</span>
+                            {dept.bgbu && <span className="text-xs text-muted-foreground">{dept.bgbu}</span>}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  {deptFilter !== "全部部门" && (
+                    <button
+                      onClick={() => setDeptFilter("全部部门")}
+                      className="inline-flex items-center gap-1 px-2 py-1 rounded text-xs text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      <X className="w-3 h-3" /> 清除
+                    </button>
+                  )}
                 </div>
               </div>
 
