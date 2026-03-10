@@ -1,177 +1,231 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Award, FileText, Star, Tag, Edit, Download, Share2, MessageCircle, Bookmark, Clock } from "lucide-react";
+import { Award, FileText, Star, Edit, Share2, Bookmark, Clock, Eye, Heart, MessageCircle, Search, SlidersHorizontal, PenLine, History } from "lucide-react";
 import AppLayout from "@/components/AppLayout";
-import CaseCard from "@/components/CaseCard";
-import { MOCK_CASES, MOCK_TAGS } from "@/data/mockData";
+import { Link } from "react-router-dom";
+import { MOCK_CASES } from "@/data/mockData";
 
-const TABS = ["发布", "草稿", "收藏", "评论"];
+import kevinAvatar from "@/assets/avatars/kevin.jpg";
+
+const LEFT_NAV = [
+  { label: "我发布的", icon: PenLine, count: 12, key: "published" },
+  { label: "我的收藏", icon: Star, count: 45, key: "favorites" },
+  { label: "草稿箱", icon: FileText, count: 3, key: "drafts" },
+  { label: "浏览历史", icon: History, count: undefined, key: "history" },
+];
+
+const BADGES = [
+  { icon: "🏅", label: "知识贡献者", date: "2023.10 获得" },
+  { icon: "🏆", label: "年度优秀员工", date: "2023.10 获得" },
+  { icon: "💡", label: "创新先锋", date: "2023.10 获得" },
+];
 
 const PersonalZone = () => {
-  const [activeTab, setActiveTab] = useState("发布");
+  const [activeSection, setActiveSection] = useState("published");
   const myCases = MOCK_CASES.slice(0, 4);
-  const myTags = MOCK_TAGS.slice(0, 5);
 
   return (
     <AppLayout>
-      <div className="flex max-w-[1100px] mx-auto">
+      <div className="flex max-w-[1400px] mx-auto">
+        {/* Left sidebar */}
+        <aside className="w-[220px] shrink-0 border-r border-border p-5 hidden lg:block sticky top-14 h-[calc(100vh-56px)]">
+          <h3 className="font-semibold text-foreground mb-4">个人中心</h3>
+          <div className="space-y-0.5">
+            {LEFT_NAV.map((item) => (
+              <button
+                key={item.key}
+                onClick={() => setActiveSection(item.key)}
+                className={`flex items-center justify-between w-full px-3 py-2.5 rounded-md text-sm transition-colors ${
+                  activeSection === item.key
+                    ? "text-primary font-medium bg-primary/5"
+                    : "text-muted-foreground hover:text-foreground hover:bg-accent"
+                }`}
+              >
+                <span className="flex items-center gap-2.5">
+                  <item.icon className="w-4 h-4" />
+                  {item.label}
+                </span>
+                {item.count !== undefined && (
+                  <span className={`text-xs px-1.5 py-0.5 rounded-full ${
+                    activeSection === item.key
+                      ? "bg-primary/10 text-primary"
+                      : "bg-accent text-muted-foreground"
+                  }`}>
+                    {item.count}
+                  </span>
+                )}
+              </button>
+            ))}
+          </div>
+        </aside>
+
+        {/* Center content */}
         <div className="flex-1 min-w-0 p-6">
           <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
-            {/* Profile header */}
-            <div className="card-base p-6 mb-6">
-              <div className="flex items-center gap-4 mb-4">
-                <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold text-2xl">
-                  我
-                </div>
-                <div className="flex-1">
-                  <h1 className="text-lg font-semibold text-foreground">我的知识中心</h1>
-                  <p className="text-sm text-muted-foreground mt-0.5">AI中台 · 知识贡献者</p>
-                </div>
-                <div className="flex gap-2">
-                  <button className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-border text-xs text-foreground hover:border-primary hover:text-primary transition-colors">
-                    <Edit className="w-3.5 h-3.5" /> 编辑资料
-                  </button>
-                  <button className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-border text-xs text-foreground hover:border-primary hover:text-primary transition-colors">
-                    <Share2 className="w-3.5 h-3.5" /> 分享主页
+            {/* Profile card */}
+            <div className="card-base p-8 mb-6">
+              <div className="flex flex-col items-center">
+                {/* Avatar */}
+                <div className="relative mb-4">
+                  <img
+                    src={kevinAvatar}
+                    alt="Kevin"
+                    className="w-24 h-24 rounded-full object-cover border-4 border-card"
+                  />
+                  <button className="absolute bottom-0 right-0 w-7 h-7 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-md">
+                    <Edit className="w-3.5 h-3.5" />
                   </button>
                 </div>
-              </div>
-              <div className="flex gap-6 text-sm">
-                <div className="text-center">
-                  <p className="font-semibold text-foreground">4</p>
-                  <p className="text-xs text-muted-foreground">发布</p>
+
+                {/* Name & title */}
+                <h1 className="text-xl font-semibold text-foreground mb-1">Kevin</h1>
+                <p className="text-sm text-muted-foreground mb-5">高级产品经理 @ 产品创新部</p>
+
+                {/* Action buttons */}
+                <div className="flex gap-3 mb-8">
+                  <button className="px-6 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors">
+                    编辑资料
+                  </button>
+                  <button className="px-6 py-2 rounded-lg border border-border text-sm text-foreground hover:border-primary hover:text-primary transition-colors">
+                    分享主页
+                  </button>
                 </div>
-                <div className="text-center">
-                  <p className="font-semibold text-foreground">128</p>
-                  <p className="text-xs text-muted-foreground">获赞</p>
-                </div>
-                <div className="text-center">
-                  <p className="font-semibold text-foreground">42</p>
-                  <p className="text-xs text-muted-foreground">评论</p>
-                </div>
-                <div className="text-center">
-                  <p className="font-semibold text-foreground">36</p>
-                  <p className="text-xs text-muted-foreground">收藏</p>
+
+                {/* Stats */}
+                <div className="flex gap-12">
+                  <div className="text-center">
+                    <p className="text-2xl font-bold text-foreground">12</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">发布内容</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-2xl font-bold text-foreground">856</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">获得赞同</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-2xl font-bold text-foreground">340</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">被收藏</p>
+                  </div>
                 </div>
               </div>
             </div>
 
-            {/* Tabs */}
-            <div className="flex items-center gap-1 mb-6 border-b border-border">
-              {TABS.map((tab) => (
-                <button
-                  key={tab}
-                  onClick={() => setActiveTab(tab)}
-                  className={`px-4 py-2.5 text-sm transition-colors border-b-2 -mb-px ${
-                    activeTab === tab
-                      ? "border-primary text-primary font-medium"
-                      : "border-transparent text-muted-foreground hover:text-foreground"
-                  }`}
-                >
-                  {tab === "发布" && <FileText className="w-3.5 h-3.5 inline mr-1.5" />}
-                  {tab === "草稿" && <Clock className="w-3.5 h-3.5 inline mr-1.5" />}
-                  {tab === "收藏" && <Bookmark className="w-3.5 h-3.5 inline mr-1.5" />}
-                  {tab === "评论" && <MessageCircle className="w-3.5 h-3.5 inline mr-1.5" />}
-                  {tab}
+            {/* Content section header */}
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold text-foreground">
+                {activeSection === "published" && "我发布的"}
+                {activeSection === "favorites" && "我的收藏"}
+                {activeSection === "drafts" && "草稿箱"}
+                {activeSection === "history" && "浏览历史"}
+              </h2>
+              <div className="flex items-center gap-2">
+                <button className="p-2 rounded-md hover:bg-accent transition-colors text-muted-foreground hover:text-foreground">
+                  <Search className="w-4 h-4" />
                 </button>
-              ))}
+                <button className="p-2 rounded-md hover:bg-accent transition-colors text-muted-foreground hover:text-foreground">
+                  <SlidersHorizontal className="w-4 h-4" />
+                </button>
+              </div>
             </div>
 
-            {/* Content */}
-            {activeTab === "发布" && (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-                {myCases.map((c, i) => (
-                  <motion.div key={c.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }}>
-                    <CaseCard caseItem={c} />
+            {/* Content list */}
+            {(activeSection === "published" || activeSection === "favorites") && (
+              <div className="space-y-0">
+                {(activeSection === "published" ? myCases : MOCK_CASES.slice(2, 6)).map((c, i) => (
+                  <motion.div
+                    key={c.id}
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.04 }}
+                  >
+                    <Link
+                      to={`/case/${c.id}`}
+                      className="block py-5 border-b border-border hover:bg-accent/30 transition-colors -mx-2 px-2 rounded"
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="px-2 py-0.5 rounded text-xs font-medium bg-primary/10 text-primary">已发布</span>
+                        <span className="text-xs text-muted-foreground">{i === 0 ? "2小时前" : i === 1 ? "4小时前" : i === 2 ? "昨天" : "3天前"}</span>
+                      </div>
+                      <h3 className="text-base font-semibold text-foreground mb-2 line-clamp-1">{c.title}</h3>
+                      <p className="text-sm text-muted-foreground line-clamp-2 mb-3">{c.summary}</p>
+                      <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                        <span className="flex items-center gap-1">
+                          <Eye className="w-3.5 h-3.5" />
+                          {c.views >= 1000 ? (c.views / 1000).toFixed(1) + "k" : c.views}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Heart className="w-3.5 h-3.5" />
+                          {c.likes}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <MessageCircle className="w-3.5 h-3.5" />
+                          {c.comments}
+                        </span>
+                      </div>
+                    </Link>
                   </motion.div>
                 ))}
               </div>
             )}
 
-            {activeTab === "草稿" && (
-              <div className="text-center py-12">
+            {activeSection === "drafts" && (
+              <div className="text-center py-16">
+                <FileText className="w-10 h-10 text-muted-foreground/30 mx-auto mb-3" />
                 <p className="text-muted-foreground text-sm">暂无草稿</p>
-                <button className="mt-3 px-4 py-2 rounded-md bg-primary text-primary-foreground text-sm hover:bg-primary/90 transition-colors">
+                <button className="mt-4 px-5 py-2 rounded-lg bg-primary text-primary-foreground text-sm hover:bg-primary/90 transition-colors">
                   新建草稿
                 </button>
               </div>
             )}
 
-            {activeTab === "收藏" && (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-                {MOCK_CASES.slice(2, 6).map((c, i) => (
-                  <motion.div key={c.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }}>
-                    <CaseCard caseItem={c} />
-                  </motion.div>
-                ))}
-              </div>
-            )}
-
-            {activeTab === "评论" && (
-              <div className="text-center py-12">
-                <p className="text-muted-foreground text-sm">暂无评论记录</p>
+            {activeSection === "history" && (
+              <div className="text-center py-16">
+                <History className="w-10 h-10 text-muted-foreground/30 mx-auto mb-3" />
+                <p className="text-muted-foreground text-sm">暂无浏览记录</p>
               </div>
             )}
           </motion.div>
         </div>
 
         {/* Right sidebar */}
-        <aside className="w-[260px] shrink-0 border-l border-border p-5 hidden xl:block sticky top-14 h-[calc(100vh-56px)] overflow-y-auto space-y-5">
+        <aside className="w-[300px] shrink-0 border-l border-border p-5 hidden xl:block sticky top-14 h-[calc(100vh-56px)] overflow-y-auto space-y-5">
+          {/* Achievements */}
           <div>
-            <h3 className="font-semibold text-sm text-foreground mb-3 flex items-center gap-2">
-              <Tag className="w-4 h-4 text-primary" /> 我的知识标签
+            <h3 className="font-semibold text-sm text-foreground mb-4 flex items-center gap-2">
+              <Award className="w-4 h-4 text-primary" /> 我的成就
             </h3>
-            <div className="flex flex-wrap gap-1.5">
-              {myTags.map((tag) => (
-                <span key={tag.label} className="px-2.5 py-0.5 rounded bg-accent text-secondary-foreground text-xs">
-                  {tag.emoji} {tag.label}
-                </span>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <h3 className="font-semibold text-sm text-foreground mb-3 flex items-center gap-2">
-              <Award className="w-4 h-4 text-primary" /> 成就与荣誉
-            </h3>
-            <div className="space-y-2">
-              {[
-                { icon: "🏅", label: "知识先锋", desc: "累计发布 5+ 案例" },
-                { icon: "⭐", label: "优质作者", desc: "获得 100+ 点赞" },
-                { icon: "🔥", label: "活跃贡献者", desc: "连续 30 天活跃" },
-              ].map((badge) => (
-                <div key={badge.label} className="flex items-center gap-3 p-3 rounded-md bg-accent">
-                  <span className="text-lg">{badge.icon}</span>
+            <div className="space-y-3">
+              {BADGES.map((badge) => (
+                <div key={badge.label} className="flex items-center gap-3 p-3 rounded-lg border border-border hover:border-primary/20 transition-colors">
+                  <span className="text-xl">{badge.icon}</span>
                   <div>
                     <p className="text-sm font-medium text-foreground">{badge.label}</p>
-                    <p className="text-xs text-muted-foreground">{badge.desc}</p>
+                    <p className="text-xs text-muted-foreground">{badge.date}</p>
                   </div>
                 </div>
               ))}
             </div>
           </div>
 
-          <div>
-            <h3 className="font-semibold text-sm text-foreground mb-3 flex items-center gap-2">
-              <Star className="w-4 h-4 text-primary" /> 影响力
-            </h3>
-            <div className="card-base p-4 space-y-2.5">
-              {[
-                { label: "总浏览量", value: "12.3k" },
-                { label: "总获赞数", value: 128 },
-                { label: "影响力排名", value: "Top 15%" },
-              ].map((stat) => (
-                <div key={stat.label} className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">{stat.label}</span>
-                  <span className="font-medium text-foreground">{stat.value}</span>
-                </div>
-              ))}
+          {/* Creator benefits card */}
+          <div className="rounded-xl bg-foreground text-background p-5">
+            <h4 className="font-semibold text-sm mb-1.5">创作权益 Level 3</h4>
+            <p className="text-xs opacity-70 mb-4 leading-relaxed">
+              您当前享有高级排版、数据分析导出、优先审核等3项特权。
+            </p>
+            {/* Progress bar */}
+            <div className="mb-2">
+              <div className="w-full h-2 rounded-full bg-background/20 overflow-hidden">
+                <div className="h-full rounded-full bg-primary" style={{ width: "68%" }} />
+              </div>
             </div>
+            <div className="flex justify-between text-xs opacity-60 mb-4">
+              <span>成长值 340</span>
+              <span>下一级 500</span>
+            </div>
+            <button className="w-full py-2 rounded-lg border border-background/30 text-sm text-background hover:bg-background/10 transition-colors">
+              查看权益详情
+            </button>
           </div>
-
-          <button className="w-full inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-md border border-border text-sm text-muted-foreground hover:text-foreground hover:border-primary transition-colors">
-            <Download className="w-4 h-4" /> 导出数据
-          </button>
         </aside>
       </div>
     </AppLayout>
