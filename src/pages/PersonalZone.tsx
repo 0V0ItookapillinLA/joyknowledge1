@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Award, FileText, Star, Edit, Share2, Bookmark, Clock, Eye, Heart, MessageCircle, Search, SlidersHorizontal, PenLine, History } from "lucide-react";
+import { Award, FileText, Star, Edit, Share2, Bookmark, Clock, Eye, Heart, MessageCircle, Search, SlidersHorizontal, PenLine, History, Tag, Download } from "lucide-react";
 import AppLayout from "@/components/AppLayout";
 import { Link } from "react-router-dom";
 import { MOCK_CASES } from "@/data/mockData";
@@ -187,13 +187,71 @@ const PersonalZone = () => {
         </div>
 
         {/* Right sidebar */}
-        <aside className="w-[300px] shrink-0 border-l border-border p-5 hidden xl:block sticky top-14 h-[calc(100vh-56px)] overflow-y-auto space-y-5">
+        <aside className="w-[300px] shrink-0 border-l border-border p-5 hidden xl:block sticky top-14 h-[calc(100vh-56px)] overflow-y-auto space-y-6">
+          {/* Knowledge tags */}
+          <div>
+            <h3 className="font-semibold text-sm text-foreground mb-3 flex items-center gap-2">
+              <Tag className="w-4 h-4 text-primary" /> 我的知识标签
+            </h3>
+            <div className="flex flex-wrap gap-1.5">
+              {[
+                { emoji: "🎯", label: "项目复盘" },
+                { emoji: "🚀", label: "最佳实践" },
+                { emoji: "🤖", label: "AI应用" },
+                { emoji: "👥", label: "团队管理" },
+                { emoji: "🎨", label: "产品设计" },
+              ].map((tag) => (
+                <span key={tag.label} className="px-2.5 py-1 rounded-md bg-accent text-secondary-foreground text-xs">
+                  {tag.emoji} {tag.label}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          {/* Skills */}
+          <div>
+            <h3 className="font-semibold text-sm text-foreground mb-3 flex items-center gap-2">
+              🛠️ 能力技能
+            </h3>
+            <div className="flex flex-wrap gap-1.5">
+              {[
+                "Prompt Engineering", "用户研究", "A/B测试", "数据分析",
+                "产品规划", "竞品分析", "Figma", "需求管理",
+              ].map((skill) => (
+                <span key={skill} className="px-2.5 py-1 rounded-md border border-border text-xs text-foreground">
+                  {skill}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          {/* Personal attributes */}
+          <div>
+            <h3 className="font-semibold text-sm text-foreground mb-3 flex items-center gap-2">
+              🧬 个人属性
+            </h3>
+            <div className="space-y-2">
+              {[
+                { label: "擅长领域", value: "产品创新 · 增长策略" },
+                { label: "工作年限", value: "8年" },
+                { label: "认证资质", value: "PMP · NPDP" },
+                { label: "带队规模", value: "15人团队" },
+                { label: "主导项目", value: "12个" },
+              ].map((attr) => (
+                <div key={attr.label} className="flex items-center justify-between text-sm">
+                  <span className="text-muted-foreground">{attr.label}</span>
+                  <span className="font-medium text-foreground">{attr.value}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
           {/* Achievements */}
           <div>
-            <h3 className="font-semibold text-sm text-foreground mb-4 flex items-center gap-2">
-              <Award className="w-4 h-4 text-primary" /> 我的成就
+            <h3 className="font-semibold text-sm text-foreground mb-3 flex items-center gap-2">
+              <Award className="w-4 h-4 text-primary" /> 成就与荣誉
             </h3>
-            <div className="space-y-3">
+            <div className="space-y-2">
               {BADGES.map((badge) => (
                 <div key={badge.label} className="flex items-center gap-3 p-3 rounded-lg border border-border hover:border-primary/20 transition-colors">
                   <span className="text-xl">{badge.icon}</span>
@@ -206,26 +264,28 @@ const PersonalZone = () => {
             </div>
           </div>
 
-          {/* Creator benefits card */}
-          <div className="rounded-xl bg-foreground text-background p-5">
-            <h4 className="font-semibold text-sm mb-1.5">创作权益 Level 3</h4>
-            <p className="text-xs opacity-70 mb-4 leading-relaxed">
-              您当前享有高级排版、数据分析导出、优先审核等3项特权。
-            </p>
-            {/* Progress bar */}
-            <div className="mb-2">
-              <div className="w-full h-2 rounded-full bg-background/20 overflow-hidden">
-                <div className="h-full rounded-full bg-primary" style={{ width: "68%" }} />
-              </div>
+          {/* Influence */}
+          <div>
+            <h3 className="font-semibold text-sm text-foreground mb-3 flex items-center gap-2">
+              <Star className="w-4 h-4 text-primary" /> 影响力
+            </h3>
+            <div className="card-base p-4 space-y-2.5">
+              {[
+                { label: "总浏览量", value: "12.3k" },
+                { label: "总获赞数", value: "128" },
+                { label: "影响力排名", value: "Top 15%" },
+              ].map((stat) => (
+                <div key={stat.label} className="flex items-center justify-between text-sm">
+                  <span className="text-muted-foreground">{stat.label}</span>
+                  <span className="font-medium text-foreground">{stat.value}</span>
+                </div>
+              ))}
             </div>
-            <div className="flex justify-between text-xs opacity-60 mb-4">
-              <span>成长值 340</span>
-              <span>下一级 500</span>
-            </div>
-            <button className="w-full py-2 rounded-lg border border-background/30 text-sm text-background hover:bg-background/10 transition-colors">
-              查看权益详情
-            </button>
           </div>
+
+          <button className="w-full inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-md border border-border text-sm text-muted-foreground hover:text-foreground hover:border-primary transition-colors">
+            <Download className="w-4 h-4" /> 导出数据
+          </button>
         </aside>
       </div>
     </AppLayout>
