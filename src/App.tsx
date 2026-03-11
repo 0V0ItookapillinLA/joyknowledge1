@@ -11,6 +11,7 @@ import KnowledgeExtract from "./pages/KnowledgeExtract";
 import KnowledgeList from "./pages/KnowledgeList";
 import Community from "./pages/Community";
 import Messages from "./pages/Messages";
+import DepartmentSpace from "./pages/DepartmentSpace";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
