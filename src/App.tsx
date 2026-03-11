@@ -11,6 +11,7 @@ import KnowledgeExtract from "./pages/KnowledgeExtract";
 import KnowledgeList from "./pages/KnowledgeList";
 import Community from "./pages/Community";
 import Messages from "./pages/Messages";
+import DepartmentSpace from "./pages/DepartmentSpace";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -30,6 +31,7 @@ const App = () => (
           <Route path="/knowledge" element={<KnowledgeList />} />
           <Route path="/community" element={<Community />} />
           <Route path="/messages" element={<Messages />} />
+          <Route path="/department/:name" element={<DepartmentSpace />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

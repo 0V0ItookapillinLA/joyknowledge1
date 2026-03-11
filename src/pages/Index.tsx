@@ -1,7 +1,7 @@
 // Index page
 import { useState, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Flame, Users, Sparkles, MessageSquare, Home as HomeIcon, ChevronDown, ChevronRight, Briefcase, ShoppingCart, Truck, Cpu, Heart, Factory, Building2, Shield, TrendingUp, Code2, CheckCircle2, CreditCard, Lightbulb, BarChart3, X } from "lucide-react";
+import { Flame, Users, Sparkles, MessageSquare, Home as HomeIcon, ChevronDown, ChevronRight, Briefcase, ShoppingCart, Truck, Cpu, Heart, Factory, Building2, Shield, TrendingUp, Code2, CheckCircle2, CreditCard, Lightbulb, BarChart3, X, Grid3X3, ArrowRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import AppLayout from "@/components/AppLayout";
 import CaseCard from "@/components/CaseCard";
@@ -235,6 +235,24 @@ const Index = () => {
               ))}
             </div>
           </div>
+
+          {/* 我的部门 card */}
+          <Link
+            to="/department/企业信息化部"
+            className="block mx-1 mb-4 rounded-xl bg-primary text-primary-foreground p-4 hover:bg-primary/90 transition-colors"
+          >
+            <div className="flex items-center justify-between mb-2">
+              <span className="flex items-center gap-2 text-sm font-medium">
+                <Building2 className="w-4 h-4" /> 我的部门
+              </span>
+              <Grid3X3 className="w-5 h-5 opacity-60" />
+            </div>
+            <p className="text-base font-semibold mb-1">企业信息化部</p>
+            <div className="flex items-center justify-between text-xs opacity-80">
+              <span>12 条新内容</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </div>
+          </Link>
 
           {/* BGBU & Domain sections with hover popover */}
           <SidebarSectionWithPopover section={BGBU_SECTION} sectionType="bgbu" />
