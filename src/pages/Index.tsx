@@ -236,6 +236,24 @@ const Index = () => {
             </div>
           </div>
 
+          {/* 我的部门 card */}
+          <Link
+            to="/department/企业信息化部"
+            className="block mx-1 mb-4 rounded-xl bg-primary text-primary-foreground p-4 hover:bg-primary/90 transition-colors"
+          >
+            <div className="flex items-center justify-between mb-2">
+              <span className="flex items-center gap-2 text-sm font-medium">
+                <Building2 className="w-4 h-4" /> 我的部门
+              </span>
+              <Grid3X3 className="w-5 h-5 opacity-60" />
+            </div>
+            <p className="text-base font-semibold mb-1">企业信息化部</p>
+            <div className="flex items-center justify-between text-xs opacity-80">
+              <span>12 条新内容</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </div>
+          </Link>
+
           {/* BGBU & Domain sections with hover popover */}
           <SidebarSectionWithPopover section={BGBU_SECTION} sectionType="bgbu" />
           <SidebarSectionWithPopover section={DOMAIN_SECTION} sectionType="domain" />
