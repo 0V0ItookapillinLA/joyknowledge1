@@ -31,6 +31,7 @@ const App = () => (
           <Route path="/knowledge" element={<KnowledgeList />} />
           <Route path="/community" element={<Community />} />
           <Route path="/messages" element={<Messages />} />
+          <Route path="/department/:name" element={<DepartmentSpace />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
