@@ -166,6 +166,7 @@ const ExpertLibrary = () => {
                 </div>
               }
             />
+            {/* Profile hero */}
             <motion.div
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
@@ -181,23 +182,13 @@ const ExpertLibrary = () => {
                   <Star className="w-4 h-4 text-white fill-white" />
                 </div>
               </div>
-              <h1 className="text-xl font-semibold text-foreground">{selectedExpert.name}</h1>
+              <h2 className="text-lg font-semibold text-foreground">{selectedExpert.name}</h2>
               <p className="text-sm text-muted-foreground mt-1">
                 {selectedExpert.title} @ {selectedExpert.department}
               </p>
 
-              {/* Action buttons */}
-              <div className="flex items-center justify-center gap-3 mt-5">
-                <button className="inline-flex items-center gap-2 px-6 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors">
-                  <UserPlus className="w-4 h-4" /> 关注专家
-                </button>
-                <button className="inline-flex items-center gap-2 px-6 py-2 rounded-lg border border-border text-sm text-foreground hover:border-primary/40 hover:text-primary transition-colors">
-                  <Mail className="w-4 h-4" /> 发私信
-                </button>
-              </div>
-
               {/* Stats row */}
-              <div className="flex items-center justify-center gap-12 mt-8">
+              <div className="flex items-center justify-center gap-12 mt-6">
                 <div className="text-center">
                   <p className="text-2xl font-semibold text-foreground">15</p>
                   <p className="text-xs text-muted-foreground mt-0.5">从业年限</p>
