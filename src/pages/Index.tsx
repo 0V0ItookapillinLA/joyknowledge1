@@ -385,7 +385,7 @@ const Index = () => {
                         <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
                           <span>{zone.count} 内容</span>
                           {zone.hot && zone.hotViews && (
-                            <span className="inline-flex items-center gap-0.5 text-orange-500 font-medium">
+                            <span className="inline-flex items-center gap-0.5 text-destructive font-medium">
                               🔥 {zone.hotViews}
                             </span>
                           )}
