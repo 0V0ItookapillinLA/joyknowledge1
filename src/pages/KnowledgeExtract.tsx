@@ -1178,7 +1178,7 @@ const KnowledgeExtract = () => {
       </AppLayout>
     );
   }
-        </div>
+
 
   // ───── Deep Structuring Mode ─────
   if (appMode === "deep-structuring") {
