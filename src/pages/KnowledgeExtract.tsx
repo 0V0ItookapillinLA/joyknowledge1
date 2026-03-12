@@ -1288,7 +1288,17 @@ const KnowledgeExtract = () => {
 
   return (
     <AppLayout>
-      <div className="flex h-[calc(100vh-56px)] relative">
+      <div className="flex flex-col h-[calc(100vh-56px)] relative">
+        {/* ═══ Top: Step indicator + back ═══ */}
+        <div className="px-6 py-3 border-b border-border flex items-center gap-3 bg-card/80 backdrop-blur-sm shrink-0">
+          <button onClick={() => { setAppMode("select"); setChatMessages([]); }} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
+            <ChevronLeft className="w-4 h-4" /> 返回
+          </button>
+          <div className="h-5 w-px bg-border" />
+          <DeepStepIndicator current={1} />
+        </div>
+
+        <div className="flex flex-1 overflow-hidden relative">
         {/* ═══ Left: Sources + Search ═══ */}
         <aside className="w-[300px] shrink-0 border-r border-border flex flex-col bg-muted/30">
           <div className="px-4 pt-4 pb-3">
