@@ -132,7 +132,7 @@ const ExpertLibrary = () => {
               <ArrowLeft className="w-4 h-4" /> 返回专家库
             </button>
 
-            <h3 className="font-semibold text-sm text-foreground mb-3">专家领域</h3>
+            <h3 className="text-sm font-semibold text-foreground mb-3">专家领域</h3>
             <div className="flex flex-wrap gap-1.5 mb-6">
               {selectedExpert.domains.map((d) => (
                 <span key={d} className="px-3 py-1.5 rounded-full border border-primary/20 bg-primary/5 text-primary text-xs font-medium">{d}</span>
