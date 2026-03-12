@@ -37,7 +37,7 @@ const DIRECTORY = [
   { label: "5-部门文化", key: "culture" },
   { label: "8-历史归档", key: "archive" },
   { label: "7-二级空间", key: "sub" },
-  { label: "周报", key: "weekly" },
+  { label: "\n", key: "weekly" },
 ];
 
 const TEAM_MEMBERS = [
