@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { MessageSquare, Eye, Plus, CheckCircle2, Clock, Flame, HelpCircle, Trophy } from "lucide-react";
 import AppLayout from "@/components/AppLayout";
+import PageHeader from "@/components/PageHeader";
 
 interface Question {
   id: string;
