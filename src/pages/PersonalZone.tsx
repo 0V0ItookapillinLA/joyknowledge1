@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Award, FileText, Star, Edit, Share2, Bookmark, Clock, Eye, Heart, MessageCircle, Search, SlidersHorizontal, PenLine, History, Tag, Download } from "lucide-react";
 import AppLayout from "@/components/AppLayout";
+import PageHeader from "@/components/PageHeader";
 import { Link } from "react-router-dom";
 import { MOCK_CASES } from "@/data/mockData";
 
@@ -61,6 +62,20 @@ const PersonalZone = () => {
 
         {/* Center content */}
         <div className="flex-1 min-w-0 p-6">
+          <PageHeader
+            title="个人中心"
+            breadcrumbs={[{ label: "个人专区" }]}
+            actions={
+              <div className="flex gap-2">
+                <button className="px-4 py-1.5 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors">
+                  编辑资料
+                </button>
+                <button className="px-4 py-1.5 rounded-lg border border-border text-sm text-foreground hover:border-primary hover:text-primary transition-colors">
+                  分享主页
+                </button>
+              </div>
+            }
+          />
           <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
             {/* Profile card */}
             <div className="card-base p-8 mb-6">
@@ -78,18 +93,8 @@ const PersonalZone = () => {
                 </div>
 
                 {/* Name & title */}
-                <h1 className="text-xl font-semibold text-foreground mb-1">Kevin</h1>
+                <h2 className="text-lg font-semibold text-foreground mb-1">Kevin</h2>
                 <p className="text-sm text-muted-foreground mb-5">高级产品经理 @ 产品创新部</p>
-
-                {/* Action buttons */}
-                <div className="flex gap-3 mb-8">
-                  <button className="px-6 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors">
-                    编辑资料
-                  </button>
-                  <button className="px-6 py-2 rounded-lg border border-border text-sm text-foreground hover:border-primary hover:text-primary transition-colors">
-                    分享主页
-                  </button>
-                </div>
 
                 {/* Stats */}
                 <div className="flex gap-12">
@@ -111,7 +116,7 @@ const PersonalZone = () => {
 
             {/* Content section header */}
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-foreground">
+              <h2 className="text-sm font-semibold text-foreground">
                 {activeSection === "published" && "我发布的"}
                 {activeSection === "favorites" && "我的收藏"}
                 {activeSection === "drafts" && "草稿箱"}

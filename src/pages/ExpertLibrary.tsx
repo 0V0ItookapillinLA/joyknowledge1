@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import AppLayout from "@/components/AppLayout";
+import PageHeader from "@/components/PageHeader";
 import { MOCK_EXPERTS, MOCK_CASES } from "@/data/mockData";
 import { ArrowLeft, UserPlus, Mail, Calendar, Heart, MessageCircle, ChevronDown, Star } from "lucide-react";
 
@@ -131,14 +132,14 @@ const ExpertLibrary = () => {
               <ArrowLeft className="w-4 h-4" /> 返回专家库
             </button>
 
-            <h3 className="font-semibold text-sm text-foreground mb-3">专家领域</h3>
+            <h3 className="text-sm font-semibold text-foreground mb-3">专家领域</h3>
             <div className="flex flex-wrap gap-1.5 mb-6">
               {selectedExpert.domains.map((d) => (
                 <span key={d} className="px-3 py-1.5 rounded-full border border-primary/20 bg-primary/5 text-primary text-xs font-medium">{d}</span>
               ))}
             </div>
 
-            <h3 className="font-semibold text-sm text-foreground mb-3">技能专长</h3>
+            <h3 className="text-sm font-semibold text-foreground mb-3">技能专长</h3>
             <div className="flex flex-wrap gap-1.5">
               {selectedExpert.skills.map((s) => (
                 <span key={s} className="px-2.5 py-1 rounded-md bg-accent text-secondary-foreground text-xs">{s}</span>
@@ -148,6 +149,23 @@ const ExpertLibrary = () => {
 
           {/* Center: Profile + Cases */}
           <div className="flex-1 min-w-0 p-6">
+            <PageHeader
+              title={selectedExpert.name}
+              breadcrumbs={[{ label: "专家书房", path: "/experts" }, { label: selectedExpert.name }]}
+              actions={
+                <div className="flex items-center gap-2">
+                  <button className="inline-flex items-center gap-2 px-4 py-1.5 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors">
+                    <UserPlus className="w-4 h-4" /> 关注专家
+                  </button>
+                  <button
+                    onClick={() => navigate(`/messages?to=${encodeURIComponent(selectedExpert.name)}`)}
+                    className="inline-flex items-center gap-2 px-4 py-1.5 rounded-lg border border-border text-sm text-foreground hover:border-primary/40 hover:text-primary transition-colors"
+                  >
+                    <Mail className="w-4 h-4" /> 发私信
+                  </button>
+                </div>
+              }
+            />
             {/* Profile hero */}
             <motion.div
               initial={{ opacity: 0, y: 12 }}
@@ -164,23 +182,13 @@ const ExpertLibrary = () => {
                   <Star className="w-4 h-4 text-white fill-white" />
                 </div>
               </div>
-              <h1 className="text-xl font-semibold text-foreground">{selectedExpert.name}</h1>
+              <h2 className="text-lg font-semibold text-foreground">{selectedExpert.name}</h2>
               <p className="text-sm text-muted-foreground mt-1">
                 {selectedExpert.title} @ {selectedExpert.department}
               </p>
 
-              {/* Action buttons */}
-              <div className="flex items-center justify-center gap-3 mt-5">
-                <button className="inline-flex items-center gap-2 px-6 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors">
-                  <UserPlus className="w-4 h-4" /> 关注专家
-                </button>
-                <button className="inline-flex items-center gap-2 px-6 py-2 rounded-lg border border-border text-sm text-foreground hover:border-primary/40 hover:text-primary transition-colors">
-                  <Mail className="w-4 h-4" /> 发私信
-                </button>
-              </div>
-
               {/* Stats row */}
-              <div className="flex items-center justify-center gap-12 mt-8">
+              <div className="flex items-center justify-center gap-12 mt-6">
                 <div className="text-center">
                   <p className="text-2xl font-semibold text-foreground">15</p>
                   <p className="text-xs text-muted-foreground mt-0.5">从业年限</p>
@@ -199,7 +207,7 @@ const ExpertLibrary = () => {
             {/* Cases */}
             <div>
               <div className="flex items-center justify-between mb-4">
-                <h2 className="font-semibold text-base text-foreground">已发布案例</h2>
+                <h2 className="text-sm font-semibold text-foreground">已发布案例</h2>
                 <button className="text-sm text-primary hover:underline">查看全部</button>
               </div>
 
@@ -232,7 +240,7 @@ const ExpertLibrary = () => {
           <aside className="w-[280px] shrink-0 border-l border-border p-5 hidden xl:block sticky top-14 h-[calc(100vh-56px)] overflow-y-auto space-y-5">
             {/* Ability radar */}
             <div>
-              <h3 className="font-semibold text-sm text-foreground mb-3">能力图谱</h3>
+              <h3 className="text-sm font-semibold text-foreground mb-3">能力图谱</h3>
               {renderRadarChart(abilities)}
               <div className="grid grid-cols-2 gap-2 mt-3">
                 {abilities.map((a) => (
@@ -251,7 +259,7 @@ const ExpertLibrary = () => {
                   <MessageCircle className="w-6 h-6 text-card" />
                 </div>
               </div>
-              <h4 className="font-semibold text-sm text-card mb-1 text-center">专家咨询</h4>
+              <h4 className="text-sm font-semibold text-card mb-1 text-center">专家咨询</h4>
               <p className="text-xs text-card/70 mb-4 text-center">
                 与 {selectedExpert.name} 1 对 1 交流，解决您的技术难题。
               </p>
@@ -294,19 +302,17 @@ const ExpertLibrary = () => {
 
         {/* Main */}
         <div className="flex-1 min-w-0 p-6">
-          {/* Header */}
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h1 className="text-xl font-semibold text-foreground">
-                企业专家库
-                <span className="text-sm font-normal text-muted-foreground ml-3">共 42 位认证专家</span>
-              </h1>
-            </div>
-            <button className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-border text-sm text-muted-foreground hover:text-foreground transition-colors">
-              {sortBy}
-              <ChevronDown className="w-4 h-4" />
-            </button>
-          </div>
+          <PageHeader
+            title="企业专家库"
+            subtitle="共 42 位认证专家"
+            breadcrumbs={[{ label: "专家书房" }]}
+            actions={
+              <button className="inline-flex items-center gap-2 px-4 py-1.5 rounded-lg border border-border text-sm text-muted-foreground hover:text-foreground transition-colors">
+                {sortBy}
+                <ChevronDown className="w-4 h-4" />
+              </button>
+            }
+          />
 
           {/* Expert grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">

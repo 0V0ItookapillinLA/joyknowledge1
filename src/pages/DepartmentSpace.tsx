@@ -176,7 +176,7 @@ const DepartmentSpace = () => {
                 <Eye className="w-3.5 h-3.5" />
                 <span>371人已读</span>
               </div>
-              <h1 className="text-2xl font-bold text-foreground mb-3">
+              <h1 className="text-lg font-semibold text-foreground mb-3">
                 EI{deptName}团队空间主页
               </h1>
               <div className="flex items-center gap-3 mb-6">
@@ -210,7 +210,7 @@ const DepartmentSpace = () => {
 
             {/* Business scenarios table */}
             <div className="mb-8">
-              <h3 className="text-lg font-semibold text-foreground mb-4">• 按业务场景找人</h3>
+              <h3 className="text-sm font-semibold text-foreground mb-4">• 按业务场景找人</h3>
               <div className="border border-border rounded-lg overflow-hidden">
                 <table className="w-full text-sm">
                   <thead>
@@ -265,7 +265,7 @@ const DepartmentSpace = () => {
 
             {/* Team members */}
             <div>
-              <h3 className="text-lg font-semibold text-foreground mb-4">• 团队成员</h3>
+              <h3 className="text-sm font-semibold text-foreground mb-4">• 团队成员</h3>
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
                 {TEAM_MEMBERS.map((member) => (
                   <div key={member.name} className="flex flex-col items-center gap-2 p-4 rounded-lg border border-border hover:border-primary/30 transition-colors">

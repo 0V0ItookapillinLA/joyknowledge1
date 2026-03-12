@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { MessageSquare, Eye, Plus, CheckCircle2, Clock, Flame, HelpCircle, Trophy } from "lucide-react";
 import AppLayout from "@/components/AppLayout";
+import PageHeader from "@/components/PageHeader";
 
 interface Question {
   id: string;
@@ -91,24 +92,27 @@ const Community = () => {
 
         {/* Main */}
         <div className="flex-1 min-w-0 p-6">
-          <div className="flex items-center justify-between mb-6">
-            <h1 className="text-xl font-semibold text-foreground">问答社区</h1>
-            <div className="flex items-center gap-1 bg-accent rounded-lg p-0.5">
-              {FILTERS.map((f) => (
-                <button
-                  key={f}
-                  onClick={() => setActiveFilter(f)}
-                  className={`px-4 py-1.5 rounded-md text-sm transition-colors ${
-                    activeFilter === f
-                      ? "bg-card text-foreground font-medium shadow-sm"
-                      : "text-muted-foreground hover:text-foreground"
-                  }`}
-                >
-                  {f}
-                </button>
-              ))}
-            </div>
-          </div>
+          <PageHeader
+            title="问答社区"
+            breadcrumbs={[{ label: "社区" }]}
+            actions={
+              <div className="flex items-center gap-1 bg-accent rounded-lg p-0.5">
+                {FILTERS.map((f) => (
+                  <button
+                    key={f}
+                    onClick={() => setActiveFilter(f)}
+                    className={`px-4 py-1.5 rounded-md text-sm transition-colors ${
+                      activeFilter === f
+                        ? "bg-card text-foreground font-medium shadow-sm"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    {f}
+                  </button>
+                ))}
+              </div>
+            }
+          />
 
           <div className="space-y-0 divide-y divide-border">
             {MOCK_QUESTIONS.map((q, i) => (
