@@ -221,6 +221,13 @@ const KnowledgeExtract = () => {
   const [publishSubmitted, setPublishSubmitted] = useState(false);
   const [dropHighlight, setDropHighlight] = useState<number | null>(null);
 
+  // Deep structuring tool workspace state
+  const [selectedStructTool, setSelectedStructTool] = useState<string | null>(null);
+  const [toolInputTexts, setToolInputTexts] = useState<Record<string, string>>({});
+  const [toolGenerating, setToolGenerating] = useState<string | null>(null);
+  const [toolResults, setToolResults] = useState<Record<string, string>>({});
+  const [toolGenProgress, setToolGenProgress] = useState(0);
+
   const [tools, setTools] = useState<ToolOption[]>([
     { id: "report", label: "结构化文本", desc: "按章节组织的完整文档", icon: FileText, checked: false, color: "text-blue-600 bg-blue-50 border-blue-200" },
     { id: "mindmap", label: "思维导图", desc: "知识脉络可视化", icon: GitBranch, checked: false, color: "text-green-600 bg-green-50 border-green-200" },
@@ -340,6 +347,35 @@ const KnowledgeExtract = () => {
 
   const addToolToParagraph = (paragraphIdx: number, toolId: string) => {
     setParagraphTools(prev => ({ ...prev, [paragraphIdx]: [toolId] }));
+  };
+
+  const TOOL_MOCK_RESULTS: Record<string, string> = {
+    report: "## 结构化分析结果\n\n### 核心要点\n1. 研发效能提升关键在于自动化流水线建设\n2. 渐进式推进策略有效降低团队抵触\n3. 数据驱动优化确保改进点有据可依\n\n### 详细分析\n该段落涉及技术选型与流程重构两个维度...",
+    mindmap: "🗺️ 思维导图\n\n├── 项目背景\n│   ├── 业务挑战\n│   │   ├── 交付周期长\n│   │   ├── 质量不稳定\n│   │   └── 协作低效\n│   └── 目标设定\n│       ├── 发布周期缩短30%\n│       └── 代码覆盖率80%+\n├── 解决方案\n│   ├── Jenkins + GitLab CI\n│   └── Scrum + Kanban\n└── 实施成果\n    ├── 发布周期↓40%\n    └── Bug修复↓75%",
+    flashcard: "⚡ 知识闪卡\n\n【卡片1】渐进式迁移策略\nQ: 为什么选择渐进式而非一刀切？\nA: 避免团队抵触情绪，确保适应性和可持续性\n\n【卡片2】数据驱动优化\nQ: 如何确保改进有效？\nA: 每个改进点都有数据支撑，持续跟踪核心指标\n\n【卡片3】跨部门协作\nQ: 协作效率提升的关键？\nA: 明确接口人机制，缩短需求对齐周期",
+    data: "📊 数据图表摘要\n\n| 指标 | 改进前 | 改进后 | 变化 |\n|------|--------|--------|------|\n| 发布周期 | 14天 | 8.4天 | ↓40% |\n| Bug修复时长 | 48h | 12h | ↓75% |\n| 代码覆盖率 | 45% | 82% | ↑82% |\n| 需求交付率 | 65% | 91% | ↑40% |\n| 满意度 | 35% | 78% | ↑123% |",
+    audio: "🎙️ 音频概览脚本\n\n大家好，今天为大家分享Q3研发效能提升的核心经验。\n\n首先是背景：我们团队面临交付周期长、质量不稳定的挑战...\n\n关键举措包括引入CI/CD流水线和混合敏捷模式...\n\n最终成果：发布周期缩短40%，团队满意度翻倍。",
+    video: "🎬 视频概览脚本\n\n[开场] 标题卡：Q3研发效能提升总结\n[场景1] 问题展示：72%开发者认为流程有瓶颈\n[场景2] 方案解析：Jenkins + GitLab CI 自动化\n[场景3] 成果数据：核心指标全面提升\n[结尾] 下一步：AI辅助代码审查",
+  };
+
+  const handleToolGenerate = (toolId: string) => {
+    if (toolGenerating) return; // only one at a time
+    const inputText = toolInputTexts[toolId];
+    if (!inputText?.trim()) return;
+    setToolGenerating(toolId);
+    setToolGenProgress(0);
+    let step = 0;
+    const totalSteps = 15;
+    const interval = setInterval(() => {
+      step++;
+      setToolGenProgress(Math.min((step / totalSteps) * 100, 100));
+      if (step >= totalSteps) {
+        clearInterval(interval);
+        setToolResults(prev => ({ ...prev, [toolId]: TOOL_MOCK_RESULTS[toolId] || "生成完成的内容..." }));
+        setToolGenerating(null);
+        setToolGenProgress(0);
+      }
+    }, 200);
   };
 
   const handleSend = () => {
@@ -1182,6 +1218,7 @@ const KnowledgeExtract = () => {
   // ───── Deep Structuring Mode ─────
   if (appMode === "deep-structuring") {
     const paragraphs = initialDoc.split("\n\n").filter(p => p.trim());
+    const activeToolObj = selectedStructTool ? tools.find(t => t.id === selectedStructTool) : null;
     return (
       <AppLayout>
         <div className="flex flex-col h-[calc(100vh-56px)]">
@@ -1204,8 +1241,6 @@ const KnowledgeExtract = () => {
             <div className="flex-1 overflow-y-auto">
               <div className="max-w-3xl mx-auto py-8 px-10">
                 {paragraphs.map((para, idx) => {
-                  const assignedToolIds = paragraphTools[idx] || [];
-                  const assignedTool = assignedToolIds.length > 0 ? tools.find(t => t.id === assignedToolIds[0]) : null;
                   const isHighlighted = dropHighlight === idx;
                   return (
                     <div
@@ -1215,64 +1250,195 @@ const KnowledgeExtract = () => {
                       onDrop={(e) => {
                         e.preventDefault();
                         setDropHighlight(null);
-                        const toolId = e.dataTransfer.getData("toolId");
-                        if (toolId) addToolToParagraph(idx, toolId);
+                        const resultToolId = e.dataTransfer.getData("resultToolId");
+                        if (resultToolId && toolResults[resultToolId]) {
+                          // Insert tool result after this paragraph
+                          const newParagraphs = [...paragraphs];
+                          newParagraphs.splice(idx + 1, 0, toolResults[resultToolId]);
+                          setInitialDoc(newParagraphs.join("\n\n"));
+                        }
                       }}
                       className={`py-2 transition-all ${isHighlighted ? "bg-primary/5 border-b-2 border-dashed border-primary" : "border-b border-transparent"}`}
                     >
-                      <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">{para}</p>
-                      {assignedTool && (
-                        <motion.span
-                          initial={{ opacity: 0, scale: 0.8 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium mt-1.5 border ${assignedTool.color}`}
-                        >
-                          <assignedTool.icon className="w-3 h-3" />
-                          {assignedTool.label}
-                          <button
-                            onClick={() => setParagraphTools(prev => { const next = { ...prev }; delete next[idx]; return next; })}
-                            className="ml-0.5 p-0.5 rounded-full hover:bg-foreground/10 transition-colors"
-                          >
-                            <X className="w-2.5 h-2.5" />
-                          </button>
-                        </motion.span>
-                      )}
+                      {/* Render paragraph as markdown-like */}
+                      {para.split("\n").map((line, li) => {
+                        if (line.startsWith("# ")) return <h1 key={li} className="text-2xl font-bold text-foreground mt-6 mb-3">{line.slice(2)}</h1>;
+                        if (line.startsWith("## ")) return <h2 key={li} className="text-lg font-semibold text-foreground mt-4 mb-2">{line.slice(3)}</h2>;
+                        if (line.startsWith("### ")) return <h3 key={li} className="text-base font-medium text-foreground mt-3 mb-1.5">{line.slice(4)}</h3>;
+                        if (line.startsWith("---")) return <hr key={li} className="border-border my-4" />;
+                        if (line.startsWith("- ")) return <li key={li} className="text-sm text-foreground ml-4 mb-1 list-disc">{line.slice(2)}</li>;
+                        if (line.startsWith("> ")) return <blockquote key={li} className="text-sm text-muted-foreground border-l-2 border-primary/30 pl-3 my-1 italic">{line.slice(2)}</blockquote>;
+                        if (line.startsWith("|")) return <p key={li} className="text-sm text-foreground font-mono bg-accent/50 px-3 py-1 rounded">{line}</p>;
+                        if (line.startsWith("├") || line.startsWith("│") || line.startsWith("└")) return <p key={li} className="text-sm text-foreground font-mono leading-relaxed">{line}</p>;
+                        if (line.trim() === "") return <div key={li} className="h-1" />;
+                        return <p key={li} className="text-sm text-foreground leading-relaxed">{line}</p>;
+                      })}
                     </div>
                   );
                 })}
               </div>
             </div>
 
-            {/* Right: Draggable tools */}
-            <aside className="w-[260px] shrink-0 border-l border-border flex flex-col bg-muted/30">
+            {/* Right: Tool grid + workspace */}
+            <aside className="w-[380px] shrink-0 border-l border-border flex flex-col bg-muted/30">
+              {/* Tool grid header */}
               <div className="px-4 pt-4 pb-3 border-b border-border">
                 <h3 className="font-semibold text-sm text-foreground">结构化工具</h3>
-                <p className="text-xs text-muted-foreground mt-1">拖拽到左侧段落，添加结构化标签</p>
+                <p className="text-xs text-muted-foreground mt-1">点击工具开始处理，可复制左侧文本粘贴到下方</p>
               </div>
-              <div className="flex-1 overflow-y-auto p-3 space-y-2">
-                {tools.map((tool) => (
-                  <div
-                    key={tool.id}
-                    draggable
-                    onDragStart={(e) => {
-                      e.dataTransfer.setData("toolId", tool.id);
-                      e.dataTransfer.effectAllowed = "copy";
-                      setDraggedTool(tool.id);
-                    }}
-                    onDragEnd={() => { setDraggedTool(null); setDropHighlight(null); }}
-                    className={`flex items-center gap-3 p-3 rounded-xl border cursor-grab active:cursor-grabbing transition-all ${
-                      draggedTool === tool.id ? "opacity-40 border-primary scale-95" : `${tool.color} hover:shadow-md hover:scale-[1.02]`
-                    }`}
+
+              {/* 2x3 tool grid */}
+              <div className="px-3 pt-3 pb-2">
+                <div className="grid grid-cols-3 gap-2">
+                  {tools.map((tool) => {
+                    const isSelected = selectedStructTool === tool.id;
+                    const hasResult = !!toolResults[tool.id];
+                    const isGenerating = toolGenerating === tool.id;
+                    return (
+                      <motion.button
+                        key={tool.id}
+                        whileHover={{ scale: 1.03 }}
+                        whileTap={{ scale: 0.97 }}
+                        onClick={() => setSelectedStructTool(isSelected ? null : tool.id)}
+                        className={`relative flex flex-col items-center gap-1.5 p-3 rounded-xl border transition-all text-center ${
+                          isSelected
+                            ? "border-primary bg-primary/5 shadow-md"
+                            : hasResult
+                            ? `${tool.color} border-2`
+                            : "border-border bg-card hover:border-primary/30 hover:shadow-sm"
+                        }`}
+                      >
+                        {hasResult && (
+                          <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-primary flex items-center justify-center">
+                            <Check className="w-2.5 h-2.5 text-primary-foreground" />
+                          </div>
+                        )}
+                        {isGenerating && (
+                          <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-primary flex items-center justify-center">
+                            <Loader2 className="w-2.5 h-2.5 text-primary-foreground animate-spin" />
+                          </div>
+                        )}
+                        <tool.icon className={`w-5 h-5 ${isSelected ? "text-primary" : "text-muted-foreground"}`} />
+                        <span className={`text-[11px] font-medium ${isSelected ? "text-primary" : "text-foreground"}`}>{tool.label}</span>
+                      </motion.button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Tool workspace (when a tool is selected) */}
+              <AnimatePresence mode="wait">
+                {activeToolObj && (
+                  <motion.div
+                    key={selectedStructTool}
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -8 }}
+                    className="flex-1 flex flex-col border-t border-border overflow-hidden"
                   >
-                    <GripVertical className="w-3.5 h-3.5 text-muted-foreground/40 shrink-0" />
-                    <tool.icon className="w-4 h-4 shrink-0" />
-                    <div className="flex-1 min-w-0">
-                      <span className="text-sm font-medium block">{tool.label}</span>
-                      <span className="text-[10px] text-muted-foreground">{tool.desc}</span>
+                    {/* Workspace header */}
+                    <div className="px-4 py-3 flex items-center gap-2">
+                      <activeToolObj.icon className="w-4 h-4 text-primary" />
+                      <span className="text-sm font-medium text-foreground">{activeToolObj.label}</span>
+                      <span className="text-[10px] text-muted-foreground">· {activeToolObj.desc}</span>
                     </div>
+
+                    {/* Input area */}
+                    <div className="px-4 flex-1 flex flex-col min-h-0">
+                      <div className="text-[11px] text-muted-foreground mb-1.5">粘贴或输入要处理的文本：</div>
+                      <textarea
+                        value={toolInputTexts[activeToolObj.id] || ""}
+                        onChange={(e) => setToolInputTexts(prev => ({ ...prev, [activeToolObj.id]: e.target.value }))}
+                        placeholder="从左侧文档中选择并复制文本，粘贴到这里..."
+                        className="flex-1 min-h-[100px] max-h-[160px] w-full px-3 py-2.5 rounded-lg border border-border bg-background text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-primary/50 resize-none transition-colors"
+                      />
+
+                      {/* Generate button */}
+                      <div className="py-3 flex items-center gap-2">
+                        <motion.button
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                          onClick={() => handleToolGenerate(activeToolObj.id)}
+                          disabled={!toolInputTexts[activeToolObj.id]?.trim() || toolGenerating !== null}
+                          className="flex-1 flex items-center justify-center gap-2 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 shadow-sm disabled:opacity-40 transition-all"
+                        >
+                          {toolGenerating === activeToolObj.id ? (
+                            <><Loader2 className="w-4 h-4 animate-spin" /> 生成中 {Math.round(toolGenProgress)}%</>
+                          ) : (
+                            <><Wand2 className="w-4 h-4" /> 生成{activeToolObj.label}</>
+                          )}
+                        </motion.button>
+                        {toolResults[activeToolObj.id] && (
+                          <button
+                            onClick={() => setToolResults(prev => { const next = { ...prev }; delete next[activeToolObj.id]; return next; })}
+                            className="p-2 rounded-lg border border-border text-muted-foreground hover:text-destructive hover:border-destructive/30 transition-colors"
+                            title="清除结果"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        )}
+                      </div>
+
+                      {/* Generation progress bar */}
+                      {toolGenerating === activeToolObj.id && (
+                        <div className="w-full h-1.5 rounded-full bg-accent overflow-hidden mb-2">
+                          <motion.div
+                            className="h-full rounded-full bg-primary"
+                            initial={{ width: "0%" }}
+                            animate={{ width: `${toolGenProgress}%` }}
+                            transition={{ duration: 0.2 }}
+                          />
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Result area */}
+                    {toolResults[activeToolObj.id] && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        className="border-t border-border overflow-hidden"
+                      >
+                        <div className="px-4 py-2 flex items-center justify-between">
+                          <div className="flex items-center gap-1.5">
+                            <CheckCircle2 className="w-3.5 h-3.5 text-primary" />
+                            <span className="text-xs font-medium text-foreground">生成结果</span>
+                          </div>
+                          <span className="text-[10px] text-muted-foreground">拖拽到左侧文档插入</span>
+                        </div>
+                        <div
+                          draggable
+                          onDragStart={(e) => {
+                            e.dataTransfer.setData("resultToolId", activeToolObj.id);
+                            e.dataTransfer.effectAllowed = "copy";
+                          }}
+                          className="mx-4 mb-4 max-h-[200px] overflow-y-auto p-3 rounded-lg border border-primary/20 bg-primary/5 cursor-grab active:cursor-grabbing hover:shadow-md transition-all"
+                        >
+                          <div className="text-xs text-foreground leading-relaxed whitespace-pre-wrap">
+                            {toolResults[activeToolObj.id]}
+                          </div>
+                          <div className="mt-2 flex items-center gap-1 text-[10px] text-primary">
+                            <GripVertical className="w-3 h-3" /> 拖拽到左侧插入
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* Empty state when no tool selected */}
+              {!selectedStructTool && (
+                <div className="flex-1 flex items-center justify-center px-6">
+                  <div className="text-center">
+                    <div className="w-12 h-12 rounded-2xl bg-accent flex items-center justify-center mx-auto mb-3">
+                      <Layers className="w-5 h-5 text-muted-foreground/40" />
+                    </div>
+                    <p className="text-xs text-muted-foreground">点击上方工具开始</p>
+                    <p className="text-xs text-muted-foreground">结构化处理文档内容</p>
                   </div>
-                ))}
-              </div>
+                </div>
+              )}
             </aside>
           </div>
         </div>
