@@ -157,19 +157,18 @@ const QUICK_RESPONSES = [
 
 /* ───── Upload categories ───── */
 const LOCAL_UPLOAD_TYPES = [
-  { icon: FileText, label: "非结构化文档", desc: "PDF、Word、PPT、Markdown 等，自动解析和切分", type: "file" as const, gradient: "from-blue-500 to-indigo-600" },
-  { icon: Table2, label: "表格数据", desc: "Excel、CSV 等，按索引列进行分块解析", type: "file" as const, gradient: "from-emerald-500 to-teal-600" },
-  { icon: HelpCircle, label: "QA 问答", desc: "CSV/Excel，包含 Question 和 Answer 两列", type: "file" as const, gradient: "from-amber-500 to-orange-500" },
+  { icon: FileText, label: "本地非结构化文档", desc: "根据上传的文件，进行解析和切分处理", type: "file" as const, gradient: "from-blue-500 to-indigo-600" },
+  { icon: Table2, label: "表格", desc: "根据上传的表格数据，按照索引列进行分块和解析处理", type: "file" as const, gradient: "from-emerald-500 to-teal-600" },
+  { icon: HelpCircle, label: "QA 文件", desc: "CSV、Excel 文件，只包含 Question、Answer 两列数据", type: "file" as const, gradient: "from-amber-500 to-orange-500" },
   { icon: Image, label: "图片", desc: "JPG、PNG、截图等，OCR 识别与内容提取", type: "image" as const, gradient: "from-pink-500 to-rose-600" },
-  { icon: FileVideo, label: "视频", desc: "视频文字识别，图片与文本解析切分", type: "video" as const, gradient: "from-purple-500 to-violet-600" },
-  { icon: Headphones, label: "音频", desc: "ASR 语音识别，文本解析和内容切分", type: "audio" as const, gradient: "from-orange-500 to-amber-600" },
+  { icon: FileVideo, label: "视频", desc: "根据上传的视频数据，进行视频、文字识别，再对图片、文本进行解析和切分处理", type: "video" as const, gradient: "from-purple-500 to-violet-600" },
+  { icon: Headphones, label: "音频", desc: "根据上传的音频数据，进行 ASR 文本识别，再对文本进行解析和切分处理", type: "audio" as const, gradient: "from-orange-500 to-amber-600" },
 ];
 
 const ONLINE_UPLOAD_TYPES = [
-  { icon: Globe, label: "网页", desc: "抓取网页内容，自动解析和结构化处理", type: "url" as const, gradient: "from-cyan-500 to-sky-600" },
-  { icon: BookOpen, label: "在线文档", desc: "飞书、语雀、Notion 等在线文档链接", type: "url" as const, gradient: "from-blue-400 to-blue-600" },
-  { icon: Database, label: "API 接入", desc: "通过 API 获取结构化数据内容", type: "url" as const, gradient: "from-slate-500 to-slate-700", comingSoon: true },
-  { icon: StickyNote, label: "自定义文本", desc: "直接粘贴笔记、会议记录等文本内容", type: "text" as const, gradient: "from-rose-500 to-pink-600" },
+  { icon: BookOpen, label: "在线文档", desc: "获取飞书、语雀、Notion 等文档或目录下文档内容，进行解析和切分处理，支持设置自动更新", type: "url" as const, gradient: "from-blue-400 to-blue-600" },
+  { icon: Globe, label: "网页", desc: "获取上传 URL 的网页数据，进行解析和切分处理，支持设置自动更新", type: "url" as const, gradient: "from-cyan-500 to-sky-600" },
+  { icon: StickyNote, label: "自定义文本", desc: "直接粘贴笔记、会议记录或任何文本内容，进行解析和切分处理", type: "text" as const, gradient: "from-rose-500 to-pink-600" },
 ];
 
 const FILE_TYPE_ICON: Record<string, typeof FileText> = {
