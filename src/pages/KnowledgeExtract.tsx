@@ -1778,40 +1778,116 @@ const KnowledgeExtract = () => {
         {/* Close flex-1 wrapper */}
         </div>
 
-        {/* ═══ Add Source Modal ═══ */}
+        {/* ═══ Add Source Modal - JoySpace-style file picker ═══ */}
         <AnimatePresence>
-          {showAddSource && (
+          {showAddSource && (() => {
+            const FILE_PICKER_NAV = [
+              { icon: HomeIcon, label: "首页", key: "home" },
+              { icon: Lock, label: "私人空间", key: "private" },
+              { icon: Star, label: "收藏", key: "favorites" },
+              { icon: Zap, label: "快速访问", key: "quick" },
+            ];
+            const FILE_PICKER_KB = [
+              { icon: BookOpen, label: "文化与成长", key: "kb-culture" },
+              { icon: FileText, label: "知识管理项目", key: "kb-km" },
+              { icon: Sparkles, label: "集团AI战略级项目", key: "kb-ai" },
+              { icon: MessageSquare, label: "Journey Agent PM...", key: "kb-agent" },
+            ];
+            const FILE_PICKER_TABS = ["最近打开", "我收到的", "我创建的", "我发送的"];
+            const MOCK_JS_FILES = [
+              { icon: Table2, label: "知识管理页面分工拆解", format: "sheet" },
+              { icon: FileText, label: "让知识沉淀及自由流动-知识管理运营方案（20260310）", format: "doc" },
+              { icon: Table2, label: "政企-客户经理岗-AI培训资料汇集", format: "sheet" },
+              { icon: FileText, label: "公益采购\"黑匣子\"如何破局，京东市场机会点剖析", format: "doc" },
+              { icon: FileText, label: "【全】26年 AI培训 业务对接清单", format: "doc" },
+              { icon: FileVideo, label: "【W11】集团AI战略级项目-HR AI专项周例会", format: "ppt" },
+              { icon: FileVideo, label: "【W10】集团AI战略级项目-HR AI专项周例会", format: "ppt" },
+              { icon: FileVideo, label: "【W11】集团AI战略级项目-HR AI专项周例会", format: "ppt2" },
+            ];
+            return (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               className="absolute inset-0 z-50 flex items-center justify-center bg-foreground/40" onClick={() => setShowAddSource(false)}>
               <motion.div initial={{ opacity: 0, scale: 0.95, y: 12 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 12 }}
-                className="w-full max-w-[600px] bg-card rounded-2xl shadow-2xl border border-border overflow-hidden" onClick={(e) => e.stopPropagation()}>
-                <div className="relative px-8 pt-8 pb-4 text-center">
-                  <button onClick={() => setShowAddSource(false)} className="absolute right-4 top-4 p-1.5 rounded-lg hover:bg-accent text-muted-foreground transition-colors"><X className="w-5 h-5" /></button>
-                  <h2 className="text-xl font-semibold text-foreground">添加知识来源</h2>
-                  <p className="text-sm text-primary mt-1">支持多种格式的资料上传</p>
+                className="w-full max-w-[780px] h-[560px] bg-card rounded-2xl shadow-2xl border border-border overflow-hidden flex flex-col" onClick={(e) => e.stopPropagation()}>
+                {/* Header */}
+                <div className="px-5 py-3 border-b border-border bg-muted/30 flex items-center justify-between shrink-0">
+                  <span className="text-sm font-semibold text-foreground">请选择</span>
+                  <div className="flex-1 max-w-[320px] mx-4">
+                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-border bg-background text-sm">
+                      <Search className="w-3.5 h-3.5 text-muted-foreground" />
+                      <input placeholder="搜索或粘贴链接" className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground" />
+                    </div>
+                  </div>
+                  <button onClick={() => setShowAddSource(false)} className="p-1 rounded hover:bg-accent text-muted-foreground"><X className="w-4 h-4" /></button>
                 </div>
-                <div className="px-8 pb-6">
-                  <div className="border-2 border-dashed border-border rounded-xl p-10 text-center hover:border-primary/40 hover:bg-primary/5 transition-all cursor-pointer">
-                    <p className="text-base text-muted-foreground font-medium">拖放你的文件到这里</p>
-                    <p className="text-sm text-muted-foreground/70 mt-1">支持文档、图片、音频、视频等格式</p>
+
+                {/* Body */}
+                <div className="flex flex-1 overflow-hidden">
+                  {/* Left nav */}
+                  <div className="w-[180px] shrink-0 border-r border-border py-3 px-2 overflow-y-auto">
+                    {FILE_PICKER_NAV.map(nav => (
+                      <button key={nav.key} className="flex items-center gap-2.5 w-full px-3 py-2 rounded-md text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
+                        <nav.icon className="w-4 h-4" />{nav.label}
+                      </button>
+                    ))}
+                    <div className="mt-3 mb-1 px-3">
+                      <span className="text-[10px] text-muted-foreground uppercase tracking-wider">知识库</span>
+                    </div>
+                    {FILE_PICKER_KB.map(kb => (
+                      <button key={kb.key} className="flex items-center gap-2.5 w-full px-3 py-2 rounded-md text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
+                        <kb.icon className="w-4 h-4 text-primary" />
+                        <span className="truncate">{kb.label}</span>
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Right content */}
+                  <div className="flex-1 flex flex-col min-w-0">
+                    {/* Tabs */}
+                    <div className="flex items-center gap-6 px-5 pt-3 border-b border-border">
+                      {FILE_PICKER_TABS.map((tab, i) => (
+                        <button key={tab} className={`pb-2.5 text-sm font-medium transition-colors ${i === 0 ? "text-foreground border-b-2 border-primary" : "text-muted-foreground hover:text-foreground"}`}>
+                          {tab}
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* File list */}
+                    <div className="flex-1 overflow-y-auto">
+                      {MOCK_JS_FILES.map((file, i) => {
+                        const formatColors: Record<string, string> = {
+                          sheet: "text-emerald-600",
+                          doc: "text-blue-600",
+                          ppt: "text-orange-600",
+                          ppt2: "text-orange-600",
+                        };
+                        return (
+                          <button key={`${file.label}-${i}`}
+                            onClick={() => { addSource("file", file.label); }}
+                            className="flex items-center gap-3 w-full px-5 py-3 hover:bg-accent/50 transition-colors text-left border-b border-border/50 group">
+                            <div className="w-4 h-4 rounded border border-border group-hover:border-primary/40 shrink-0" />
+                            <file.icon className={`w-5 h-5 shrink-0 ${formatColors[file.format] || "text-muted-foreground"}`} />
+                            <span className="text-sm text-foreground truncate flex-1">{file.label}</span>
+                            <span className="text-xs text-muted-foreground shrink-0">可阅读 ▾</span>
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
                 </div>
-                <div className="px-8 pb-8 grid grid-cols-3 gap-2">
-                  {[
-                    { icon: FileText, label: "研发规范文档.pdf", type: "file" as const },
-                    { icon: Image, label: "架构设计图.png", type: "image" as const },
-                    { icon: FileAudio, label: "需求评审录音.mp3", type: "audio" as const },
-                  ].map((item) => (
-                    <button key={item.label} onClick={() => addSource(item.type, item.label)}
-                      className="flex items-center gap-2.5 p-3 rounded-xl border border-border bg-background hover:border-primary/30 hover:bg-primary/5 transition-all text-left">
-                      <item.icon className="w-4 h-4 text-primary shrink-0" />
-                      <span className="text-xs text-foreground truncate">{item.label}</span>
-                    </button>
-                  ))}
+
+                {/* Footer */}
+                <div className="px-5 py-3 border-t border-border flex items-center justify-between shrink-0 bg-muted/20">
+                  <span className="text-xs text-muted-foreground">已选择 0 项 ∧</span>
+                  <div className="flex items-center gap-2">
+                    <button onClick={() => setShowAddSource(false)} className="px-4 py-1.5 rounded-lg border border-border text-sm text-muted-foreground hover:text-foreground transition-colors">取消</button>
+                    <button onClick={() => setShowAddSource(false)} className="px-4 py-1.5 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors">发送</button>
+                  </div>
                 </div>
               </motion.div>
             </motion.div>
-          )}
+            );
+          })()}
         </AnimatePresence>
       </div>
     </AppLayout>
