@@ -240,7 +240,7 @@ const ExpertLibrary = () => {
           <aside className="w-[280px] shrink-0 border-l border-border p-5 hidden xl:block sticky top-14 h-[calc(100vh-56px)] overflow-y-auto space-y-5">
             {/* Ability radar */}
             <div>
-              <h3 className="font-semibold text-sm text-foreground mb-3">能力图谱</h3>
+              <h3 className="text-sm font-semibold text-foreground mb-3">能力图谱</h3>
               {renderRadarChart(abilities)}
               <div className="grid grid-cols-2 gap-2 mt-3">
                 {abilities.map((a) => (
