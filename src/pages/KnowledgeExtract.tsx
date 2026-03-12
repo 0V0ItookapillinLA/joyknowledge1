@@ -531,7 +531,6 @@ const KnowledgeExtract = () => {
 
   // ───── Quick Step 1: Multi-Modal Upload ─────
   if (appMode === "quick-upload") {
-    const [selectedOnlineType, setSelectedOnlineType] = useState<string | null>(null);
     const handleTypeClick = (opt: { type: string; comingSoon?: boolean; label: string }) => {
       if ((opt as any).comingSoon) return;
       if (opt.type === "url") {
