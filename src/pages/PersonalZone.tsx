@@ -62,8 +62,20 @@ const PersonalZone = () => {
 
         {/* Center content */}
         <div className="flex-1 min-w-0 p-6">
-          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
-            {/* Profile card */}
+          <PageHeader
+            title="个人中心"
+            breadcrumbs={[{ label: "个人专区" }]}
+            actions={
+              <div className="flex gap-2">
+                <button className="px-4 py-1.5 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors">
+                  编辑资料
+                </button>
+                <button className="px-4 py-1.5 rounded-lg border border-border text-sm text-foreground hover:border-primary hover:text-primary transition-colors">
+                  分享主页
+                </button>
+              </div>
+            }
+          />
             <div className="card-base p-8 mb-6">
               <div className="flex flex-col items-center">
                 {/* Avatar */}
