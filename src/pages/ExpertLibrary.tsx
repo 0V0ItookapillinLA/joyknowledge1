@@ -259,7 +259,7 @@ const ExpertLibrary = () => {
                   <MessageCircle className="w-6 h-6 text-card" />
                 </div>
               </div>
-              <h4 className="font-semibold text-sm text-card mb-1 text-center">专家咨询</h4>
+              <h4 className="text-sm font-semibold text-card mb-1 text-center">专家咨询</h4>
               <p className="text-xs text-card/70 mb-4 text-center">
                 与 {selectedExpert.name} 1 对 1 交流，解决您的技术难题。
               </p>
