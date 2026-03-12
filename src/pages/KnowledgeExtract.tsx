@@ -263,7 +263,23 @@ const KnowledgeExtract = () => {
   const [paragraphTools, setParagraphTools] = useState<Record<number, string[]>>({});
   const [draggedTool, setDraggedTool] = useState<string | null>(null);
 
-  useEffect(() => {
+  const [tools, setTools] = useState<ToolOption[]>([
+    { id: "report", label: "结构化文本", desc: "按章节组织的完整文档", icon: FileText, checked: false, color: "text-blue-600 bg-blue-50 border-blue-200" },
+    { id: "mindmap", label: "思维导图", desc: "知识脉络可视化", icon: GitBranch, checked: false, color: "text-green-600 bg-green-50 border-green-200" },
+    { id: "flashcard", label: "知识闪卡", desc: "核心知识点速记卡", icon: Zap, checked: false, color: "text-amber-600 bg-amber-50 border-amber-200" },
+    { id: "data", label: "数据图表", desc: "关键指标可视化", icon: BarChart3, checked: false, color: "text-rose-600 bg-rose-50 border-rose-200" },
+    { id: "audio", label: "音频概览", desc: "语音版内容摘要", icon: Mic, checked: false, color: "text-orange-600 bg-orange-50 border-orange-200" },
+    { id: "video", label: "视频概览", desc: "视频版知识讲解", icon: Video, checked: false, color: "text-purple-600 bg-purple-50 border-purple-200" },
+  ]);
+
+  const MOCK_SEARCH_RESULTS: SearchResult[] = [
+    { id: "sr1", title: "2024中国"大模型+知识管理"最佳实践案例TOP15重磅发布", url: "https://53ai.com/news/top15", desc: "这份报告为你揭示了大模型在知识管理领域的最佳实践案例。", source: "53AI" },
+    { id: "sr2", title: "《技术趋势2026》报告 | 德勤中国", url: "https://deloitte.com/cn/tech-trends", desc: "德勤发布的2026年技术趋势深度报告。", source: "Deloitte" },
+    { id: "sr3", title: "人工智能知识管理：指南、策略与优势", url: "https://lark.com/ai-knowledge", desc: "全面解读AI驱动的知识管理指南与策略。", source: "Lark" },
+    { id: "sr4", title: "大模型知识管理系统", url: "https://zte.com/km-system", desc: "中兴通讯大模型知识管理系统技术架构。", source: "ZTE" },
+    { id: "sr5", title: "人工智能安全治理框架解读", url: "https://security.com/ai-governance", desc: "AI安全治理框架的深度解读。", source: "安全内参" },
+  ];
+
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [chatMessages]);
 
