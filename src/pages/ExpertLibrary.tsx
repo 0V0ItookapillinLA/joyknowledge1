@@ -302,19 +302,17 @@ const ExpertLibrary = () => {
 
         {/* Main */}
         <div className="flex-1 min-w-0 p-6">
-          {/* Header */}
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h1 className="text-xl font-semibold text-foreground">
-                企业专家库
-                <span className="text-sm font-normal text-muted-foreground ml-3">共 42 位认证专家</span>
-              </h1>
-            </div>
-            <button className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-border text-sm text-muted-foreground hover:text-foreground transition-colors">
-              {sortBy}
-              <ChevronDown className="w-4 h-4" />
-            </button>
-          </div>
+          <PageHeader
+            title="企业专家库"
+            subtitle="共 42 位认证专家"
+            breadcrumbs={[{ label: "专家书房" }]}
+            actions={
+              <button className="inline-flex items-center gap-2 px-4 py-1.5 rounded-lg border border-border text-sm text-muted-foreground hover:text-foreground transition-colors">
+                {sortBy}
+                <ChevronDown className="w-4 h-4" />
+              </button>
+            }
+          />
 
           {/* Expert grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
