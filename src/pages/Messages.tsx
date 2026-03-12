@@ -96,11 +96,18 @@ const Messages = () => {
           {/* Header */}
           <div className="p-4 border-b border-border">
             <div className="flex items-center justify-between mb-3">
-              <h1 className="text-lg font-semibold text-foreground">私信</h1>
-              <Link to="/" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                <ArrowLeft className="w-4 h-4" />
-              </Link>
+              <div className="flex items-center gap-2">
+                <Link to="/" className="p-1 rounded-md hover:bg-accent text-muted-foreground hover:text-foreground transition-colors">
+                  <ChevronLeft className="w-4 h-4" />
+                </Link>
+                <nav className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                  <Link to="/" className="hover:text-foreground transition-colors">首页</Link>
+                  <ChevronRight className="w-3 h-3" />
+                  <span className="text-foreground">私信</span>
+                </nav>
+              </div>
             </div>
+            <h1 className="text-lg font-semibold text-foreground mb-3">私信</h1>
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <input

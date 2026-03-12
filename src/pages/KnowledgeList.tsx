@@ -339,51 +339,52 @@ const KnowledgeList = () => {
 
         {/* Main content */}
         <div className="flex-1 min-w-0 p-6">
-          {/* Header bar */}
-          <div className="flex items-center justify-between mb-4">
-            <Link
-              to="/"
-              className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
-              <ArrowLeft className="w-4 h-4" /> 返回首页
-            </Link>
-            <div className="flex items-center gap-3">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <input
-                  type="text"
-                  placeholder="在结果中搜索..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-9 pr-4 py-2 rounded-md border border-border bg-card text-sm text-foreground placeholder:text-muted-foreground w-[200px] focus:outline-none focus:border-primary/40"
-                />
+          <PageHeader
+            title={filterLabel || "知识列表"}
+            breadcrumbs={[
+              ...(filterType === "dept" ? [{ label: "BGBU专区", path: "/" }] : []),
+              ...(filterType === "domain" ? [{ label: "领域专区", path: "/" }] : []),
+              { label: filterLabel || "知识列表" },
+            ]}
+            actions={
+              <div className="flex items-center gap-3">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <input
+                    type="text"
+                    placeholder="在结果中搜索..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-9 pr-4 py-1.5 rounded-md border border-border bg-card text-sm text-foreground placeholder:text-muted-foreground w-[200px] focus:outline-none focus:border-primary/40"
+                  />
+                </div>
+                <div className="relative">
+                  <button
+                    onClick={() => setShowSortDropdown(!showSortDropdown)}
+                    className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    {sortBy}
+                    <ChevronDown className="w-4 h-4" />
+                  </button>
+                  {showSortDropdown && (
+                    <div className="absolute right-0 top-full mt-1 bg-card border border-border rounded-md shadow-md z-10 min-w-[120px]">
+                      {SORT_OPTIONS.map((opt) => (
+                        <button
+                          key={opt}
+                          onClick={() => { setSortBy(opt); setShowSortDropdown(false); }}
+                          className={`block w-full text-left px-3 py-2 text-sm transition-colors ${
+                            sortBy === opt ? "text-primary bg-primary/5" : "text-foreground hover:bg-accent"
+                          }`}
+                        >
+                          {opt}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
-              <div className="relative">
-                <button
-                  onClick={() => setShowSortDropdown(!showSortDropdown)}
-                  className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  {sortBy}
-                  <ChevronDown className="w-4 h-4" />
-                </button>
-                {showSortDropdown && (
-                  <div className="absolute right-0 top-full mt-1 bg-card border border-border rounded-md shadow-md z-10 min-w-[120px]">
-                    {SORT_OPTIONS.map((opt) => (
-                      <button
-                        key={opt}
-                        onClick={() => { setSortBy(opt); setShowSortDropdown(false); }}
-                        className={`block w-full text-left px-3 py-2 text-sm transition-colors ${
-                          sortBy === opt ? "text-primary bg-primary/5" : "text-foreground hover:bg-accent"
-                        }`}
-                      >
-                        {opt}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
+            }
+          />
 
           {/* Department filter bar */}
           <div className="flex items-center gap-3 flex-wrap mb-4">

@@ -76,6 +76,8 @@ const PersonalZone = () => {
               </div>
             }
           />
+          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
+            {/* Profile card */}
             <div className="card-base p-8 mb-6">
               <div className="flex flex-col items-center">
                 {/* Avatar */}
@@ -91,18 +93,8 @@ const PersonalZone = () => {
                 </div>
 
                 {/* Name & title */}
-                <h1 className="text-xl font-semibold text-foreground mb-1">Kevin</h1>
+                <h2 className="text-lg font-semibold text-foreground mb-1">Kevin</h2>
                 <p className="text-sm text-muted-foreground mb-5">高级产品经理 @ 产品创新部</p>
-
-                {/* Action buttons */}
-                <div className="flex gap-3 mb-8">
-                  <button className="px-6 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors">
-                    编辑资料
-                  </button>
-                  <button className="px-6 py-2 rounded-lg border border-border text-sm text-foreground hover:border-primary hover:text-primary transition-colors">
-                    分享主页
-                  </button>
-                </div>
 
                 {/* Stats */}
                 <div className="flex gap-12">
