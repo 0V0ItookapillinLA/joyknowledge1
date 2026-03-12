@@ -41,12 +41,12 @@ const DIRECTORY = [
 ];
 
 const TEAM_MEMBERS = [
-  { name: "张睿祎", role: "负责人", avatar: samAvatar },
-  { name: "刘长江", role: "产品", avatar: ericAvatar },
-  { name: "白冰", role: "研发", avatar: richardAvatar },
-  { name: "徐慧娟", role: "产品", avatar: sophieAvatar },
-  { name: "裴东彬", role: "研发", avatar: kevinAvatar },
-  { name: "杨光", role: "财务", avatar: amyAvatar },
+  { name: "张孔泓伯", role: "负责人", avatar: samAvatar },
+  { name: "庞晓宇", role: "产品", avatar: ericAvatar },
+  { name: "杨宇翔", role: "研发", avatar: richardAvatar },
+  { name: "姜东良", role: "产品", avatar: sophieAvatar },
+  { name: "马丽杰", role: "研发", avatar: kevinAvatar },
+  { name: "于潇", role: "财务", avatar: amyAvatar },
 ];
 
 const BIZ_SCENARIOS = [
@@ -54,24 +54,24 @@ const BIZ_SCENARIOS = [
     line: "HR条线",
     color: "text-primary",
     roles: [
-      { scene: "招聘", members: [{ name: "刘长江", avatar: ericAvatar }, { name: "白冰", avatar: richardAvatar }] },
-      { scene: "绩效", members: [{ name: "钱东海", avatar: kevinAvatar }, { name: "陈强", avatar: samAvatar }] },
+      { scene: "招聘", members: [{ name: "庞晓宇", avatar: ericAvatar }, { name: "杨宇翔", avatar: richardAvatar }] },
+      { scene: "绩效", members: [{ name: "马丽杰", avatar: kevinAvatar }, { name: "张孔泓伯", avatar: samAvatar }] },
     ],
   },
   {
     line: "京ME条线",
     color: "text-orange-600",
     roles: [
-      { scene: "日历", members: [{ name: "白冰", avatar: richardAvatar }] },
-      { scene: "待办+项目", members: [{ name: "徐慧娟", avatar: sophieAvatar }] },
+      { scene: "日历", members: [{ name: "杨宇翔", avatar: richardAvatar }] },
+      { scene: "待办+项目", members: [{ name: "姜东良", avatar: sophieAvatar }] },
     ],
   },
   {
     line: "财务条线",
     color: "text-red-600",
     roles: [
-      { scene: "税务发票", members: [{ name: "杨光", avatar: amyAvatar }] },
-      { scene: "经营性结算", members: [{ name: "李鑫", avatar: kevinAvatar }] },
+      { scene: "税务发票", members: [{ name: "于潇", avatar: amyAvatar }] },
+      { scene: "经营性结算", members: [{ name: "刘靓璠", avatar: kevinAvatar }] },
     ],
   },
 ];
