@@ -1399,26 +1399,25 @@ const KnowledgeExtract = () => {
                         animate={{ opacity: 1, height: "auto" }}
                         className="border-t border-border overflow-hidden"
                       >
-                        <div className="px-4 py-2 flex items-center justify-between">
-                          <div className="flex items-center gap-1.5">
-                            <CheckCircle2 className="w-3.5 h-3.5 text-primary" />
-                            <span className="text-xs font-medium text-foreground">生成结果</span>
-                          </div>
-                          <span className="text-[10px] text-muted-foreground">拖拽到左侧文档插入</span>
-                        </div>
                         <div
                           draggable
                           onDragStart={(e) => {
                             e.dataTransfer.setData("resultToolId", activeToolObj.id);
                             e.dataTransfer.effectAllowed = "copy";
                           }}
-                          className="mx-4 mb-4 max-h-[200px] overflow-y-auto p-3 rounded-lg border border-primary/20 bg-primary/5 cursor-grab active:cursor-grabbing hover:shadow-md transition-all"
+                          className="px-4 py-2 flex items-center justify-between cursor-grab active:cursor-grabbing hover:bg-accent/50 transition-colors"
                         >
+                          <div className="flex items-center gap-1.5">
+                            <CheckCircle2 className="w-3.5 h-3.5 text-primary" />
+                            <span className="text-xs font-medium text-foreground">生成结果</span>
+                          </div>
+                          <div className="flex items-center gap-1 text-[10px] text-primary">
+                            <GripVertical className="w-3 h-3" /> 拖拽到左侧插入
+                          </div>
+                        </div>
+                        <div className="mx-4 mb-4 max-h-[200px] overflow-y-auto p-3 rounded-lg border border-border bg-card">
                           <div className="text-xs text-foreground leading-relaxed whitespace-pre-wrap">
                             {toolResults[activeToolObj.id]}
-                          </div>
-                          <div className="mt-2 flex items-center gap-1 text-[10px] text-primary">
-                            <GripVertical className="w-3 h-3" /> 拖拽到左侧插入
                           </div>
                         </div>
                       </motion.div>
