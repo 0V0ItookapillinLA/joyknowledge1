@@ -332,23 +332,20 @@ const KnowledgeExtract = () => {
 
   /* ───── Deep structuring ───── */
   const enterStructuringMode = () => {
-    setInitialDoc(GENERATED_DOC);
+    const doc = GENERATED_DOC;
+    const paragraphs = doc.split("\n\n").filter(p => p.trim());
+    const mockedParagraphTools = Object.fromEntries(
+      paragraphs.map((_, idx) => [idx, ["report"]])
+    ) as Record<number, string[]>;
+
+    setInitialDoc(doc);
+    setParagraphTools(mockedParagraphTools);
+    setDropHighlight(null);
     setAppMode("deep-structuring");
   };
 
   const addToolToParagraph = (paragraphIdx: number, toolId: string) => {
-    setParagraphTools(prev => {
-      const existing = prev[paragraphIdx] || [];
-      if (existing.includes(toolId)) return prev;
-      return { ...prev, [paragraphIdx]: [...existing, toolId] };
-    });
-  };
-
-  const removeToolFromParagraph = (paragraphIdx: number, toolId: string) => {
-    setParagraphTools(prev => {
-      const existing = prev[paragraphIdx] || [];
-      return { ...prev, [paragraphIdx]: existing.filter(t => t !== toolId) };
-    });
+    setParagraphTools(prev => ({ ...prev, [paragraphIdx]: [toolId] }));
   };
 
   const handleSend = () => {
@@ -1167,7 +1164,7 @@ const KnowledgeExtract = () => {
     return (
       <AppLayout>
         <div className="flex h-[calc(100vh-56px)]">
-          {/* Left: Document with drop zones */}
+          {/* Left: Pure text document */}
           <div className="flex-1 overflow-y-auto">
             <div className="max-w-3xl mx-auto py-8 px-6">
               <div className="flex items-center justify-between mb-6">
@@ -1175,65 +1172,26 @@ const KnowledgeExtract = () => {
                   <button onClick={() => setAppMode("workspace")} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
                     <ChevronLeft className="w-4 h-4" /> 返回对话
                   </button>
-                  <h2 className="text-lg font-bold text-foreground">配置输出格式</h2>
+                  <h2 className="text-lg font-bold text-foreground">纯文本初稿</h2>
                 </div>
                 <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={startGeneration}
                   className="flex items-center gap-2 px-5 py-2 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 shadow-md">
                   <Wand2 className="w-4 h-4" /> 最终生成
                 </motion.button>
               </div>
-              <p className="text-sm text-muted-foreground mb-6">从右侧拖拽结构化工具到段落后方，定义每段的输出格式</p>
+              <p className="text-sm text-muted-foreground mb-6">拖拽右侧工具到某一段文本上，会替换该段后方标签（已默认 mock 为“结构化文本”）</p>
 
               {paragraphs.map((para, idx) => {
-                const assignedTools = paragraphTools[idx] || [];
+                const assignedToolId = paragraphTools[idx]?.[0] || "report";
+                const assignedTool = tools.find(t => t.id === assignedToolId) || tools[0];
                 const isHighlighted = dropHighlight === idx;
                 return (
-                  <div key={idx} className="mb-1">
-                    {/* Paragraph content */}
-                    <div className="mb-1 px-3 py-2 rounded-lg hover:bg-accent/20 transition-colors">
-                      {para.split("\n").map((line, li) => {
-                        if (line.startsWith("# ")) return <h1 key={li} className="text-2xl font-bold text-foreground mt-4 mb-2">{line.slice(2)}</h1>;
-                        if (line.startsWith("## ")) return <h2 key={li} className="text-lg font-semibold text-foreground mt-3 mb-1.5">{line.slice(3)}</h2>;
-                        if (line.startsWith("### ")) return <h3 key={li} className="text-base font-medium text-foreground mt-2 mb-1">{line.slice(4)}</h3>;
-                        if (line.startsWith("---")) return <hr key={li} className="border-border my-3" />;
-                        if (line.startsWith("- ")) return <li key={li} className="text-sm text-foreground ml-4 mb-0.5 list-disc">{line.slice(2)}</li>;
-                        if (line.startsWith("> ")) return <blockquote key={li} className="text-sm text-muted-foreground border-l-2 border-primary/30 pl-3 my-0.5 italic">{line.slice(2)}</blockquote>;
-                        if (line.startsWith("|")) return <p key={li} className="text-sm text-foreground font-mono bg-accent/50 px-2 py-0.5 rounded">{line}</p>;
-                        if (line.startsWith("**")) return <p key={li} className="text-sm font-semibold text-foreground mb-0.5">{line.replace(/\*\*/g, "")}</p>;
-                        if (line.trim() === "") return null;
-                        return <p key={li} className="text-sm text-foreground leading-relaxed">{line}</p>;
-                      })}
-                    </div>
-
-                    {/* Assigned tools - visual cards */}
-                    <AnimatePresence>
-                      {assignedTools.length > 0 && (
-                        <motion.div initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} className="flex flex-wrap items-center gap-2 ml-3 mb-2">
-                          {assignedTools.map(toolId => {
-                            const tool = tools.find(t => t.id === toolId);
-                            if (!tool) return null;
-                            return (
-                              <motion.div key={toolId} initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
-                                transition={{ type: "spring", stiffness: 300 }}
-                                className={`inline-flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium border shadow-sm ${tool.color}`}>
-                                <tool.icon className="w-3.5 h-3.5" />
-                                <span>{tool.label}</span>
-                                <div className="w-px h-3 bg-current opacity-20" />
-                                <span className="text-[10px] opacity-70">将在此生成</span>
-                                <button onClick={() => removeToolFromParagraph(idx, toolId)}
-                                  className="ml-1 p-0.5 rounded-md hover:bg-foreground/10 transition-colors">
-                                  <X className="w-3 h-3" />
-                                </button>
-                              </motion.div>
-                            );
-                          })}
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-
-                    {/* Drop zone */}
+                  <div key={idx} className="mb-4">
                     <div
-                      onDragOver={(e) => { e.preventDefault(); setDropHighlight(idx); }}
+                      onDragOver={(e) => {
+                        e.preventDefault();
+                        setDropHighlight(idx);
+                      }}
                       onDragLeave={() => setDropHighlight(null)}
                       onDrop={(e) => {
                         e.preventDefault();
@@ -1241,20 +1199,23 @@ const KnowledgeExtract = () => {
                         const toolId = e.dataTransfer.getData("toolId");
                         if (toolId) addToolToParagraph(idx, toolId);
                       }}
-                      className={`h-7 my-0.5 mx-3 border-2 border-dashed rounded-lg flex items-center justify-center transition-all ${
+                      className={`px-4 py-3 rounded-xl border transition-all ${
                         isHighlighted
-                          ? "border-primary bg-primary/10 h-12"
-                          : "border-transparent hover:border-muted-foreground/20"
+                          ? "border-primary bg-primary/5"
+                          : "border-border bg-card"
                       }`}
                     >
-                      {isHighlighted ? (
-                        <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-xs text-primary font-medium flex items-center gap-1.5">
-                          <Plus className="w-3.5 h-3.5" /> 松开添加工具
-                        </motion.span>
-                      ) : (
-                        <span className="text-[10px] text-muted-foreground/30">+ 拖放工具</span>
-                      )}
+                      <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">{para}</p>
                     </div>
+
+                    <motion.div
+                      initial={{ opacity: 0, y: -4 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium border shadow-sm mt-2 ml-1"
+                    >
+                      <assignedTool.icon className="w-3.5 h-3.5" />
+                      <span>{assignedTool.label}</span>
+                    </motion.div>
                   </div>
                 );
               })}
@@ -1265,7 +1226,7 @@ const KnowledgeExtract = () => {
           <aside className="w-[260px] shrink-0 border-l border-border flex flex-col bg-muted/30">
             <div className="px-4 pt-4 pb-3 border-b border-border">
               <h3 className="font-semibold text-sm text-foreground">结构化工具</h3>
-              <p className="text-xs text-muted-foreground mt-1">拖拽到左侧段落后方，定义输出格式</p>
+              <p className="text-xs text-muted-foreground mt-1">拖拽到左侧段落上，即可替换该段标签</p>
             </div>
             <div className="flex-1 overflow-y-auto p-3 space-y-2">
               {tools.map((tool) => (
@@ -1290,12 +1251,6 @@ const KnowledgeExtract = () => {
                   </div>
                 </div>
               ))}
-            </div>
-            <div className="p-3 border-t border-border">
-              <div className="p-3 rounded-xl bg-accent/50 text-center">
-                <p className="text-[11px] text-muted-foreground">拖拽工具到文档段落后</p>
-                <p className="text-[11px] text-muted-foreground">点击右上角「最终生成」</p>
-              </div>
             </div>
           </aside>
         </div>
