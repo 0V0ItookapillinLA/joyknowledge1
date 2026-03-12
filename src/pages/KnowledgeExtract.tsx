@@ -248,14 +248,20 @@ const KnowledgeExtract = () => {
   const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
-  const [tools, setTools] = useState<ToolOption[]>([
-    { id: "report", label: "结构化报告", desc: "按章节组织的完整文档", icon: FileText, checked: true, color: "text-blue-600 bg-blue-50 border-blue-200" },
-    { id: "mindmap", label: "思维导图", desc: "知识脉络可视化", icon: GitBranch, checked: true, color: "text-green-600 bg-green-50 border-green-200" },
-    { id: "flashcard", label: "知识闪卡", desc: "核心知识点速记卡", icon: Zap, checked: false, color: "text-amber-600 bg-amber-50 border-amber-200" },
-    { id: "data", label: "数据图表", desc: "关键指标可视化", icon: BarChart3, checked: false, color: "text-rose-600 bg-rose-50 border-rose-200" },
-    { id: "audio", label: "音频概览", desc: "语音版内容摘要", icon: Mic, checked: false, color: "text-orange-600 bg-orange-50 border-orange-200" },
-    { id: "video", label: "视频概览", desc: "视频版知识讲解", icon: Video, checked: false, color: "text-purple-600 bg-purple-50 border-purple-200" },
-  ]);
+  // Deep mode search state
+  const [searchScope, setSearchScope] = useState<SearchScope>("web");
+  const [searchDepth, setSearchDepth] = useState<SearchDepth>("fast");
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+  const [searchComplete, setSearchComplete] = useState(false);
+  const [searchProgress, setSearchProgress] = useState<string[]>([]);
+  const [showScopeDropdown, setShowScopeDropdown] = useState(false);
+  const [showDepthDropdown, setShowDepthDropdown] = useState(false);
+
+  // Deep structuring state
+  const [initialDoc, setInitialDoc] = useState("");
+  const [paragraphTools, setParagraphTools] = useState<Record<number, string[]>>({});
+  const [draggedTool, setDraggedTool] = useState<string | null>(null);
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
