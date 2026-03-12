@@ -1179,8 +1179,6 @@ const KnowledgeExtract = () => {
     );
   }
 
-        {/* Close flex-1 wrapper */}
-        </div>
   // ───── Deep Structuring Mode ─────
   if (appMode === "deep-structuring") {
     const paragraphs = initialDoc.split("\n\n").filter(p => p.trim());
