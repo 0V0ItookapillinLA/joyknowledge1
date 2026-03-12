@@ -280,6 +280,7 @@ const KnowledgeExtract = () => {
     { id: "sr5", title: "人工智能安全治理框架解读", url: "https://security.com/ai-governance", desc: "AI安全治理框架的深度解读。", source: "安全内参" },
   ];
 
+  useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [chatMessages]);
 
