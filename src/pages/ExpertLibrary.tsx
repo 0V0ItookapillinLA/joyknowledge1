@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import AppLayout from "@/components/AppLayout";
+import PageHeader from "@/components/PageHeader";
 import { MOCK_EXPERTS, MOCK_CASES } from "@/data/mockData";
 import { ArrowLeft, UserPlus, Mail, Calendar, Heart, MessageCircle, ChevronDown, Star } from "lucide-react";
 
