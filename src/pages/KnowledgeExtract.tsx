@@ -1398,7 +1398,7 @@ const KnowledgeExtract = () => {
                       <motion.div
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: "auto" }}
-                        className="border-t border-border overflow-hidden"
+                        className="border-t border-border overflow-hidden flex-1 flex flex-col min-h-0"
                       >
                         <div
                           draggable
@@ -1406,17 +1406,26 @@ const KnowledgeExtract = () => {
                             e.dataTransfer.setData("resultToolId", activeToolObj.id);
                             e.dataTransfer.effectAllowed = "copy";
                           }}
-                          className="px-4 py-2 flex items-center justify-between cursor-grab active:cursor-grabbing hover:bg-accent/50 transition-colors"
+                          className="px-4 py-2 flex items-center justify-between cursor-grab active:cursor-grabbing hover:bg-accent/50 transition-colors shrink-0"
                         >
                           <div className="flex items-center gap-1.5">
                             <CheckCircle2 className="w-3.5 h-3.5 text-primary" />
                             <span className="text-xs font-medium text-foreground">生成结果</span>
                           </div>
-                          <div className="flex items-center gap-1 text-[10px] text-primary">
-                            <GripVertical className="w-3 h-3" /> 拖拽到左侧插入
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={(e) => { e.stopPropagation(); setExpandedResult(activeToolObj.id); }}
+                              className="p-1 rounded hover:bg-accent text-muted-foreground hover:text-foreground transition-colors"
+                              title="放大查看"
+                            >
+                              <Maximize2 className="w-3.5 h-3.5" />
+                            </button>
+                            <div className="flex items-center gap-1 text-[10px] text-primary">
+                              <GripVertical className="w-3 h-3" /> 拖拽插入
+                            </div>
                           </div>
                         </div>
-                        <div className="mx-4 mb-4 max-h-[200px] overflow-y-auto p-3 rounded-lg border border-border bg-card">
+                        <div className="mx-4 mb-4 flex-1 min-h-0 overflow-y-auto p-3 rounded-lg border border-border bg-card">
                           <div className="text-xs text-foreground leading-relaxed whitespace-pre-wrap">
                             {toolResults[activeToolObj.id]}
                           </div>
