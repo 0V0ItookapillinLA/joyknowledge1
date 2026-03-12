@@ -197,6 +197,9 @@ const KnowledgeExtract = () => {
   const [activeUploadType, setActiveUploadType] = useState<string | null>(null);
   const [selectedOnlineType, setSelectedOnlineType] = useState<string | null>(null);
   const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
+  const [pickerSelected, setPickerSelected] = useState<string[]>([]);
+  const [pickerTab, setPickerTab] = useState("最近打开");
+  const [pickerNav, setPickerNav] = useState("home");
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   // Deep mode search state
