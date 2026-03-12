@@ -262,6 +262,10 @@ const KnowledgeExtract = () => {
   const [initialDoc, setInitialDoc] = useState("");
   const [paragraphTools, setParagraphTools] = useState<Record<number, string[]>>({});
   const [draggedTool, setDraggedTool] = useState<string | null>(null);
+  const [showPublishDialog, setShowPublishDialog] = useState(false);
+  const [publishTarget, setPublishTarget] = useState<"personal" | "bgbu" | null>(null);
+  const [publishSubmitted, setPublishSubmitted] = useState(false);
+  const [dropHighlight, setDropHighlight] = useState<number | null>(null);
 
   const [tools, setTools] = useState<ToolOption[]>([
     { id: "report", label: "结构化文本", desc: "按章节组织的完整文档", icon: FileText, checked: false, color: "text-blue-600 bg-blue-50 border-blue-200" },
