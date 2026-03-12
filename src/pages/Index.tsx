@@ -40,13 +40,14 @@ const RECOMMENDED_TOPICS_ROW2 = [
 ];
 
 const HOT_ZONES = [
-  { label: "HR管理", emoji: "👥", navDomain: "HR管理", navFilters: [] },
-  { label: "领导力", emoji: "🎯", navDomain: "HR管理", navFilters: ["领导力发展"] },
-  { label: "绩效管理", emoji: "📊", navDomain: "HR管理", navFilters: ["绩效管理"] },
-  { label: "组织发展", emoji: "🏢", navDomain: "HR管理", navFilters: ["组织发展"] },
-  { label: "人才招聘", emoji: "🤝", navDomain: "HR管理", navFilters: ["人才招聘"] },
-  { label: "培训赋能", emoji: "📚", navDomain: "HR管理", navFilters: ["培训赋能"] },
-  { label: "AI应用", emoji: "🚀", navDomain: "全部领域", navFilters: [] },
+  { label: "HR 专区", icon: MessageSquareText, navDomain: "HR管理", navFilters: [], count: 1240, hot: true, hotViews: "9.8w", updatedAt: "10分钟前更新" },
+  { label: "领导力", icon: Flag, navDomain: "HR管理", navFilters: ["领导力发展"], count: 850, hot: false, hotViews: "", updatedAt: "1小时前更新" },
+  { label: "组织变革", icon: Landmark, navDomain: "HR管理", navFilters: ["组织发展"], count: 620, hot: false, hotViews: "", updatedAt: "昨天更新" },
+  { label: "绩效管理", icon: PieChart, navDomain: "HR管理", navFilters: ["绩效管理"], count: 1580, hot: true, hotViews: "10w+", updatedAt: "5分钟前更新" },
+  { label: "企业文化", icon: Handshake, navDomain: "HR管理", navFilters: [], count: 430, hot: false, hotViews: "", updatedAt: "3天前更新" },
+  { label: "人才发展", icon: Sparkles, navDomain: "HR管理", navFilters: ["人才招聘"], count: 760, hot: false, hotViews: "", updatedAt: "2小时前更新" },
+  { label: "薪酬福利", icon: CreditCard, navDomain: "HR管理", navFilters: ["培训赋能"], count: 920, hot: false, hotViews: "", updatedAt: "今天更新" },
+  { label: "数字化转型", icon: Rocket, navDomain: "全部领域", navFilters: [], count: 2100, hot: true, hotViews: "12w+", updatedAt: "刚刚更新" },
 ];
 
 const NAV_ITEMS = [
