@@ -349,6 +349,35 @@ const KnowledgeExtract = () => {
     setParagraphTools(prev => ({ ...prev, [paragraphIdx]: [toolId] }));
   };
 
+  const TOOL_MOCK_RESULTS: Record<string, string> = {
+    report: "## 结构化分析结果\n\n### 核心要点\n1. 研发效能提升关键在于自动化流水线建设\n2. 渐进式推进策略有效降低团队抵触\n3. 数据驱动优化确保改进点有据可依\n\n### 详细分析\n该段落涉及技术选型与流程重构两个维度...",
+    mindmap: "🗺️ 思维导图\n\n├── 项目背景\n│   ├── 业务挑战\n│   │   ├── 交付周期长\n│   │   ├── 质量不稳定\n│   │   └── 协作低效\n│   └── 目标设定\n│       ├── 发布周期缩短30%\n│       └── 代码覆盖率80%+\n├── 解决方案\n│   ├── Jenkins + GitLab CI\n│   └── Scrum + Kanban\n└── 实施成果\n    ├── 发布周期↓40%\n    └── Bug修复↓75%",
+    flashcard: "⚡ 知识闪卡\n\n【卡片1】渐进式迁移策略\nQ: 为什么选择渐进式而非一刀切？\nA: 避免团队抵触情绪，确保适应性和可持续性\n\n【卡片2】数据驱动优化\nQ: 如何确保改进有效？\nA: 每个改进点都有数据支撑，持续跟踪核心指标\n\n【卡片3】跨部门协作\nQ: 协作效率提升的关键？\nA: 明确接口人机制，缩短需求对齐周期",
+    data: "📊 数据图表摘要\n\n| 指标 | 改进前 | 改进后 | 变化 |\n|------|--------|--------|------|\n| 发布周期 | 14天 | 8.4天 | ↓40% |\n| Bug修复时长 | 48h | 12h | ↓75% |\n| 代码覆盖率 | 45% | 82% | ↑82% |\n| 需求交付率 | 65% | 91% | ↑40% |\n| 满意度 | 35% | 78% | ↑123% |",
+    audio: "🎙️ 音频概览脚本\n\n大家好，今天为大家分享Q3研发效能提升的核心经验。\n\n首先是背景：我们团队面临交付周期长、质量不稳定的挑战...\n\n关键举措包括引入CI/CD流水线和混合敏捷模式...\n\n最终成果：发布周期缩短40%，团队满意度翻倍。",
+    video: "🎬 视频概览脚本\n\n[开场] 标题卡：Q3研发效能提升总结\n[场景1] 问题展示：72%开发者认为流程有瓶颈\n[场景2] 方案解析：Jenkins + GitLab CI 自动化\n[场景3] 成果数据：核心指标全面提升\n[结尾] 下一步：AI辅助代码审查",
+  };
+
+  const handleToolGenerate = (toolId: string) => {
+    if (toolGenerating) return; // only one at a time
+    const inputText = toolInputTexts[toolId];
+    if (!inputText?.trim()) return;
+    setToolGenerating(toolId);
+    setToolGenProgress(0);
+    let step = 0;
+    const totalSteps = 15;
+    const interval = setInterval(() => {
+      step++;
+      setToolGenProgress(Math.min((step / totalSteps) * 100, 100));
+      if (step >= totalSteps) {
+        clearInterval(interval);
+        setToolResults(prev => ({ ...prev, [toolId]: TOOL_MOCK_RESULTS[toolId] || "生成完成的内容..." }));
+        setToolGenerating(null);
+        setToolGenProgress(0);
+      }
+    }, 200);
+  };
+
   const handleSend = () => {
     if (!chatInput.trim() || isAiTyping) return;
     setChatMessages(prev => [...prev, { id: Date.now().toString(), role: "user", content: chatInput }]);
