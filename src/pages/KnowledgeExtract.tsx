@@ -1269,17 +1269,17 @@ const KnowledgeExtract = () => {
             </div>
             <div className="flex-1 overflow-y-auto p-3 space-y-2">
               {tools.map((tool) => (
-                <motion.div
+                <div
                   key={tool.id}
                   draggable
-                  onDragStart={(e: any) => {
+                  onDragStart={(e) => {
                     e.dataTransfer.setData("toolId", tool.id);
+                    e.dataTransfer.effectAllowed = "copy";
                     setDraggedTool(tool.id);
                   }}
                   onDragEnd={() => { setDraggedTool(null); setDropHighlight(null); }}
-                  whileHover={{ scale: 1.02, x: -4 }}
                   className={`flex items-center gap-3 p-3 rounded-xl border cursor-grab active:cursor-grabbing transition-all ${
-                    draggedTool === tool.id ? "opacity-40 border-primary scale-95" : `${tool.color} hover:shadow-md`
+                    draggedTool === tool.id ? "opacity-40 border-primary scale-95" : `${tool.color} hover:shadow-md hover:scale-[1.02]`
                   }`}
                 >
                   <GripVertical className="w-3.5 h-3.5 text-muted-foreground/40 shrink-0" />
@@ -1288,7 +1288,7 @@ const KnowledgeExtract = () => {
                     <span className="text-sm font-medium block">{tool.label}</span>
                     <span className="text-[10px] text-muted-foreground">{tool.desc}</span>
                   </div>
-                </motion.div>
+                </div>
               ))}
             </div>
             <div className="p-3 border-t border-border">
