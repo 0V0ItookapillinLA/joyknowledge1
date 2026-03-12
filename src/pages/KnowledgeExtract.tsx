@@ -199,6 +199,7 @@ const KnowledgeExtract = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
   const [activeUploadType, setActiveUploadType] = useState<string | null>(null);
+  const [selectedOnlineType, setSelectedOnlineType] = useState<string | null>(null);
   const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
@@ -533,7 +534,9 @@ const KnowledgeExtract = () => {
     const handleTypeClick = (opt: { type: string; comingSoon?: boolean; label: string }) => {
       if ((opt as any).comingSoon) return;
       if (opt.type === "url") {
-        setActiveUploadType(activeUploadType === "url" ? null : "url");
+        // Always keep URL input open, just track which online type is selected
+        setSelectedOnlineType(opt.label);
+        setActiveUploadType("url");
       } else if (opt.type === "text") {
         setActiveUploadType(activeUploadType === "text" ? null : "text");
       } else {
@@ -552,15 +555,25 @@ const KnowledgeExtract = () => {
         <div className="flex flex-col h-[calc(100vh-56px)] bg-background">
           {/* Header - compact */}
           <div className="px-6 pt-4 pb-3 border-b border-border">
-            <div className="flex items-center gap-3 mb-3">
+            <div className="flex items-center gap-3">
               <button onClick={() => setAppMode("select")} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
                 <ChevronLeft className="w-4 h-4" /> 返回
               </button>
               <StepIndicator current={1} />
+              <div className="flex-1" />
+              <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                <span>{readySources.length} 个文件已就绪</span>
+                {analyzingSources.length > 0 && (
+                  <span className="flex items-center gap-1 text-primary"><Loader2 className="w-3 h-3 animate-spin" />{analyzingSources.length} 个解析中</span>
+                )}
+              </div>
+              <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
+                onClick={() => setAppMode("quick-template")}
+                disabled={readySources.length === 0}
+                className="flex items-center gap-2 px-5 py-2 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-all shadow-sm disabled:opacity-50 group">
+                下一步：选择模板 <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+              </motion.button>
             </div>
-            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-              <h1 className="text-lg font-bold text-foreground">上传你的知识资料</h1>
-            </motion.div>
           </div>
 
           {/* Main content - two column layout */}
@@ -640,7 +653,7 @@ const KnowledgeExtract = () => {
                         whileHover={{ scale: 1.03, y: -1 }}
                         whileTap={{ scale: 0.97 }}
                         onClick={() => handleTypeClick(opt)}
-                        className="group relative p-2.5 rounded-lg border border-border bg-card hover:border-primary/40 hover:shadow-sm transition-all text-left"
+                        className={`group relative p-2.5 rounded-lg border bg-card hover:shadow-sm transition-all text-left ${selectedOnlineType === opt.label ? "border-primary bg-primary/5" : "border-border hover:border-primary/40"}`}
                       >
                         <div className="flex items-center gap-2 mb-1">
                           <div className={`w-6 h-6 rounded-md bg-gradient-to-br ${opt.gradient} flex items-center justify-center shrink-0 shadow-sm`}>
@@ -661,9 +674,9 @@ const KnowledgeExtract = () => {
                       <div className="p-3 rounded-lg border border-primary/20 bg-primary/5 space-y-2">
                         <div className="flex items-center justify-between">
                           <span className="text-[11px] font-medium text-foreground flex items-center gap-1.5">
-                            <Globe className="w-3 h-3 text-primary" /> 输入链接
+                            <Globe className="w-3 h-3 text-primary" /> 输入{selectedOnlineType || ""}链接
                           </span>
-                          <button onClick={() => setActiveUploadType(null)} className="p-0.5 rounded hover:bg-accent"><X className="w-3 h-3 text-muted-foreground" /></button>
+                          <button onClick={() => { setActiveUploadType(null); setSelectedOnlineType(null); }} className="p-0.5 rounded hover:bg-accent"><X className="w-3 h-3 text-muted-foreground" /></button>
                         </div>
                         <textarea
                           placeholder={"每行一条 URL\nhttps://example.com/article"}
@@ -750,23 +763,6 @@ const KnowledgeExtract = () => {
             </div>
           </div>
 
-          {/* Bottom action bar */}
-          <div className="px-8 py-3.5 border-t border-border bg-card/50">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                <span>{readySources.length} 个文件已就绪</span>
-                {analyzingSources.length > 0 && (
-                  <span className="flex items-center gap-1 text-primary"><Loader2 className="w-3 h-3 animate-spin" />{analyzingSources.length} 个解析中</span>
-                )}
-              </div>
-              <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
-                onClick={() => setAppMode("quick-template")}
-                disabled={readySources.length === 0}
-                className="flex items-center gap-2 px-5 py-2 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-all shadow-sm disabled:opacity-50 group">
-                下一步：选择模板 <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-              </motion.button>
-            </div>
-          </div>
         </div>
       </AppLayout>
     );
