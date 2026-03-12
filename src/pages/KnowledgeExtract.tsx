@@ -7,7 +7,7 @@ import {
   ChevronLeft, Edit3, BookOpen, Wand2, MessageSquare, FileUp,
   Check, RotateCcw, Image, FileAudio, FileVideo,
   Headphones, StickyNote, Layers, PenTool, Table2,
-  HelpCircle, Monitor, Cloud, Database
+  HelpCircle, Monitor, Cloud
 } from "lucide-react";
 import AppLayout from "@/components/AppLayout";
 
