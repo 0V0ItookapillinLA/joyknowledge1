@@ -1556,6 +1556,9 @@ const KnowledgeExtract = () => {
           </div>
         </div>
 
+        {/* Close flex-1 wrapper */}
+        </div>
+
         {/* ═══ Add Source Modal ═══ */}
         <AnimatePresence>
           {showAddSource && (
