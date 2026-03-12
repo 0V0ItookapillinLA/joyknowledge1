@@ -1323,7 +1323,7 @@ const KnowledgeExtract = () => {
             </div>
 
             {/* ── Enhanced search box ── */}
-            <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden">
+            <div className="rounded-xl border border-border bg-card shadow-sm">
               <div className="flex items-center gap-2 px-3 py-2.5">
                 <Search className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
                 <input
