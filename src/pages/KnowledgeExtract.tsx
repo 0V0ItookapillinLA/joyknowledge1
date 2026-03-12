@@ -6,7 +6,8 @@ import {
   Mic, Video, GitBranch, BarChart3, Globe, ArrowRight,
   ChevronLeft, Edit3, BookOpen, Wand2, MessageSquare, FileUp,
   Check, RotateCcw, Image, FileAudio, FileVideo,
-  Headphones, StickyNote, Layers, PenTool
+  Headphones, StickyNote, Layers, PenTool, Table2,
+  HelpCircle, Monitor, Cloud, Database
 } from "lucide-react";
 import AppLayout from "@/components/AppLayout";
 
