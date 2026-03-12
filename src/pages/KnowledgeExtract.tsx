@@ -1349,7 +1349,7 @@ const KnowledgeExtract = () => {
                   <AnimatePresence>
                     {showScopeDropdown && (
                       <motion.div initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }}
-                        className="absolute top-full left-0 mt-1 w-28 bg-card rounded-lg border border-border shadow-lg z-20 overflow-hidden">
+                        className="absolute top-full left-0 mt-1 w-28 bg-card rounded-lg border border-border shadow-lg z-50 overflow-hidden">
                         {[{ value: "web" as const, label: "全网", icon: Globe }, { value: "enterprise" as const, label: "企业", icon: Building2 }].map(opt => (
                           <button key={opt.value} onClick={() => { setSearchScope(opt.value); setShowScopeDropdown(false); }}
                             className={`w-full flex items-center gap-2 px-3 py-2 text-xs hover:bg-accent transition-colors ${searchScope === opt.value ? "text-primary bg-primary/5" : "text-foreground"}`}>
