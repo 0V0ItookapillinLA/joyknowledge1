@@ -181,7 +181,7 @@ const DepartmentSpace = () => {
               </h1>
               <div className="flex items-center gap-3 mb-6">
                 <img src={samAvatar} alt="creator" className="w-8 h-8 rounded-full object-cover" />
-                <span className="text-sm text-foreground font-medium">张睿祎(Cris)</span>
+                <span className="text-sm text-foreground font-medium">张孔泓伯(Cris)</span>
                 <span className="text-sm text-muted-foreground">创建于 2025年4月24日</span>
               </div>
             </div>
