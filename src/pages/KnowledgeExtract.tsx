@@ -197,6 +197,9 @@ const KnowledgeExtract = () => {
   const [activeUploadType, setActiveUploadType] = useState<string | null>(null);
   const [selectedOnlineType, setSelectedOnlineType] = useState<string | null>(null);
   const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
+  const [pickerSelected, setPickerSelected] = useState<string[]>([]);
+  const [pickerTab, setPickerTab] = useState("最近打开");
+  const [pickerNav, setPickerNav] = useState("home");
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   // Deep mode search state
@@ -1794,20 +1797,42 @@ const KnowledgeExtract = () => {
               { icon: Sparkles, label: "集团AI战略级项目", key: "kb-ai" },
               { icon: MessageSquare, label: "Journey Agent PM...", key: "kb-agent" },
             ];
-            const FILE_PICKER_TABS = ["最近打开", "我收到的", "我创建的", "我发送的"];
-            const MOCK_JS_FILES = [
-              { icon: Table2, label: "知识管理页面分工拆解", format: "sheet" },
-              { icon: FileText, label: "让知识沉淀及自由流动-知识管理运营方案（20260310）", format: "doc" },
-              { icon: Table2, label: "政企-客户经理岗-AI培训资料汇集", format: "sheet" },
-              { icon: FileText, label: "公益采购\"黑匣子\"如何破局，京东市场机会点剖析", format: "doc" },
-              { icon: FileText, label: "【全】26年 AI培训 业务对接清单", format: "doc" },
-              { icon: FileVideo, label: "【W11】集团AI战略级项目-HR AI专项周例会", format: "ppt" },
-              { icon: FileVideo, label: "【W10】集团AI战略级项目-HR AI专项周例会", format: "ppt" },
-              { icon: FileVideo, label: "【W11】集团AI战略级项目-HR AI专项周例会", format: "ppt2" },
-            ];
+            const FILE_PICKER_TABS_DATA: Record<string, { icon: typeof FileText; label: string; format: string }[]> = {
+              "最近打开": [
+                { icon: Table2, label: "知识管理页面分工拆解", format: "sheet" },
+                { icon: FileText, label: "让知识沉淀及自由流动-知识管理运营方案（20260310）", format: "doc" },
+                { icon: Table2, label: "政企-客户经理岗-AI培训资料汇集", format: "sheet" },
+                { icon: FileText, label: "公益采购\"黑匣子\"如何破局，京东市场机会点剖析", format: "doc" },
+                { icon: FileText, label: "【全】26年 AI培训 业务对接清单", format: "doc" },
+                { icon: FileVideo, label: "【W11】集团AI战略级项目-HR AI专项周例会", format: "ppt" },
+                { icon: FileVideo, label: "【W10】集团AI战略级项目-HR AI专项周例会", format: "ppt" },
+              ],
+              "我收到的": [
+                { icon: FileText, label: "2026年Q1绩效考核模板", format: "doc" },
+                { icon: Table2, label: "年度预算分配表-研发中心", format: "sheet" },
+                { icon: FileVideo, label: "新员工入职培训-企业文化", format: "ppt" },
+                { icon: FileText, label: "产品需求文档PRD-知识管理V2.0", format: "doc" },
+                { icon: Table2, label: "供应商评估对比分析", format: "sheet" },
+              ],
+              "我创建的": [
+                { icon: FileText, label: "知识萃取方法论总结", format: "doc" },
+                { icon: Table2, label: "团队OKR跟踪表-2026Q1", format: "sheet" },
+                { icon: FileText, label: "AI赋能知识管理白皮书", format: "doc" },
+                { icon: FileVideo, label: "部门月度汇报-3月", format: "ppt" },
+                { icon: FileText, label: "敏捷转型实践复盘", format: "doc" },
+                { icon: Table2, label: "项目风险评估矩阵", format: "sheet" },
+              ],
+              "我发送的": [
+                { icon: FileText, label: "会议纪要-知识管理项目启动会", format: "doc" },
+                { icon: Table2, label: "竞品分析报告-知识管理工具", format: "sheet" },
+                { icon: FileText, label: "技术方案评审-向量检索优化", format: "doc" },
+                { icon: FileVideo, label: "客户案例分享-制造业知识管理", format: "ppt" },
+              ],
+            };
+            const TAB_KEYS = Object.keys(FILE_PICKER_TABS_DATA);
             return (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              className="absolute inset-0 z-50 flex items-center justify-center bg-foreground/40" onClick={() => setShowAddSource(false)}>
+              className="absolute inset-0 z-50 flex items-center justify-center bg-foreground/40" onClick={() => { setShowAddSource(false); setPickerSelected([]); setPickerTab("最近打开"); setPickerNav("home"); }}>
               <motion.div initial={{ opacity: 0, scale: 0.95, y: 12 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 12 }}
                 className="w-full max-w-[780px] h-[560px] bg-card rounded-2xl shadow-2xl border border-border overflow-hidden flex flex-col" onClick={(e) => e.stopPropagation()}>
                 {/* Header */}
@@ -1819,7 +1844,7 @@ const KnowledgeExtract = () => {
                       <input placeholder="搜索或粘贴链接" className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground" />
                     </div>
                   </div>
-                  <button onClick={() => setShowAddSource(false)} className="p-1 rounded hover:bg-accent text-muted-foreground"><X className="w-4 h-4" /></button>
+                  <button onClick={() => { setShowAddSource(false); setPickerSelected([]); setPickerTab("最近打开"); setPickerNav("home"); }} className="p-1 rounded hover:bg-accent text-muted-foreground"><X className="w-4 h-4" /></button>
                 </div>
 
                 {/* Body */}
@@ -1827,7 +1852,9 @@ const KnowledgeExtract = () => {
                   {/* Left nav */}
                   <div className="w-[180px] shrink-0 border-r border-border py-3 px-2 overflow-y-auto">
                     {FILE_PICKER_NAV.map(nav => (
-                      <button key={nav.key} className="flex items-center gap-2.5 w-full px-3 py-2 rounded-md text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
+                      <button key={nav.key}
+                        onClick={() => setPickerNav(nav.key)}
+                        className={`flex items-center gap-2.5 w-full px-3 py-2 rounded-md text-sm transition-colors ${pickerNav === nav.key ? "text-primary bg-primary/10 font-medium" : "text-muted-foreground hover:text-foreground hover:bg-accent"}`}>
                         <nav.icon className="w-4 h-4" />{nav.label}
                       </button>
                     ))}
@@ -1835,8 +1862,10 @@ const KnowledgeExtract = () => {
                       <span className="text-[10px] text-muted-foreground uppercase tracking-wider">知识库</span>
                     </div>
                     {FILE_PICKER_KB.map(kb => (
-                      <button key={kb.key} className="flex items-center gap-2.5 w-full px-3 py-2 rounded-md text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
-                        <kb.icon className="w-4 h-4 text-primary" />
+                      <button key={kb.key}
+                        onClick={() => setPickerNav(kb.key)}
+                        className={`flex items-center gap-2.5 w-full px-3 py-2 rounded-md text-sm transition-colors ${pickerNav === kb.key ? "text-primary bg-primary/10 font-medium" : "text-muted-foreground hover:text-foreground hover:bg-accent"}`}>
+                        <kb.icon className={`w-4 h-4 ${pickerNav === kb.key ? "text-primary" : "text-primary"}`} />
                         <span className="truncate">{kb.label}</span>
                       </button>
                     ))}
@@ -1846,8 +1875,10 @@ const KnowledgeExtract = () => {
                   <div className="flex-1 flex flex-col min-w-0">
                     {/* Tabs */}
                     <div className="flex items-center gap-6 px-5 pt-3 border-b border-border">
-                      {FILE_PICKER_TABS.map((tab, i) => (
-                        <button key={tab} className={`pb-2.5 text-sm font-medium transition-colors ${i === 0 ? "text-foreground border-b-2 border-primary" : "text-muted-foreground hover:text-foreground"}`}>
+                      {TAB_KEYS.map((tab) => (
+                        <button key={tab}
+                          onClick={() => setPickerTab(tab)}
+                          className={`pb-2.5 text-sm font-medium transition-colors ${pickerTab === tab ? "text-foreground border-b-2 border-primary" : "text-muted-foreground hover:text-foreground"}`}>
                           {tab}
                         </button>
                       ))}
@@ -1855,18 +1886,23 @@ const KnowledgeExtract = () => {
 
                     {/* File list */}
                     <div className="flex-1 overflow-y-auto">
-                      {MOCK_JS_FILES.map((file, i) => {
+                      {(FILE_PICKER_TABS_DATA[pickerTab] || []).map((file, i) => {
+                        const fileKey = `${pickerTab}-${file.label}-${i}`;
+                        const isSelected = pickerSelected.includes(fileKey);
                         const formatColors: Record<string, string> = {
                           sheet: "text-emerald-600",
                           doc: "text-blue-600",
                           ppt: "text-orange-600",
-                          ppt2: "text-orange-600",
                         };
                         return (
-                          <button key={`${file.label}-${i}`}
-                            onClick={() => { addSource("file", file.label); }}
-                            className="flex items-center gap-3 w-full px-5 py-3 hover:bg-accent/50 transition-colors text-left border-b border-border/50 group">
-                            <div className="w-4 h-4 rounded border border-border group-hover:border-primary/40 shrink-0" />
+                          <button key={fileKey}
+                            onClick={() => {
+                              setPickerSelected(prev => isSelected ? prev.filter(k => k !== fileKey) : [...prev, fileKey]);
+                            }}
+                            className={`flex items-center gap-3 w-full px-5 py-3 transition-colors text-left border-b border-border/50 group ${isSelected ? "bg-primary/5" : "hover:bg-accent/50"}`}>
+                            <div className={`w-4 h-4 rounded border shrink-0 flex items-center justify-center transition-colors ${isSelected ? "border-primary bg-primary" : "border-border group-hover:border-primary/40"}`}>
+                              {isSelected && <Check className="w-3 h-3 text-primary-foreground" />}
+                            </div>
                             <file.icon className={`w-5 h-5 shrink-0 ${formatColors[file.format] || "text-muted-foreground"}`} />
                             <span className="text-sm text-foreground truncate flex-1">{file.label}</span>
                             <span className="text-xs text-muted-foreground shrink-0">可阅读 ▾</span>
@@ -1879,10 +1915,25 @@ const KnowledgeExtract = () => {
 
                 {/* Footer */}
                 <div className="px-5 py-3 border-t border-border flex items-center justify-between shrink-0 bg-muted/20">
-                  <span className="text-xs text-muted-foreground">已选择 0 项 ∧</span>
+                  <span className="text-xs text-muted-foreground">已选择 {pickerSelected.length} 项</span>
                   <div className="flex items-center gap-2">
-                    <button onClick={() => setShowAddSource(false)} className="px-4 py-1.5 rounded-lg border border-border text-sm text-muted-foreground hover:text-foreground transition-colors">取消</button>
-                    <button onClick={() => setShowAddSource(false)} className="px-4 py-1.5 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors">发送</button>
+                    <button onClick={() => { setShowAddSource(false); setPickerSelected([]); setPickerTab("最近打开"); setPickerNav("home"); }} className="px-4 py-1.5 rounded-lg border border-border text-sm text-muted-foreground hover:text-foreground transition-colors">取消</button>
+                    <button
+                      disabled={pickerSelected.length === 0}
+                      onClick={() => {
+                        const allFiles = Object.entries(FILE_PICKER_TABS_DATA).flatMap(([tab, files]) => files.map((f, i) => ({ ...f, key: `${tab}-${f.label}-${i}` })));
+                        pickerSelected.forEach(key => {
+                          const matched = allFiles.find(f => f.key === key);
+                          if (matched) addSource("file", matched.label);
+                        });
+                        setPickerSelected([]);
+                        setPickerTab("最近打开");
+                        setPickerNav("home");
+                        setShowAddSource(false);
+                      }}
+                      className="px-4 py-1.5 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors disabled:opacity-40">
+                      上传 {pickerSelected.length > 0 ? `(${pickerSelected.length})` : ""}
+                    </button>
                   </div>
                 </div>
               </motion.div>
