@@ -667,7 +667,7 @@ const KnowledgeExtract = () => {
                   </div>
                 </div>
 
-                {/* URL input area */}
+                {/* URL input area - supports batch input */}
                 <AnimatePresence>
                   {activeUploadType === "url" && (
                     <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="overflow-hidden">
@@ -679,19 +679,24 @@ const KnowledgeExtract = () => {
                           <button onClick={() => { setActiveUploadType(null); setSelectedOnlineType(null); }} className="p-0.5 rounded hover:bg-accent"><X className="w-3 h-3 text-muted-foreground" /></button>
                         </div>
                         <textarea
-                          placeholder={"每行一条 URL\nhttps://example.com/article"}
-                          className="w-full h-16 px-3 py-2 rounded-md border border-border bg-background text-[11px] outline-none focus:border-primary/50 resize-none"
-                          onKeyDown={(e) => {
-                            if (e.key === "Enter" && !e.shiftKey && (e.target as HTMLTextAreaElement).value.trim()) {
-                              e.preventDefault();
-                              const urls = (e.target as HTMLTextAreaElement).value.split("\n").filter(u => u.trim());
-                              urls.forEach(url => quickAddSource("url", url.trim()));
-                              (e.target as HTMLTextAreaElement).value = "";
-                            }
-                          }}
+                          id="batch-url-input"
+                          placeholder={"每行一条 URL\nhttps://example.com/article-1\nhttps://example.com/article-2\nhttps://example.com/article-3"}
+                          className="w-full h-20 px-3 py-2 rounded-md border border-border bg-background text-[11px] outline-none focus:border-primary/50 resize-none"
                         />
-                        <div className="flex items-center justify-end">
-                          <button onClick={() => quickAddSource("url", "https://wiki.company.com/article")} className="px-3 py-1 rounded-md bg-primary text-primary-foreground text-[11px] hover:bg-primary/90 transition-colors">添加</button>
+                        <div className="flex items-center justify-between">
+                          <span className="text-[10px] text-muted-foreground">支持多条 URL，每行一条，一键全部添加</span>
+                          <button
+                            onClick={() => {
+                              const textarea = document.getElementById("batch-url-input") as HTMLTextAreaElement;
+                              if (textarea && textarea.value.trim()) {
+                                const urls = textarea.value.split("\n").filter(u => u.trim());
+                                urls.forEach(url => quickAddSource("url", url.trim()));
+                                textarea.value = "";
+                              }
+                            }}
+                            className="px-3 py-1 rounded-md bg-primary text-primary-foreground text-[11px] hover:bg-primary/90 transition-colors">
+                            添加{(() => { try { const el = document.getElementById("batch-url-input") as HTMLTextAreaElement; const count = el?.value?.split("\n").filter((u: string) => u.trim()).length || 0; return count > 1 ? ` (${count}条)` : ""; } catch { return ""; } })()}
+                          </button>
                         </div>
                       </div>
                     </motion.div>
