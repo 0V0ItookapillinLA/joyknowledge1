@@ -116,7 +116,7 @@ const PersonalZone = () => {
 
             {/* Content section header */}
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-foreground">
+              <h2 className="text-sm font-semibold text-foreground">
                 {activeSection === "published" && "我发布的"}
                 {activeSection === "favorites" && "我的收藏"}
                 {activeSection === "drafts" && "草稿箱"}
