@@ -139,7 +139,7 @@ const ExpertLibrary = () => {
               ))}
             </div>
 
-            <h3 className="font-semibold text-sm text-foreground mb-3">技能专长</h3>
+            <h3 className="text-sm font-semibold text-foreground mb-3">技能专长</h3>
             <div className="flex flex-wrap gap-1.5">
               {selectedExpert.skills.map((s) => (
                 <span key={s} className="px-2.5 py-1 rounded-md bg-accent text-secondary-foreground text-xs">{s}</span>
