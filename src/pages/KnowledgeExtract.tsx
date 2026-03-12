@@ -1239,7 +1239,7 @@ const KnowledgeExtract = () => {
 
           <div className="flex flex-1 overflow-hidden">
             {/* Left: Word-style document */}
-            <div className="flex-1 overflow-y-auto">
+            <div className="w-[55%] shrink-0 overflow-y-auto">
               <div className="max-w-3xl mx-auto py-8 px-10">
                 {paragraphs.map((para, idx) => {
                   const isHighlighted = dropHighlight === idx;
