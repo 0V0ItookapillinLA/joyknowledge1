@@ -1071,6 +1071,121 @@ const KnowledgeExtract = () => {
     );
   }
 
+  // ───── Deep Structuring Mode ─────
+  if (appMode === "deep-structuring") {
+    const paragraphs = initialDoc.split("\n\n").filter(p => p.trim());
+    return (
+      <AppLayout>
+        <div className="flex h-[calc(100vh-56px)]">
+          {/* Center: Document with drop zones */}
+          <div className="flex-1 overflow-y-auto">
+            <div className="max-w-3xl mx-auto py-8 px-6">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                  <button onClick={() => setAppMode("workspace")} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
+                    <ChevronLeft className="w-4 h-4" /> 返回对话
+                  </button>
+                  <h2 className="text-lg font-bold text-foreground">配置输出格式</h2>
+                </div>
+                <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={startGeneration}
+                  className="flex items-center gap-2 px-5 py-2 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 shadow-md">
+                  <Wand2 className="w-4 h-4" /> 最终生成
+                </motion.button>
+              </div>
+              <p className="text-sm text-muted-foreground mb-6">从右侧拖拽结构化工具到段落之间，定义每段的输出格式</p>
+
+              {paragraphs.map((para, idx) => {
+                const assignedTools = paragraphTools[idx] || [];
+                return (
+                  <div key={idx}>
+                    {/* Paragraph content */}
+                    <div className="mb-2">
+                      {para.split("\n").map((line, li) => {
+                        if (line.startsWith("# ")) return <h1 key={li} className="text-2xl font-bold text-foreground mt-6 mb-3">{line.slice(2)}</h1>;
+                        if (line.startsWith("## ")) return <h2 key={li} className="text-xl font-semibold text-foreground mt-4 mb-2">{line.slice(3)}</h2>;
+                        if (line.startsWith("### ")) return <h3 key={li} className="text-base font-medium text-foreground mt-3 mb-1">{line.slice(4)}</h3>;
+                        if (line.startsWith("---")) return <hr key={li} className="border-border my-4" />;
+                        if (line.startsWith("- ")) return <li key={li} className="text-sm text-foreground ml-4 mb-1 list-disc">{line.slice(2)}</li>;
+                        if (line.startsWith("> ")) return <blockquote key={li} className="text-sm text-muted-foreground border-l-2 border-primary/30 pl-3 my-1 italic">{line.slice(2)}</blockquote>;
+                        if (line.trim() === "") return null;
+                        return <p key={li} className="text-sm text-foreground leading-relaxed">{line}</p>;
+                      })}
+                    </div>
+
+                    {/* Assigned tools badges */}
+                    {assignedTools.length > 0 && (
+                      <div className="flex items-center gap-2 mb-2 ml-2">
+                        {assignedTools.map(toolId => {
+                          const tool = tools.find(t => t.id === toolId);
+                          if (!tool) return null;
+                          return (
+                            <motion.div key={toolId} initial={{ scale: 0 }} animate={{ scale: 1 }}
+                              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium border ${tool.color}`}>
+                              <tool.icon className="w-3 h-3" />
+                              {tool.label}
+                              <button onClick={() => removeToolFromParagraph(idx, toolId)} className="ml-0.5 hover:text-destructive"><X className="w-3 h-3" /></button>
+                            </motion.div>
+                          );
+                        })}
+                      </div>
+                    )}
+
+                    {/* Drop zone between paragraphs */}
+                    <div
+                      onDragOver={(e) => { e.preventDefault(); e.currentTarget.classList.add("border-primary", "bg-primary/5"); }}
+                      onDragLeave={(e) => { e.currentTarget.classList.remove("border-primary", "bg-primary/5"); }}
+                      onDrop={(e) => {
+                        e.preventDefault();
+                        e.currentTarget.classList.remove("border-primary", "bg-primary/5");
+                        const toolId = e.dataTransfer.getData("toolId");
+                        if (toolId) addToolToParagraph(idx, toolId);
+                      }}
+                      className="h-8 my-1 border-2 border-dashed border-transparent rounded-lg flex items-center justify-center transition-all hover:border-muted-foreground/20"
+                    >
+                      <span className="text-[10px] text-muted-foreground/40">拖放工具到这里</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Right: Draggable tools */}
+          <aside className="w-[240px] shrink-0 border-l border-border flex flex-col bg-muted/30">
+            <div className="px-4 pt-4 pb-3 border-b border-border">
+              <h3 className="font-semibold text-sm text-foreground">结构化工具</h3>
+              <p className="text-xs text-muted-foreground mt-1">拖拽到段落间添加输出格式</p>
+            </div>
+            <div className="flex-1 overflow-y-auto p-3 space-y-2">
+              {tools.map((tool) => (
+                <motion.div
+                  key={tool.id}
+                  draggable
+                  onDragStart={(e: any) => {
+                    e.dataTransfer.setData("toolId", tool.id);
+                    setDraggedTool(tool.id);
+                  }}
+                  onDragEnd={() => setDraggedTool(null)}
+                  whileHover={{ scale: 1.02 }}
+                  className={`flex items-center gap-3 p-3 rounded-xl border cursor-grab active:cursor-grabbing transition-all ${
+                    draggedTool === tool.id ? "opacity-50 border-primary" : `${tool.color} hover:shadow-sm`
+                  }`}
+                >
+                  <GripVertical className="w-3.5 h-3.5 text-muted-foreground/50 shrink-0" />
+                  <tool.icon className="w-4 h-4 shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <span className="text-sm font-medium block">{tool.label}</span>
+                    <span className="text-[10px] text-muted-foreground">{tool.desc}</span>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </aside>
+        </div>
+      </AppLayout>
+    );
+  }
+
   // ───── Deep mode: Workspace (3-column) ─────
   const suggestions = extractMode === "deep"
     ? [{ emoji: "🧠", text: "继续追问我" }, { emoji: "📝", text: "总结我的隐性知识" }]
@@ -1079,8 +1194,8 @@ const KnowledgeExtract = () => {
   return (
     <AppLayout>
       <div className="flex h-[calc(100vh-56px)] relative">
-        {/* ═══ Left: Sources ═══ */}
-        <aside className="w-[272px] shrink-0 border-r border-border flex flex-col bg-muted/30">
+        {/* ═══ Left: Sources + Search ═══ */}
+        <aside className="w-[300px] shrink-0 border-r border-border flex flex-col bg-muted/30">
           <div className="px-4 pt-4 pb-3">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
@@ -1089,30 +1204,190 @@ const KnowledgeExtract = () => {
               </div>
               <button onClick={() => setShowAddSource(true)} className="p-1.5 rounded-lg hover:bg-accent text-muted-foreground hover:text-primary transition-colors"><Plus className="w-4 h-4" /></button>
             </div>
-            <div className="flex items-center gap-2 px-3 py-2 rounded-lg border border-border bg-card text-sm shadow-sm">
-              <Search className="w-3.5 h-3.5 text-muted-foreground" />
-              <input placeholder="搜索来源..." className="flex-1 bg-transparent text-foreground placeholder:text-muted-foreground outline-none text-sm" />
+
+            {/* ── Enhanced search box ── */}
+            <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden">
+              <div className="flex items-center gap-2 px-3 py-2.5">
+                <Search className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                <input
+                  value={webSearchQuery}
+                  onChange={(e) => setWebSearchQuery(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleWebSearch()}
+                  placeholder="搜索知识来源..."
+                  className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none"
+                />
+                <button onClick={handleWebSearch} disabled={isSearching || !webSearchQuery.trim()}
+                  className="p-1.5 rounded-full bg-primary/10 hover:bg-primary/20 text-primary transition-colors disabled:opacity-30">
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+              {/* Scope & depth selectors */}
+              <div className="flex items-center gap-2 px-3 pb-2.5">
+                {/* Scope dropdown */}
+                <div className="relative">
+                  <button onClick={() => { setShowScopeDropdown(!showScopeDropdown); setShowDepthDropdown(false); }}
+                    className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-accent text-xs text-muted-foreground hover:text-foreground transition-colors">
+                    {searchScope === "web" ? <Globe className="w-3 h-3" /> : <Building2 className="w-3 h-3" />}
+                    {searchScope === "web" ? "全网" : "企业"}
+                    <ChevronDown className="w-3 h-3" />
+                  </button>
+                  <AnimatePresence>
+                    {showScopeDropdown && (
+                      <motion.div initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }}
+                        className="absolute top-full left-0 mt-1 w-28 bg-card rounded-lg border border-border shadow-lg z-20 overflow-hidden">
+                        {[{ value: "web" as const, label: "全网", icon: Globe }, { value: "enterprise" as const, label: "企业", icon: Building2 }].map(opt => (
+                          <button key={opt.value} onClick={() => { setSearchScope(opt.value); setShowScopeDropdown(false); }}
+                            className={`w-full flex items-center gap-2 px-3 py-2 text-xs hover:bg-accent transition-colors ${searchScope === opt.value ? "text-primary bg-primary/5" : "text-foreground"}`}>
+                            <opt.icon className="w-3 h-3" />{opt.label}
+                            {searchScope === opt.value && <Check className="w-3 h-3 ml-auto" />}
+                          </button>
+                        ))}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+                {/* Depth dropdown */}
+                <div className="relative">
+                  <button onClick={() => { setShowDepthDropdown(!showDepthDropdown); setShowScopeDropdown(false); }}
+                    className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-accent text-xs text-muted-foreground hover:text-foreground transition-colors">
+                    <Sparkles className="w-3 h-3" />
+                    {searchDepth === "fast" ? "快速搜索" : "深度搜索"}
+                    <ChevronDown className="w-3 h-3" />
+                  </button>
+                  <AnimatePresence>
+                    {showDepthDropdown && (
+                      <motion.div initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }}
+                        className="absolute top-full left-0 mt-1 w-32 bg-card rounded-lg border border-border shadow-lg z-20 overflow-hidden">
+                        {[{ value: "fast" as const, label: "快速搜索" }, { value: "deep" as const, label: "深度搜索" }].map(opt => (
+                          <button key={opt.value} onClick={() => { setSearchDepth(opt.value); setShowDepthDropdown(false); }}
+                            className={`w-full flex items-center gap-2 px-3 py-2 text-xs hover:bg-accent transition-colors ${searchDepth === opt.value ? "text-primary bg-primary/5" : "text-foreground"}`}>
+                            {opt.label}
+                            {searchDepth === opt.value && <Check className="w-3 h-3 ml-auto" />}
+                          </button>
+                        ))}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              </div>
             </div>
-          </div>
-          <div className="flex-1 overflow-y-auto px-3 pb-3 space-y-1.5">
-            {sources.map((source) => {
-              const Icon = FILE_TYPE_ICON[source.type] || File;
-              return (
-                <motion.div key={source.id} layout
-                  className={`flex items-center gap-2.5 px-3 py-3 rounded-xl border group transition-all cursor-pointer ${source.selected ? "bg-card border-primary/20 shadow-sm" : "bg-card/50 border-border hover:border-border"}`}
-                  onClick={() => toggleSource(source.id)}>
-                  <div className={`w-4 h-4 rounded border-2 flex items-center justify-center shrink-0 transition-colors ${source.selected ? "bg-primary border-primary" : "border-muted-foreground/30"}`}>
-                    {source.selected && <CheckCircle2 className="w-3 h-3 text-primary-foreground" />}
+
+            {/* ── Search status / results ── */}
+            <AnimatePresence>
+              {(isSearching || searchComplete) && (
+                <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}
+                  className="mt-3 overflow-hidden">
+                  <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden">
+                    {/* Searching animation */}
+                    {isSearching && (
+                      <div className="px-3 py-3">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Loader2 className="w-4 h-4 text-primary animate-spin" />
+                          <span className="text-xs font-medium text-foreground">
+                            {searchDepth === "deep" ? "深度搜索中..." : "快速搜索中..."}
+                          </span>
+                        </div>
+                        <div className="space-y-1.5">
+                          {searchProgress.map((msg, i) => (
+                            <motion.div key={i} initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }}
+                              className="flex items-center gap-2 text-[11px] text-muted-foreground">
+                              <CheckCircle2 className="w-3 h-3 text-primary shrink-0" />
+                              {msg}
+                            </motion.div>
+                          ))}
+                          <motion.div animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 1.2, repeat: Infinity }}
+                            className="h-1 rounded-full bg-gradient-to-r from-primary/20 via-primary to-primary/20 mt-2" />
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Search results */}
+                    {searchComplete && searchResults.length > 0 && (
+                      <div>
+                        <div className="flex items-center justify-between px-3 pt-3 pb-2">
+                          <div className="flex items-center gap-1.5">
+                            <Sparkles className="w-3.5 h-3.5 text-primary" />
+                            <span className="text-xs font-semibold text-foreground">
+                              {searchDepth === "deep" ? "深度搜索完成!" : "快速搜索完成!"}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="px-3 space-y-1.5 max-h-[200px] overflow-y-auto">
+                          {searchResults.slice(0, 3).map((result) => (
+                            <div key={result.id} className="flex items-start gap-2 py-1.5">
+                              <div className="w-5 h-5 rounded bg-accent flex items-center justify-center shrink-0 mt-0.5">
+                                <Globe className="w-3 h-3 text-muted-foreground" />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-[11px] font-medium text-foreground truncate">{result.title}</p>
+                                <p className="text-[10px] text-muted-foreground truncate">{result.desc}</p>
+                              </div>
+                            </div>
+                          ))}
+                          {searchResults.length > 3 && (
+                            <div className="flex items-center gap-1.5 py-1 text-[10px] text-muted-foreground">
+                              <Link2 className="w-3 h-3" /> 还有 {searchResults.length - 3} 个来源
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex items-center justify-between px-3 py-2.5 border-t border-border mt-2">
+                          <button onClick={clearSearchResults} className="text-xs text-muted-foreground hover:text-destructive transition-colors">删除</button>
+                          <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={importSearchResults}
+                            className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-primary text-primary-foreground text-xs font-medium hover:bg-primary/90 shadow-sm">
+                            <Plus className="w-3 h-3" /> 导入
+                          </motion.button>
+                        </div>
+                      </div>
+                    )}
                   </div>
-                  <Icon className={`w-4 h-4 shrink-0 ${source.selected ? "text-primary" : "text-muted-foreground"}`} />
-                  <div className="flex-1 min-w-0">
-                    <span className="text-sm text-foreground truncate block">{source.name}</span>
-                    {source.status === "analyzing" && <span className="text-xs text-primary flex items-center gap-1 mt-0.5"><Loader2 className="w-3 h-3 animate-spin" /> 解析中...</span>}
-                  </div>
-                  <button onClick={(e) => { e.stopPropagation(); removeSource(source.id); }} className="p-0.5 rounded opacity-0 group-hover:opacity-100 hover:bg-accent text-muted-foreground transition-all"><X className="w-3 h-3" /></button>
                 </motion.div>
-              );
-            })}
+              )}
+            </AnimatePresence>
+          </div>
+
+          {/* Source list */}
+          <div className="flex-1 overflow-y-auto px-3 pb-3 space-y-1.5">
+            <AnimatePresence>
+              {sources.map((source) => {
+                const Icon = FILE_TYPE_ICON[source.type] || File;
+                return (
+                  <motion.div key={source.id} layout
+                    initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20, height: 0 }}
+                    className={`flex items-center gap-2.5 px-3 py-3 rounded-xl border group transition-all cursor-pointer ${source.selected ? "bg-card border-primary/20 shadow-sm" : "bg-card/50 border-border hover:border-border"}`}
+                    onClick={() => toggleSource(source.id)}>
+                    <div className={`w-4 h-4 rounded border-2 flex items-center justify-center shrink-0 transition-colors ${source.selected ? "bg-primary border-primary" : "border-muted-foreground/30"}`}>
+                      {source.selected && <CheckCircle2 className="w-3 h-3 text-primary-foreground" />}
+                    </div>
+                    <Icon className={`w-4 h-4 shrink-0 ${source.selected ? "text-primary" : "text-muted-foreground"}`} />
+                    <div className="flex-1 min-w-0">
+                      <span className="text-sm text-foreground truncate block">{source.name}</span>
+                      {source.status === "analyzing" && (
+                        <div className="flex items-center gap-1 mt-0.5">
+                          <span className="text-xs text-primary flex items-center gap-1"><Loader2 className="w-3 h-3 animate-spin" /> 解析中</span>
+                          <motion.div
+                            className="flex-1 h-1 rounded-full bg-accent overflow-hidden"
+                            initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                          >
+                            <motion.div
+                              className="h-full rounded-full bg-primary"
+                              initial={{ width: "0%" }}
+                              animate={{ width: "100%" }}
+                              transition={{ duration: 2, ease: "easeInOut" }}
+                            />
+                          </motion.div>
+                        </div>
+                      )}
+                    </div>
+                    {source.status === "ready" && (
+                      <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }}>
+                        <CheckCircle2 className="w-3.5 h-3.5 text-primary shrink-0" />
+                      </motion.span>
+                    )}
+                    <button onClick={(e) => { e.stopPropagation(); removeSource(source.id); }} className="p-0.5 rounded opacity-0 group-hover:opacity-100 hover:bg-accent text-muted-foreground transition-all"><X className="w-3 h-3" /></button>
+                  </motion.div>
+                );
+              })}
+            </AnimatePresence>
           </div>
           <div className="px-4 py-3 border-t border-border">
             <div className="flex items-center justify-between text-xs text-muted-foreground">
@@ -1177,7 +1452,7 @@ const KnowledgeExtract = () => {
           <div className="px-6 pb-5">
             <div className="flex items-center gap-3 px-4 py-3 rounded-2xl border border-border bg-card shadow-sm focus-within:border-primary/40 focus-within:shadow-md transition-all">
               <input value={chatInput} onChange={(e) => setChatInput(e.target.value)} onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && handleSend()}
-                placeholder={extractMode === "deep" ? "分享你的经验，AI 会通过追问帮你挖掘隐性知识..." : "补充信息或直接选择工具生成文档..."}
+                placeholder="分享你的经验，AI 会通过追问帮你挖掘隐性知识..."
                 disabled={isAiTyping} className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none disabled:opacity-50" />
               <button onClick={handleSend} disabled={!chatInput.trim() || isAiTyping}
                 className="p-2 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 transition-colors disabled:opacity-30 shadow-sm"><Send className="w-4 h-4" /></button>
@@ -1185,28 +1460,21 @@ const KnowledgeExtract = () => {
           </div>
         </div>
 
-        {/* ═══ Right: Tool Picker ═══ */}
-        <aside className="w-[260px] shrink-0 border-l border-border flex flex-col bg-muted/30">
+        {/* ═══ Right: Tools ═══ */}
+        <aside className="w-[240px] shrink-0 border-l border-border flex flex-col bg-muted/30">
           <div className="px-4 pt-4 pb-3 border-b border-border">
-            <div className="flex items-center gap-2">
-              <h3 className="font-semibold text-sm text-foreground">生成工具</h3>
-              <span className="px-1.5 py-0.5 rounded-md bg-primary/10 text-primary text-[10px] font-medium">{checkedTools.length} 已选</span>
-            </div>
-            <p className="text-xs text-muted-foreground mt-1">选择要包含在文档中的内容类型</p>
+            <h3 className="font-semibold text-sm text-foreground">生成工具</h3>
+            <p className="text-xs text-muted-foreground mt-1">先生成初稿，再配置各段输出格式</p>
           </div>
           <div className="flex-1 overflow-y-auto p-3 space-y-2">
             {tools.map((tool) => (
-              <motion.button key={tool.id} whileTap={{ scale: 0.98 }} onClick={() => toggleTool(tool.id)}
-                className={`w-full flex items-center gap-3 p-3 rounded-xl border transition-all text-left ${tool.checked ? `${tool.color} shadow-sm` : "bg-card border-border hover:border-primary/30"}`}>
-                <div className={`w-5 h-5 rounded border-2 flex items-center justify-center shrink-0 transition-colors ${tool.checked ? "bg-primary border-primary" : "border-muted-foreground/30"}`}>
-                  {tool.checked && <Check className="w-3 h-3 text-primary-foreground" />}
-                </div>
+              <div key={tool.id} className={`flex items-center gap-3 p-3 rounded-xl border transition-all ${tool.color}`}>
                 <tool.icon className="w-4 h-4 shrink-0" />
                 <div className="flex-1 min-w-0">
                   <span className="text-sm font-medium block">{tool.label}</span>
                   <span className="text-[10px] text-muted-foreground">{tool.desc}</span>
                 </div>
-              </motion.button>
+              </div>
             ))}
             <div className="mt-3 p-3 rounded-xl border border-border bg-card">
               <div className="flex items-center gap-2 mb-2"><Tag className="w-3.5 h-3.5 text-primary" /><span className="text-xs font-medium text-foreground">推荐标签</span></div>
@@ -1218,9 +1486,9 @@ const KnowledgeExtract = () => {
             </div>
           </div>
           <div className="p-3 border-t border-border space-y-2">
-            <button onClick={startGeneration} disabled={checkedTools.length === 0}
+            <button onClick={enterStructuringMode} disabled={chatMessages.length < 4}
               className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors shadow-sm disabled:opacity-50">
-              <Wand2 className="w-4 h-4" /> 开始生成（{checkedTools.length} 项）
+              <Wand2 className="w-4 h-4" /> 生成初稿 → 配置格式
             </button>
             <button className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-xl border border-border text-sm text-muted-foreground hover:text-foreground hover:border-primary/30 transition-colors">
               <Save className="w-4 h-4" /> 保存草稿
@@ -1240,19 +1508,9 @@ const KnowledgeExtract = () => {
                   <h2 className="text-xl font-semibold text-foreground">添加知识来源</h2>
                   <p className="text-sm text-primary mt-1">支持多种格式的资料上传</p>
                 </div>
-                <div className="px-8 pb-4">
-                  <div className="flex items-center gap-3 px-4 py-3 rounded-xl border border-border bg-background">
-                    <Search className="w-4 h-4 text-muted-foreground shrink-0" />
-                    <input value={webSearchQuery} onChange={(e) => setWebSearchQuery(e.target.value)} placeholder="搜索网络上的新知识来源" className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none" />
-                    <div className="flex items-center gap-2 shrink-0">
-                      <span className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-accent text-xs text-muted-foreground"><Globe className="w-3 h-3" /> Web</span>
-                      <button className="p-1.5 rounded-full bg-muted hover:bg-accent transition-colors"><ArrowRight className="w-4 h-4 text-muted-foreground" /></button>
-                    </div>
-                  </div>
-                </div>
                 <div className="px-8 pb-6">
                   <div className="border-2 border-dashed border-border rounded-xl p-10 text-center hover:border-primary/40 hover:bg-primary/5 transition-all cursor-pointer">
-                    <p className="text-base text-muted-foreground font-medium">或拖放你的文件到这里</p>
+                    <p className="text-base text-muted-foreground font-medium">拖放你的文件到这里</p>
                     <p className="text-sm text-muted-foreground/70 mt-1">支持文档、图片、音频、视频等格式</p>
                   </div>
                 </div>
