@@ -227,6 +227,7 @@ const KnowledgeExtract = () => {
   const [toolGenerating, setToolGenerating] = useState<string | null>(null);
   const [toolResults, setToolResults] = useState<Record<string, string>>({});
   const [toolGenProgress, setToolGenProgress] = useState(0);
+  const [expandedResult, setExpandedResult] = useState<string | null>(null);
 
   const [tools, setTools] = useState<ToolOption[]>([
     { id: "report", label: "结构化文本", desc: "按章节组织的完整文档", icon: FileText, checked: false, color: "text-blue-600 bg-blue-50 border-blue-200" },
