@@ -1371,7 +1371,7 @@ const KnowledgeExtract = () => {
                   <AnimatePresence>
                     {showDepthDropdown && (
                       <motion.div initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }}
-                        className="absolute top-full left-0 mt-1 w-32 bg-card rounded-lg border border-border shadow-lg z-20 overflow-hidden">
+                        className="absolute top-full left-0 mt-1 w-32 bg-card rounded-lg border border-border shadow-lg z-50 overflow-hidden">
                         {[{ value: "fast" as const, label: "快速搜索" }, { value: "deep" as const, label: "深度搜索" }].map(opt => (
                           <button key={opt.value} onClick={() => { setSearchDepth(opt.value); setShowDepthDropdown(false); }}
                             className={`w-full flex items-center gap-2 px-3 py-2 text-xs hover:bg-accent transition-colors ${searchDepth === opt.value ? "text-primary bg-primary/5" : "text-foreground"}`}>
