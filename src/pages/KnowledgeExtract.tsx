@@ -1450,6 +1450,54 @@ const KnowledgeExtract = () => {
               )}
             </aside>
           </div>
+
+          {/* Expanded result overlay */}
+          <AnimatePresence>
+            {expandedResult && toolResults[expandedResult] && (() => {
+              const expandedToolObj = tools.find(t => t.id === expandedResult);
+              return (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="fixed inset-0 z-50 flex items-center justify-end bg-foreground/30"
+                  onClick={() => setExpandedResult(null)}
+                >
+                  <motion.div
+                    initial={{ x: "100%" }}
+                    animate={{ x: 0 }}
+                    exit={{ x: "100%" }}
+                    transition={{ type: "spring", damping: 25, stiffness: 200 }}
+                    className="h-full w-1/2 bg-card border-l border-border shadow-2xl flex flex-col"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <div className="px-6 py-4 border-b border-border flex items-center justify-between shrink-0">
+                      <div className="flex items-center gap-2">
+                        {expandedToolObj && <expandedToolObj.icon className="w-5 h-5 text-primary" />}
+                        <h2 className="text-base font-semibold text-foreground">{expandedToolObj?.label} · 生成结果</h2>
+                      </div>
+                      <button onClick={() => setExpandedResult(null)} className="p-2 rounded-lg hover:bg-accent text-muted-foreground hover:text-foreground transition-colors">
+                        <Minimize2 className="w-5 h-5" />
+                      </button>
+                    </div>
+                    <div className="flex-1 overflow-y-auto px-6 py-5">
+                      <div className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">
+                        {toolResults[expandedResult]}
+                      </div>
+                    </div>
+                    <div className="px-6 py-3 border-t border-border flex items-center justify-end gap-2 shrink-0">
+                      <button
+                        onClick={() => setExpandedResult(null)}
+                        className="px-4 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+                      >
+                        关闭
+                      </button>
+                    </div>
+                  </motion.div>
+                </motion.div>
+              );
+            })()}
+          </AnimatePresence>
         </div>
       </AppLayout>
     );
