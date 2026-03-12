@@ -155,14 +155,21 @@ const QUICK_RESPONSES = [
   "明白了，这为报告增加了很好的上下文。我已经记录下来。\n\n你可以继续补充，或者选好工具后直接生成文档。",
 ];
 
-/* ───── Upload type config ───── */
-const UPLOAD_TYPES = [
-  { icon: Upload, label: "文档", desc: "PDF / Word / PPT", type: "file" as const, accept: ".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx", gradient: "from-blue-500 to-blue-600" },
-  { icon: Image, label: "图片", desc: "JPG / PNG / 截图", type: "image" as const, accept: "image/*", gradient: "from-emerald-500 to-teal-600" },
-  { icon: Headphones, label: "音频", desc: "会议录音 / 播客", type: "audio" as const, accept: "audio/*", gradient: "from-orange-500 to-amber-600" },
-  { icon: FileVideo, label: "视频", desc: "培训 / 演讲回放", type: "video" as const, accept: "video/*", gradient: "from-purple-500 to-violet-600" },
-  { icon: Link2, label: "网页", desc: "粘贴 URL 链接", type: "url" as const, accept: "", gradient: "from-cyan-500 to-sky-600" },
-  { icon: StickyNote, label: "笔记", desc: "粘贴文本内容", type: "text" as const, accept: "", gradient: "from-rose-500 to-pink-600" },
+/* ───── Upload categories ───── */
+const LOCAL_UPLOAD_TYPES = [
+  { icon: FileText, label: "非结构化文档", desc: "PDF、Word、PPT、Markdown 等，自动解析和切分", type: "file" as const, gradient: "from-blue-500 to-indigo-600" },
+  { icon: Table2, label: "表格数据", desc: "Excel、CSV 等，按索引列进行分块解析", type: "file" as const, gradient: "from-emerald-500 to-teal-600" },
+  { icon: HelpCircle, label: "QA 问答", desc: "CSV/Excel，包含 Question 和 Answer 两列", type: "file" as const, gradient: "from-amber-500 to-orange-500" },
+  { icon: Image, label: "图片", desc: "JPG、PNG、截图等，OCR 识别与内容提取", type: "image" as const, gradient: "from-pink-500 to-rose-600" },
+  { icon: FileVideo, label: "视频", desc: "视频文字识别，图片与文本解析切分", type: "video" as const, gradient: "from-purple-500 to-violet-600" },
+  { icon: Headphones, label: "音频", desc: "ASR 语音识别，文本解析和内容切分", type: "audio" as const, gradient: "from-orange-500 to-amber-600" },
+];
+
+const ONLINE_UPLOAD_TYPES = [
+  { icon: Globe, label: "网页", desc: "抓取网页内容，自动解析和结构化处理", type: "url" as const, gradient: "from-cyan-500 to-sky-600" },
+  { icon: BookOpen, label: "在线文档", desc: "飞书、语雀、Notion 等在线文档链接", type: "url" as const, gradient: "from-blue-400 to-blue-600" },
+  { icon: Database, label: "API 接入", desc: "通过 API 获取结构化数据内容", type: "url" as const, gradient: "from-slate-500 to-slate-700", comingSoon: true },
+  { icon: StickyNote, label: "自定义文本", desc: "直接粘贴笔记、会议记录等文本内容", type: "text" as const, gradient: "from-rose-500 to-pink-600" },
 ];
 
 const FILE_TYPE_ICON: Record<string, typeof FileText> = {
