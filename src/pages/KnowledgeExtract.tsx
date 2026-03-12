@@ -150,34 +150,29 @@ const FILE_TYPE_COLOR: Record<string, string> = {
 /* ───── Output Templates ───── */
 const OUTPUT_TEMPLATES: OutputTemplate[] = [
   {
-    id: "structured-report", label: "结构化报告", desc: "按章节组织的完整知识文档，适合正式的经验总结与汇报",
-    icon: FileText, color: "border-blue-200 bg-blue-50/60", gradient: "from-blue-500 to-indigo-600",
-    preview: ["📋 概述与背景", "🎯 核心观点提炼", "📊 数据与指标分析", "💡 经验总结与建议", "🏷️ 标签与分类"],
+    id: "methodology", label: "方法论", desc: "提炼可复用的方法论框架，帮助团队形成标准化的工作方式",
+    icon: GitBranch, color: "border-blue-200 bg-blue-50/60", gradient: "from-blue-500 to-indigo-600",
+    preview: ["📋 方法论概述", "🎯 核心原则", "🔧 实施步骤", "📐 工具与模板", "🔄 适用场景"],
   },
   {
-    id: "project-review", label: "项目复盘", desc: "复盘框架：目标回顾 → 结果评估 → 亮点与不足 → 改进措施",
-    icon: RotateCcw, color: "border-amber-200 bg-amber-50/60", gradient: "from-amber-500 to-orange-600",
-    preview: ["🎯 目标与计划回顾", "📈 执行结果评估", "✅ 亮点总结", "⚠️ 不足与改进", "📝 行动计划"],
+    id: "experience", label: "经验知识", desc: "将实践中积累的经验转化为可传承的知识文档",
+    icon: Sparkles, color: "border-amber-200 bg-amber-50/60", gradient: "from-amber-500 to-orange-600",
+    preview: ["🧩 背景与挑战", "💡 经验总结", "⚠️ 踩坑记录", "✅ 最佳实践", "📝 改进建议"],
   },
   {
-    id: "best-practice", label: "最佳实践", desc: "提炼可复用的方法论与操作指南，方便团队学习推广",
-    icon: Sparkles, color: "border-emerald-200 bg-emerald-50/60", gradient: "from-emerald-500 to-teal-600",
-    preview: ["🧩 场景与问题定义", "🔧 解决方案详述", "📐 操作步骤拆解", "⚡ 关键注意事项", "🔄 适用范围与迁移"],
+    id: "expert", label: "专家知识", desc: "萃取专家的隐性知识，转化为组织可共享的显性资产",
+    icon: BookOpen, color: "border-emerald-200 bg-emerald-50/60", gradient: "from-emerald-500 to-teal-600",
+    preview: ["👤 专家背景", "🧠 核心知识体系", "💬 关键洞察", "📊 案例佐证", "🏷️ 知识图谱"],
   },
   {
-    id: "training-material", label: "培训教材", desc: "面向新人或团队的学习材料，包含知识点、练习与测验",
-    icon: BookOpen, color: "border-purple-200 bg-purple-50/60", gradient: "from-purple-500 to-violet-600",
-    preview: ["📖 学习目标", "🧠 核心知识点", "💬 案例与场景", "✍️ 练习与思考题", "📋 学习检查清单"],
+    id: "decision", label: "决策知识", desc: "记录关键决策过程与依据，为未来类似决策提供参考",
+    icon: BarChart3, color: "border-purple-200 bg-purple-50/60", gradient: "from-purple-500 to-violet-600",
+    preview: ["🎯 决策目标", "📊 方案对比分析", "⚖️ 权衡与取舍", "✅ 最终决策", "📋 后续跟踪"],
   },
   {
-    id: "meeting-summary", label: "会议纪要", desc: "提炼会议核心信息：决议、待办、负责人与时间节点",
-    icon: MessageSquare, color: "border-cyan-200 bg-cyan-50/60", gradient: "from-cyan-500 to-sky-600",
-    preview: ["📌 会议概要", "✅ 关键决议", "📋 待办事项", "👤 责任人分配", "⏰ 时间节点"],
-  },
-  {
-    id: "insight-cards", label: "知识卡片", desc: "将知识浓缩为一张张闪卡，适合碎片化学习和快速回顾",
-    icon: Zap, color: "border-rose-200 bg-rose-50/60", gradient: "from-rose-500 to-pink-600",
-    preview: ["⚡ 核心概念卡", "🔑 关键公式/模型", "💡 经验金句", "❓ Q&A 速记卡", "🏷️ 主题分类索引"],
+    id: "case-knowledge", label: "案例知识", desc: "将典型案例结构化整理，方便团队学习和经验复用",
+    icon: FileText, color: "border-cyan-200 bg-cyan-50/60", gradient: "from-cyan-500 to-sky-600",
+    preview: ["📌 案例概要", "🔍 问题分析", "🔧 解决方案", "📈 成果与价值", "🔄 可复用要点"],
   },
 ];
 
