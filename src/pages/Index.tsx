@@ -351,24 +351,52 @@ const Index = () => {
               </motion.div>
 
               <div className="px-6 pb-4">
-                <div className="mb-4">
+                <div className="flex items-baseline gap-3 mb-5">
                   <h2 className="text-lg font-semibold text-foreground">热门专区</h2>
                   <p className="text-sm text-muted-foreground">来自专业人士的精选观点与洞察</p>
                 </div>
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {HOT_ZONES.map((zone) => (
-                    <button
-                      key={zone.label}
-                      onClick={() => {
-                        const filters = zone.navFilters.length > 0 ? zone.navFilters.join(",") : "";
-                        navigate(`/knowledge?type=domain&value=${encodeURIComponent(zone.navDomain)}&label=${encodeURIComponent(zone.label)}${filters ? `&filters=${encodeURIComponent(filters)}` : ""}`);
-                      }}
-                      className="inline-flex items-center gap-1.5 px-4 py-2 rounded-md border border-border bg-card text-sm text-foreground hover:border-primary/40 hover:bg-primary/5 transition-colors"
-                    >
-                      <span>{zone.emoji}</span>
-                      {zone.label}
-                    </button>
-                  ))}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+                  {HOT_ZONES.map((zone) => {
+                    const IconComp = zone.icon;
+                    return (
+                      <button
+                        key={zone.label}
+                        onClick={() => {
+                          const filters = zone.navFilters.length > 0 ? zone.navFilters.join(",") : "";
+                          navigate(`/knowledge?type=domain&value=${encodeURIComponent(zone.navDomain)}&label=${encodeURIComponent(zone.label)}${filters ? `&filters=${encodeURIComponent(filters)}` : ""}`);
+                        }}
+                        className={`relative text-left p-4 rounded-xl border transition-all hover:shadow-md hover:-translate-y-0.5 group ${
+                          zone.hot
+                            ? "border-primary/30 bg-primary/[0.03] hover:border-primary/50"
+                            : "border-border bg-card hover:border-primary/30"
+                        }`}
+                      >
+                        {zone.hot && (
+                          <span className="absolute top-3 right-3 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-destructive/10 text-destructive text-[10px] font-semibold">
+                            <Flame className="w-3 h-3" /> HOT
+                          </span>
+                        )}
+                        <div className={`w-9 h-9 rounded-lg flex items-center justify-center mb-3 ${
+                          zone.hot ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"
+                        }`}>
+                          <IconComp className="w-4.5 h-4.5" />
+                        </div>
+                        <h3 className="font-semibold text-sm text-card-foreground mb-1.5">{zone.label}</h3>
+                        <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
+                          <span>{zone.count} 内容</span>
+                          {zone.hot && zone.hotViews && (
+                            <span className="inline-flex items-center gap-0.5 text-orange-500 font-medium">
+                              🔥 {zone.hotViews}
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-1 text-[11px] text-muted-foreground/70">
+                          <Clock className="w-3 h-3" />
+                          {zone.updatedAt}
+                        </div>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
 
