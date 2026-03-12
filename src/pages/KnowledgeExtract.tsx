@@ -1281,7 +1281,7 @@ const KnowledgeExtract = () => {
             </div>
 
             {/* Right: Tool grid + workspace */}
-            <aside className="w-[380px] shrink-0 border-l border-border flex flex-col bg-muted/30">
+            <aside className="flex-1 min-w-0 border-l border-border flex flex-col bg-muted/30">
               {/* Tool grid header */}
               <div className="px-4 pt-4 pb-3 border-b border-border">
                 <h3 className="font-semibold text-sm text-foreground">结构化工具</h3>
