@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Award, FileText, Star, Edit, Share2, Bookmark, Clock, Eye, Heart, MessageCircle, Search, SlidersHorizontal, PenLine, History, Tag, Download } from "lucide-react";
 import AppLayout from "@/components/AppLayout";
+import PageHeader from "@/components/PageHeader";
 import { Link } from "react-router-dom";
 import { MOCK_CASES } from "@/data/mockData";
 
