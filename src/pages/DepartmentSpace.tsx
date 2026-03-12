@@ -176,7 +176,7 @@ const DepartmentSpace = () => {
                 <Eye className="w-3.5 h-3.5" />
                 <span>371人已读</span>
               </div>
-              <h1 className="text-2xl font-bold text-foreground mb-3">
+              <h1 className="text-lg font-semibold text-foreground mb-3">
                 EI{deptName}团队空间主页
               </h1>
               <div className="flex items-center gap-3 mb-6">
