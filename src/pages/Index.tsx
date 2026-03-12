@@ -255,9 +255,9 @@ const Index = () => {
             </div>
           </Link>
 
-          {/* BGBU & Domain sections with hover popover */}
-          <SidebarSectionWithPopover section={BGBU_SECTION} sectionType="bgbu" />
+          {/* Domain & BGBU sections with hover popover */}
           <SidebarSectionWithPopover section={DOMAIN_SECTION} sectionType="domain" />
+          <SidebarSectionWithPopover section={BGBU_SECTION} sectionType="bgbu" />
 
           {/* Date filter at bottom */}
           <div className="mt-auto pt-4 border-t border-border">
