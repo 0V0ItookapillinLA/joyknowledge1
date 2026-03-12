@@ -1,12 +1,12 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Sparkles, Send, FileText, Tag, Upload, Link2, ClipboardPaste,
+  Sparkles, Send, FileText, Tag, Upload, Link2,
   X, File, CheckCircle2, Plus, Search, Loader2, Save, Zap,
-  Mic, Video, GitBranch, BarChart3, Globe, ArrowRight, HardDrive,
+  Mic, Video, GitBranch, BarChart3, Globe, ArrowRight,
   ChevronLeft, Edit3, BookOpen, Wand2, MessageSquare, FileUp,
-  Check, RotateCcw, Image, FileAudio, FileVideo, Camera,
-  Headphones, StickyNote, Layers, Eye, Play, PenTool
+  Check, RotateCcw, Image, FileAudio, FileVideo,
+  Headphones, StickyNote, Layers, PenTool
 } from "lucide-react";
 import AppLayout from "@/components/AppLayout";
 
@@ -18,7 +18,6 @@ interface Source {
   status: "ready" | "processing" | "analyzing";
   selected: boolean;
   size?: string;
-  thumbnail?: string;
 }
 
 interface ChatMessage {
@@ -36,7 +35,17 @@ interface ToolOption {
   color: string;
 }
 
-type AppMode = "select" | "workspace" | "generating" | "result" | "quick-upload" | "quick-extract";
+interface OutputTemplate {
+  id: string;
+  label: string;
+  desc: string;
+  icon: typeof FileText;
+  preview: string[];
+  color: string;
+  gradient: string;
+}
+
+type AppMode = "select" | "workspace" | "generating" | "result" | "quick-upload" | "quick-template";
 type ExtractMode = "quick" | "deep";
 
 /* ───── Mock Content ───── */
@@ -141,7 +150,7 @@ const SOCRATIC_RESPONSES = [
 
 const QUICK_RESPONSES = [
   "已收到你的补充信息！我正在将其与文件内容进行交叉分析，更新后的内容将体现在最终文档中。\n\n还有什么需要补充的吗？或者你可以直接点击右侧的「开始生成」。",
-  "好的，这个信息很有价值。我会在生成报告时重点突出这部分内容。\n\n如果准备好了，可以选择右侧的工具后点击生成。",
+  "好的，这个信息很有价值。我会在生成报告时重点突出这部分内容。\n\n如果准备好了，可以选好工具后点击生成。",
   "明白了，这为报告增加了很好的上下文。我已经记录下来。\n\n你可以继续补充，或者选好工具后直接生成文档。",
 ];
 
@@ -156,30 +165,46 @@ const UPLOAD_TYPES = [
 ];
 
 const FILE_TYPE_ICON: Record<string, typeof FileText> = {
-  file: FileText,
-  image: Image,
-  audio: FileAudio,
-  video: FileVideo,
-  url: Link2,
-  text: StickyNote,
-  case: BookOpen,
+  file: FileText, image: Image, audio: FileAudio, video: FileVideo, url: Link2, text: StickyNote, case: BookOpen,
 };
 
 const FILE_TYPE_COLOR: Record<string, string> = {
-  file: "text-blue-500 bg-blue-50",
-  image: "text-emerald-500 bg-emerald-50",
-  audio: "text-orange-500 bg-orange-50",
-  video: "text-purple-500 bg-purple-50",
-  url: "text-cyan-500 bg-cyan-50",
-  text: "text-rose-500 bg-rose-50",
-  case: "text-amber-500 bg-amber-50",
+  file: "text-blue-500 bg-blue-50", image: "text-emerald-500 bg-emerald-50", audio: "text-orange-500 bg-orange-50",
+  video: "text-purple-500 bg-purple-50", url: "text-cyan-500 bg-cyan-50", text: "text-rose-500 bg-rose-50", case: "text-amber-500 bg-amber-50",
 };
 
-/* ───── Sample case previews ───── */
-const SAMPLE_CASES = [
-  { title: "Q3研发效能提升报告", type: "结构化报告", tags: ["研发效能", "DevOps"], icon: FileText, color: "border-blue-200 bg-blue-50/50" },
-  { title: "产品迭代复盘纪要", type: "经验沉淀", tags: ["产品设计", "复盘"], icon: BookOpen, color: "border-amber-200 bg-amber-50/50" },
-  { title: "AI落地实践总结", type: "最佳实践", tags: ["AI应用", "技术架构"], icon: Sparkles, color: "border-purple-200 bg-purple-50/50" },
+/* ───── Output Templates ───── */
+const OUTPUT_TEMPLATES: OutputTemplate[] = [
+  {
+    id: "structured-report", label: "结构化报告", desc: "按章节组织的完整知识文档，适合正式的经验总结与汇报",
+    icon: FileText, color: "border-blue-200 bg-blue-50/60", gradient: "from-blue-500 to-indigo-600",
+    preview: ["📋 概述与背景", "🎯 核心观点提炼", "📊 数据与指标分析", "💡 经验总结与建议", "🏷️ 标签与分类"],
+  },
+  {
+    id: "project-review", label: "项目复盘", desc: "复盘框架：目标回顾 → 结果评估 → 亮点与不足 → 改进措施",
+    icon: RotateCcw, color: "border-amber-200 bg-amber-50/60", gradient: "from-amber-500 to-orange-600",
+    preview: ["🎯 目标与计划回顾", "📈 执行结果评估", "✅ 亮点总结", "⚠️ 不足与改进", "📝 行动计划"],
+  },
+  {
+    id: "best-practice", label: "最佳实践", desc: "提炼可复用的方法论与操作指南，方便团队学习推广",
+    icon: Sparkles, color: "border-emerald-200 bg-emerald-50/60", gradient: "from-emerald-500 to-teal-600",
+    preview: ["🧩 场景与问题定义", "🔧 解决方案详述", "📐 操作步骤拆解", "⚡ 关键注意事项", "🔄 适用范围与迁移"],
+  },
+  {
+    id: "training-material", label: "培训教材", desc: "面向新人或团队的学习材料，包含知识点、练习与测验",
+    icon: BookOpen, color: "border-purple-200 bg-purple-50/60", gradient: "from-purple-500 to-violet-600",
+    preview: ["📖 学习目标", "🧠 核心知识点", "💬 案例与场景", "✍️ 练习与思考题", "📋 学习检查清单"],
+  },
+  {
+    id: "meeting-summary", label: "会议纪要", desc: "提炼会议核心信息：决议、待办、负责人与时间节点",
+    icon: MessageSquare, color: "border-cyan-200 bg-cyan-50/60", gradient: "from-cyan-500 to-sky-600",
+    preview: ["📌 会议概要", "✅ 关键决议", "📋 待办事项", "👤 责任人分配", "⏰ 时间节点"],
+  },
+  {
+    id: "insight-cards", label: "知识卡片", desc: "将知识浓缩为一张张闪卡，适合碎片化学习和快速回顾",
+    icon: Zap, color: "border-rose-200 bg-rose-50/60", gradient: "from-rose-500 to-pink-600",
+    preview: ["⚡ 核心概念卡", "🔑 关键公式/模型", "💡 经验金句", "❓ Q&A 速记卡", "🏷️ 主题分类索引"],
+  },
 ];
 
 /* ───── Component ───── */
@@ -187,17 +212,11 @@ const KnowledgeExtract = () => {
   const [appMode, setAppMode] = useState<AppMode>("select");
   const [extractMode, setExtractMode] = useState<ExtractMode>("quick");
 
-  const [sources, setSources] = useState<Source[]>([
-    { id: "1", name: "Q3季度研发效能报告.pdf", type: "file", status: "ready", selected: true, size: "2.4 MB" },
-    { id: "2", name: "项目复盘会议纪要.docx", type: "file", status: "ready", selected: true, size: "856 KB" },
-    { id: "3", name: "DevOps最佳实践指南.md", type: "file", status: "ready", selected: false, size: "128 KB" },
-  ]);
-
+  const [sources, setSources] = useState<Source[]>([]);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [chatInput, setChatInput] = useState("");
   const [showAddSource, setShowAddSource] = useState(false);
-  const [quickTitle, setQuickTitle] = useState("Q3季度研发效能提升专项总结");
-  const [quickStep, setQuickStep] = useState(0);
+  const [quickTitle, setQuickTitle] = useState("");
   const [isAiTyping, setIsAiTyping] = useState(false);
   const [webSearchQuery, setWebSearchQuery] = useState("");
   const [socraticIndex, setSocraticIndex] = useState(0);
@@ -206,8 +225,8 @@ const KnowledgeExtract = () => {
   const [resultContent, setResultContent] = useState(GENERATED_DOC);
   const [isEditing, setIsEditing] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
-  const [showPreview, setShowPreview] = useState(false);
   const [activeUploadType, setActiveUploadType] = useState<string | null>(null);
+  const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   const [tools, setTools] = useState<ToolOption[]>([
@@ -240,7 +259,7 @@ const KnowledgeExtract = () => {
 
   /* ───── Source management ───── */
   const addSource = (type: Source["type"], name: string) => {
-    const sizes = { file: "1.2 MB", image: "3.8 MB", audio: "24.5 MB", video: "156 MB", url: "", text: "", case: "" };
+    const sizes: Record<string, string> = { file: "1.2 MB", image: "3.8 MB", audio: "24.5 MB", video: "156 MB" };
     const newSource: Source = { id: Date.now().toString(), name, type, status: "analyzing", selected: true, size: sizes[type] || "" };
     setSources(prev => [...prev, newSource]);
     setShowAddSource(false);
@@ -253,7 +272,7 @@ const KnowledgeExtract = () => {
   };
 
   const quickAddSource = (type: Source["type"], name: string) => {
-    const sizes = { file: "1.2 MB", image: "3.8 MB", audio: "24.5 MB", video: "156 MB", url: "", text: "", case: "" };
+    const sizes: Record<string, string> = { file: "1.2 MB", image: "3.8 MB", audio: "24.5 MB", video: "156 MB" };
     const newSource: Source = { id: Date.now().toString(), name, type, status: "analyzing", selected: true, size: sizes[type] || "" };
     setSources(prev => [...prev, newSource]);
     setActiveUploadType(null);
@@ -272,7 +291,6 @@ const KnowledgeExtract = () => {
     setChatMessages(prev => [...prev, { id: Date.now().toString(), role: "user", content: chatInput }]);
     setChatInput("");
     setIsAiTyping(true);
-
     setTimeout(() => {
       let response: string;
       if (extractMode === "deep") {
@@ -301,7 +319,7 @@ const KnowledgeExtract = () => {
         };
         const quickMap: Record<string, string> = {
           "帮我提炼核心观点": "## 📌 核心观点\n\n1. DevOps 流水线是效能提升的关键基础设施\n2. 渐进式推进比一刀切更适合组织变革\n3. 数据驱动是持续优化的核心方法论\n4. 跨部门协作需要明确的机制保障\n\n准备好后请选择右侧工具并点击生成。",
-          "补充背景信息": "好的，请告诉我更多关于项目的背景信息，比如：\n\n- 项目的时间跨度\n- 参与的团队和人数\n- 面临的主要挑战\n\n这些信息会让生成的文档更加完整。",
+          "补充背景信息": "好的，请告诉我更多关于项目的背景信息。",
         };
         const map = extractMode === "deep" ? deepMap : quickMap;
         const response = map[text] || (extractMode === "deep" ? SOCRATIC_RESPONSES[socraticIndex % SOCRATIC_RESPONSES.length] : QUICK_RESPONSES[quickIndex % QUICK_RESPONSES.length]);
@@ -315,8 +333,8 @@ const KnowledgeExtract = () => {
   const startGeneration = () => {
     setAppMode("generating");
     setGeneratingProgress(0);
-    const selectedTools = tools.filter(t => t.checked);
-    const totalSteps = selectedTools.length * 3;
+    const template = OUTPUT_TEMPLATES.find(t => t.id === selectedTemplate);
+    const totalSteps = (template?.preview.length || 5) * 3;
     let step = 0;
     const interval = setInterval(() => {
       step++;
@@ -325,15 +343,15 @@ const KnowledgeExtract = () => {
         clearInterval(interval);
         setTimeout(() => setAppMode("result"), 600);
       }
-    }, 400);
+    }, 350);
   };
 
   const selectedCount = sources.filter(s => s.selected).length;
   const checkedTools = tools.filter(t => t.checked);
   const readySources = sources.filter(s => s.status === "ready");
   const analyzingSources = sources.filter(s => s.status === "analyzing");
+  const currentTemplate = OUTPUT_TEMPLATES.find(t => t.id === selectedTemplate);
 
-  /* ───── File type stats ───── */
   const typeStats = sources.reduce((acc, s) => {
     acc[s.type] = (acc[s.type] || 0) + 1;
     return acc;
@@ -341,47 +359,27 @@ const KnowledgeExtract = () => {
 
   /* ═══════ RENDER ═══════ */
 
-  // ───── Step 1: Mode Selection ─────
+  // ───── Step 0: Mode Selection ─────
   if (appMode === "select") {
     return (
       <AppLayout>
         <div className="flex items-center justify-center h-[calc(100vh-56px)] bg-background">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="w-full max-w-2xl px-6"
-          >
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="w-full max-w-2xl px-6">
             <div className="text-center mb-10">
-              <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-                className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-5"
-              >
+              <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.2, type: "spring", stiffness: 200 }} className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-5">
                 <Sparkles className="w-8 h-8 text-primary" />
               </motion.div>
               <h1 className="text-2xl font-bold text-foreground mb-2">开始知识萃取</h1>
               <p className="text-muted-foreground">选择萃取模式，开启你的知识沉淀之旅</p>
             </div>
-
             <div className="grid grid-cols-2 gap-4">
-              <motion.button
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.3 }}
-                whileHover={{ scale: 1.02, y: -2 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={() => enterWorkspace("quick")}
-                className="group relative p-6 rounded-2xl border-2 border-border bg-card text-left hover:border-primary/50 hover:shadow-lg transition-all"
-              >
+              <motion.button initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.3 }} whileHover={{ scale: 1.02, y: -2 }} whileTap={{ scale: 0.98 }} onClick={() => enterWorkspace("quick")}
+                className="group relative p-6 rounded-2xl border-2 border-border bg-card text-left hover:border-primary/50 hover:shadow-lg transition-all">
                 <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                   <FileUp className="w-6 h-6 text-blue-600" />
                 </div>
                 <h3 className="text-lg font-semibold text-foreground mb-1.5">快速提炼</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  多模态上传资料，AI 自动分析，一键生成结构化知识文档
-                </p>
+                <p className="text-sm text-muted-foreground leading-relaxed">多模态上传资料，选择输出模板，一键生成知识文档</p>
                 <div className="mt-4 flex flex-wrap gap-1.5">
                   {["文档", "图片", "音视频", "网页"].map(t => (
                     <span key={t} className="px-2 py-0.5 rounded-md bg-accent text-xs text-muted-foreground">{t}</span>
@@ -389,23 +387,13 @@ const KnowledgeExtract = () => {
                 </div>
                 <ArrowRight className="absolute right-5 top-6 w-5 h-5 text-muted-foreground/30 group-hover:text-primary group-hover:translate-x-1 transition-all" />
               </motion.button>
-
-              <motion.button
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.4 }}
-                whileHover={{ scale: 1.02, y: -2 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={() => enterWorkspace("deep")}
-                className="group relative p-6 rounded-2xl border-2 border-border bg-card text-left hover:border-primary/50 hover:shadow-lg transition-all"
-              >
+              <motion.button initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.4 }} whileHover={{ scale: 1.02, y: -2 }} whileTap={{ scale: 0.98 }} onClick={() => enterWorkspace("deep")}
+                className="group relative p-6 rounded-2xl border-2 border-border bg-card text-left hover:border-primary/50 hover:shadow-lg transition-all">
                 <div className="w-12 h-12 rounded-xl bg-purple-50 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                   <MessageSquare className="w-6 h-6 text-purple-600" />
                 </div>
                 <h3 className="text-lg font-semibold text-foreground mb-1.5">深度萃取</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  AI 苏格拉底式追问，深度挖掘你的隐性知识与经验
-                </p>
+                <p className="text-sm text-muted-foreground leading-relaxed">AI 苏格拉底式追问，深度挖掘你的隐性知识与经验</p>
                 <div className="mt-4 flex flex-wrap gap-1.5">
                   {["深度追问", "隐性知识", "经验萃取"].map(t => (
                     <span key={t} className="px-2 py-0.5 rounded-md bg-accent text-xs text-muted-foreground">{t}</span>
@@ -420,70 +408,68 @@ const KnowledgeExtract = () => {
     );
   }
 
-  // ───── Quick Mode: Step 1 - Multi-Modal Upload ─────
+  /* ───── Step indicator component ───── */
+  const StepIndicator = ({ current }: { current: number }) => {
+    const steps = [
+      { n: 1, label: "上传资料" },
+      { n: 2, label: "选择模板" },
+      { n: 3, label: "生成预览" },
+    ];
+    return (
+      <div className="flex items-center gap-2">
+        {steps.map((step, i) => (
+          <div key={step.n} className="flex items-center gap-2">
+            {i > 0 && <div className={`w-8 h-px ${step.n <= current ? "bg-primary" : "bg-border"}`} />}
+            <div className="flex items-center gap-1.5">
+              <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium transition-colors ${
+                step.n < current ? "bg-primary/20 text-primary" :
+                step.n === current ? "bg-primary text-primary-foreground" : "bg-accent text-muted-foreground"
+              }`}>
+                {step.n < current ? "✓" : step.n}
+              </span>
+              <span className={`text-xs font-medium ${step.n <= current ? "text-foreground" : "text-muted-foreground"}`}>{step.label}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
+  // ───── Quick Step 1: Multi-Modal Upload ─────
   if (appMode === "quick-upload") {
     return (
       <AppLayout>
-        <div className="flex h-[calc(100vh-56px)] bg-background">
-          {/* ═══ Left: Main Upload Area ═══ */}
-          <div className="flex-1 flex flex-col overflow-y-auto">
-            {/* Step indicator */}
-            <div className="px-8 pt-6 pb-4">
-              <div className="flex items-center gap-3 mb-6">
-                <button
-                  onClick={() => setAppMode("select")}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
-                >
-                  <ChevronLeft className="w-4 h-4" /> 返回
-                </button>
-                <div className="flex items-center gap-2">
-                  {[
-                    { n: 1, label: "上传资料", active: true },
-                    { n: 2, label: "AI 萃取", active: false },
-                    { n: 3, label: "确认发布", active: false },
-                  ].map((step, i) => (
-                    <div key={step.n} className="flex items-center gap-2">
-                      {i > 0 && <div className={`w-8 h-px ${step.active ? "bg-primary" : "bg-border"}`} />}
-                      <div className="flex items-center gap-1.5">
-                        <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium ${
-                          step.active ? "bg-primary text-primary-foreground" : "bg-accent text-muted-foreground"
-                        }`}>{step.n}</span>
-                        <span className={`text-xs font-medium ${step.active ? "text-foreground" : "text-muted-foreground"}`}>{step.label}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-                <h1 className="text-xl font-bold text-foreground mb-1">上传你的知识资料</h1>
-                <p className="text-sm text-muted-foreground">支持多种格式，AI 将自动分析并提炼结构化内容</p>
-              </motion.div>
+        <div className="flex flex-col h-[calc(100vh-56px)] bg-background">
+          {/* Header */}
+          <div className="px-8 pt-6 pb-4 border-b border-border">
+            <div className="flex items-center gap-3 mb-5">
+              <button onClick={() => setAppMode("select")} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
+                <ChevronLeft className="w-4 h-4" /> 返回
+              </button>
+              <StepIndicator current={1} />
             </div>
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+              <h1 className="text-xl font-bold text-foreground mb-1">上传你的知识资料</h1>
+              <p className="text-sm text-muted-foreground">支持多种格式，你可以上传文档、图片、音视频或粘贴链接与文本</p>
+            </motion.div>
+          </div>
 
-            {/* Drop zone */}
-            <div className="px-8 pb-4">
+          {/* Main content - scrollable */}
+          <div className="flex-1 overflow-y-auto">
+            <div className="max-w-3xl mx-auto px-8 py-6 space-y-6">
+              {/* Drop zone */}
               <motion.div
-                initial={{ opacity: 0, scale: 0.98 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.1 }}
+                initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.1 }}
                 onDragOver={(e) => { e.preventDefault(); setIsDragOver(true); }}
                 onDragLeave={() => setIsDragOver(false)}
                 onDrop={(e) => { e.preventDefault(); setIsDragOver(false); quickAddSource("file", `拖放文件_${sources.length + 1}.pdf`); }}
-                className={`relative border-2 border-dashed rounded-2xl p-8 text-center transition-all cursor-pointer group ${
-                  isDragOver
-                    ? "border-primary bg-primary/5 scale-[1.01]"
-                    : "border-border hover:border-primary/40 hover:bg-primary/5"
+                className={`relative border-2 border-dashed rounded-2xl p-10 text-center transition-all cursor-pointer group ${
+                  isDragOver ? "border-primary bg-primary/5 scale-[1.01]" : "border-border hover:border-primary/40 hover:bg-primary/5"
                 }`}
               >
                 <AnimatePresence>
                   {isDragOver && (
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      className="absolute inset-0 rounded-2xl bg-primary/10 flex items-center justify-center z-10"
-                    >
+                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 rounded-2xl bg-primary/10 flex items-center justify-center z-10">
                       <div className="text-center">
                         <Upload className="w-12 h-12 text-primary mx-auto mb-2 animate-bounce" />
                         <p className="text-lg font-semibold text-primary">松手即可上传</p>
@@ -498,13 +484,8 @@ const KnowledgeExtract = () => {
                     { icon: Headphones, color: "text-orange-500", delay: 0.2 },
                     { icon: FileVideo, color: "text-purple-500", delay: 0.3 },
                   ].map((item, i) => (
-                    <motion.div
-                      key={i}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.2 + item.delay }}
-                      className="w-10 h-10 rounded-xl bg-accent flex items-center justify-center group-hover:scale-110 transition-transform"
-                    >
+                    <motion.div key={i} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 + item.delay }}
+                      className="w-10 h-10 rounded-xl bg-accent flex items-center justify-center group-hover:scale-110 transition-transform">
                       <item.icon className={`w-5 h-5 ${item.color}`} />
                     </motion.div>
                   ))}
@@ -512,30 +493,17 @@ const KnowledgeExtract = () => {
                 <p className="text-sm font-medium text-foreground">拖放文件到这里，或点击下方选择上传方式</p>
                 <p className="text-xs text-muted-foreground mt-1">支持 PDF、Word、PPT、图片、音频、视频等 20+ 种格式</p>
               </motion.div>
-            </div>
 
-            {/* Multi-modal upload buttons */}
-            <div className="px-8 pb-4">
+              {/* Multi-modal upload buttons */}
               <div className="grid grid-cols-6 gap-2">
                 {UPLOAD_TYPES.map((opt, i) => (
-                  <motion.button
-                    key={opt.label}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.15 + i * 0.05 }}
-                    whileHover={{ scale: 1.04, y: -2 }}
-                    whileTap={{ scale: 0.97 }}
+                  <motion.button key={opt.label} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 + i * 0.05 }}
+                    whileHover={{ scale: 1.04, y: -2 }} whileTap={{ scale: 0.97 }}
                     onClick={() => {
                       if (opt.type === "url" || opt.type === "text") {
-                        setActiveUploadType(opt.type);
+                        setActiveUploadType(activeUploadType === opt.type ? null : opt.type);
                       } else {
-                        const names: Record<string, string> = {
-                          file: `文档_${sources.length + 1}.pdf`,
-                          image: `截图_${sources.length + 1}.png`,
-                          audio: `会议录音_${sources.length + 1}.mp3`,
-                          video: `培训视频_${sources.length + 1}.mp4`,
-                        };
-                        quickAddSource(opt.type, names[opt.type] || "文件");
+                        quickAddSource(opt.type, { file: `文档_${sources.length + 1}.pdf`, image: `截图_${sources.length + 1}.png`, audio: `会议录音_${sources.length + 1}.mp3`, video: `培训视频_${sources.length + 1}.mp4` }[opt.type] || "文件");
                       }
                     }}
                     className="flex flex-col items-center gap-1.5 p-3 rounded-xl border border-border bg-card hover:border-primary/40 hover:shadow-md transition-all group"
@@ -548,533 +516,244 @@ const KnowledgeExtract = () => {
                   </motion.button>
                 ))}
               </div>
-            </div>
 
-            {/* URL / Text input area */}
-            <AnimatePresence>
-              {activeUploadType && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: "auto" }}
-                  exit={{ opacity: 0, height: 0 }}
-                  className="px-8 pb-4 overflow-hidden"
-                >
-                  <div className="p-4 rounded-xl border border-border bg-card space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium text-foreground">
-                        {activeUploadType === "url" ? "🔗 输入网页链接" : "📝 粘贴文本内容"}
-                      </span>
-                      <button onClick={() => setActiveUploadType(null)} className="p-1 rounded hover:bg-accent">
-                        <X className="w-3.5 h-3.5 text-muted-foreground" />
-                      </button>
-                    </div>
-                    {activeUploadType === "url" ? (
-                      <div className="flex gap-2">
-                        <input
-                          placeholder="https://example.com/article"
-                          className="flex-1 px-3 py-2 rounded-lg border border-border bg-background text-sm outline-none focus:border-primary/50"
-                          onKeyDown={(e) => {
-                            if (e.key === "Enter" && (e.target as HTMLInputElement).value) {
-                              quickAddSource("url", (e.target as HTMLInputElement).value);
-                              (e.target as HTMLInputElement).value = "";
-                            }
-                          }}
-                        />
-                        <button
-                          onClick={() => quickAddSource("url", "https://wiki.company.com/article")}
-                          className="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm hover:bg-primary/90"
-                        >
-                          添加
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="space-y-2">
-                        <textarea
-                          placeholder="粘贴你的笔记、会议记录或任何文本内容..."
-                          className="w-full h-24 px-3 py-2 rounded-lg border border-border bg-background text-sm outline-none focus:border-primary/50 resize-none"
-                        />
-                        <button
-                          onClick={() => quickAddSource("text", `粘贴笔记_${sources.length + 1}`)}
-                          className="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm hover:bg-primary/90"
-                        >
-                          添加到资料
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-            {/* Uploaded files */}
-            {sources.length > 0 && (
-              <div className="px-8 pb-4">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium text-foreground">已上传资料</span>
-                    <span className="px-1.5 py-0.5 rounded-md bg-primary/10 text-primary text-xs font-medium">{sources.length}</span>
-                  </div>
-                  {/* Type stats */}
-                  <div className="flex items-center gap-1.5">
-                    {Object.entries(typeStats).map(([type, count]) => {
-                      const Icon = FILE_TYPE_ICON[type] || File;
-                      const colorClass = FILE_TYPE_COLOR[type] || "text-muted-foreground bg-accent";
-                      return (
-                        <span key={type} className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-medium ${colorClass}`}>
-                          <Icon className="w-3 h-3" />{count}
+              {/* URL / Text input area */}
+              <AnimatePresence>
+                {activeUploadType && (
+                  <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="overflow-hidden">
+                    <div className="p-4 rounded-xl border border-border bg-card space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium text-foreground">
+                          {activeUploadType === "url" ? "🔗 输入网页链接" : "📝 粘贴文本内容"}
                         </span>
-                      );
-                    })}
+                        <button onClick={() => setActiveUploadType(null)} className="p-1 rounded hover:bg-accent"><X className="w-3.5 h-3.5 text-muted-foreground" /></button>
+                      </div>
+                      {activeUploadType === "url" ? (
+                        <div className="flex gap-2">
+                          <input placeholder="https://example.com/article" className="flex-1 px-3 py-2 rounded-lg border border-border bg-background text-sm outline-none focus:border-primary/50"
+                            onKeyDown={(e) => { if (e.key === "Enter" && (e.target as HTMLInputElement).value) { quickAddSource("url", (e.target as HTMLInputElement).value); (e.target as HTMLInputElement).value = ""; } }} />
+                          <button onClick={() => quickAddSource("url", "https://wiki.company.com/article")} className="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm hover:bg-primary/90">添加</button>
+                        </div>
+                      ) : (
+                        <div className="space-y-2">
+                          <textarea placeholder="粘贴你的笔记、会议记录或任何文本内容..." className="w-full h-24 px-3 py-2 rounded-lg border border-border bg-background text-sm outline-none focus:border-primary/50 resize-none" />
+                          <button onClick={() => quickAddSource("text", `粘贴笔记_${sources.length + 1}`)} className="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm hover:bg-primary/90">添加到资料</button>
+                        </div>
+                      )}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* Uploaded files list */}
+              {sources.length > 0 && (
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium text-foreground">已上传资料</span>
+                      <span className="px-1.5 py-0.5 rounded-md bg-primary/10 text-primary text-xs font-medium">{sources.length}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      {Object.entries(typeStats).map(([type, count]) => {
+                        const Icon = FILE_TYPE_ICON[type] || File;
+                        const colorClass = FILE_TYPE_COLOR[type] || "text-muted-foreground bg-accent";
+                        return <span key={type} className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-medium ${colorClass}`}><Icon className="w-3 h-3" />{count}</span>;
+                      })}
+                    </div>
+                  </div>
+                  <div className="space-y-1.5">
+                    <AnimatePresence>
+                      {sources.map((s, i) => {
+                        const Icon = FILE_TYPE_ICON[s.type] || File;
+                        const colorClass = FILE_TYPE_COLOR[s.type] || "text-muted-foreground bg-accent";
+                        return (
+                          <motion.div key={s.id} initial={{ opacity: 0, x: -20, height: 0 }} animate={{ opacity: 1, x: 0, height: "auto" }} exit={{ opacity: 0, x: 20, height: 0 }} transition={{ delay: i * 0.03 }}
+                            className="flex items-center gap-3 px-4 py-2.5 rounded-xl border border-border bg-card group hover:border-primary/20 hover:shadow-sm transition-all">
+                            <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${colorClass}`}><Icon className="w-4 h-4" /></div>
+                            <div className="flex-1 min-w-0">
+                              <span className="text-sm text-foreground truncate block">{s.name}</span>
+                              {s.size && <span className="text-[10px] text-muted-foreground">{s.size}</span>}
+                            </div>
+                            {s.status === "analyzing" ? (
+                              <div className="flex items-center gap-1.5"><Loader2 className="w-3.5 h-3.5 text-primary animate-spin" /><span className="text-[10px] text-primary">解析中</span></div>
+                            ) : (
+                              <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", stiffness: 300 }}><CheckCircle2 className="w-4 h-4 text-primary" /></motion.div>
+                            )}
+                            <button onClick={() => removeSource(s.id)} className="p-1 rounded opacity-0 group-hover:opacity-100 hover:bg-accent text-muted-foreground transition-all"><X className="w-3.5 h-3.5" /></button>
+                          </motion.div>
+                        );
+                      })}
+                    </AnimatePresence>
                   </div>
                 </div>
-                <div className="space-y-1.5">
-                  <AnimatePresence>
-                    {sources.map((s, i) => {
-                      const Icon = FILE_TYPE_ICON[s.type] || File;
-                      const colorClass = FILE_TYPE_COLOR[s.type] || "text-muted-foreground bg-accent";
-                      return (
-                        <motion.div
-                          key={s.id}
-                          initial={{ opacity: 0, x: -20, height: 0 }}
-                          animate={{ opacity: 1, x: 0, height: "auto" }}
-                          exit={{ opacity: 0, x: 20, height: 0 }}
-                          transition={{ delay: i * 0.03 }}
-                          className="flex items-center gap-3 px-4 py-2.5 rounded-xl border border-border bg-card group hover:border-primary/20 hover:shadow-sm transition-all"
-                        >
-                          <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${colorClass}`}>
-                            <Icon className="w-4 h-4" />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <span className="text-sm text-foreground truncate block">{s.name}</span>
-                            {s.size && <span className="text-[10px] text-muted-foreground">{s.size}</span>}
-                          </div>
-                          {s.status === "analyzing" ? (
-                            <div className="flex items-center gap-1.5">
-                              <Loader2 className="w-3.5 h-3.5 text-primary animate-spin" />
-                              <span className="text-[10px] text-primary">解析中</span>
-                            </div>
-                          ) : (
-                            <motion.div
-                              initial={{ scale: 0 }}
-                              animate={{ scale: 1 }}
-                              transition={{ type: "spring", stiffness: 300 }}
-                            >
-                              <CheckCircle2 className="w-4 h-4 text-primary" />
-                            </motion.div>
-                          )}
-                          <button
-                            onClick={() => removeSource(s.id)}
-                            className="p-1 rounded opacity-0 group-hover:opacity-100 hover:bg-accent text-muted-foreground transition-all"
-                          >
-                            <X className="w-3.5 h-3.5" />
-                          </button>
-                        </motion.div>
-                      );
-                    })}
-                  </AnimatePresence>
-                </div>
-              </div>
-            )}
-
-            {/* Bottom action */}
-            <div className="px-8 py-4 mt-auto border-t border-border bg-card/50">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                  <span>{readySources.length} 个已就绪</span>
-                  {analyzingSources.length > 0 && (
-                    <span className="flex items-center gap-1 text-primary">
-                      <Loader2 className="w-3 h-3 animate-spin" />{analyzingSources.length} 个解析中
-                    </span>
-                  )}
-                </div>
-                <button
-                  onClick={() => {
-                    setAppMode("quick-extract");
-                    setQuickStep(0);
-                    setTimeout(() => setQuickStep(1), 3000);
-                  }}
-                  disabled={readySources.length === 0}
-                  className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-all shadow-sm disabled:opacity-50 group"
-                >
-                  下一步：AI 萃取
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-                </button>
-              </div>
+              )}
             </div>
           </div>
 
-          {/* ═══ Right: Preview & Cases ═══ */}
-          <aside className="w-[320px] shrink-0 border-l border-border bg-muted/30 flex flex-col overflow-y-auto">
-            <div className="px-5 pt-6 pb-3">
-              <div className="flex items-center gap-2 mb-1">
-                <Eye className="w-4 h-4 text-primary" />
-                <h3 className="text-sm font-semibold text-foreground">输出预览</h3>
-              </div>
-              <p className="text-xs text-muted-foreground">基于已上传资料，AI 将生成以下内容</p>
-            </div>
-
-            {/* Preview card */}
-            <div className="px-5 pb-4">
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
-                className="relative rounded-xl border border-border bg-card overflow-hidden"
-              >
-                {/* Mock document header */}
-                <div className="p-4 border-b border-border">
-                  <div className="flex items-center gap-2 mb-2">
-                    <div className="w-6 h-6 rounded bg-primary/10 flex items-center justify-center">
-                      <FileText className="w-3.5 h-3.5 text-primary" />
-                    </div>
-                    <span className="text-xs font-medium text-foreground">生成文档预览</span>
-                  </div>
-                  <div className="space-y-1.5">
-                    <div className="h-3 rounded bg-foreground/10 w-3/4" />
-                    <div className="h-2 rounded bg-foreground/5 w-full" />
-                    <div className="h-2 rounded bg-foreground/5 w-5/6" />
-                  </div>
-                </div>
-
-                {/* Mock sections */}
-                <div className="p-4 space-y-3">
-                  {[
-                    { label: "📋 概述", w: "w-full" },
-                    { label: "🎯 核心观点", w: "w-4/5" },
-                    { label: "📊 数据分析", w: "w-3/4" },
-                    { label: "💡 经验总结", w: "w-5/6" },
-                  ].map((section, i) => (
-                    <motion.div
-                      key={section.label}
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: 0.5 + i * 0.1 }}
-                      className="space-y-1"
-                    >
-                      <div className="text-[10px] font-medium text-foreground/70">{section.label}</div>
-                      <div className={`h-1.5 rounded bg-primary/10 ${section.w}`} />
-                      <div className="h-1.5 rounded bg-foreground/5 w-full" />
-                    </motion.div>
-                  ))}
-                </div>
-
-                {/* Overlay pulse */}
-                {sources.length > 0 && (
-                  <motion.div
-                    animate={{ opacity: [0.3, 0.6, 0.3] }}
-                    transition={{ duration: 2, repeat: Infinity }}
-                    className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent pointer-events-none"
-                  />
+          {/* Bottom action bar */}
+          <div className="px-8 py-4 border-t border-border bg-card/50">
+            <div className="max-w-3xl mx-auto flex items-center justify-between">
+              <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                <span>{readySources.length} 个文件已就绪</span>
+                {analyzingSources.length > 0 && (
+                  <span className="flex items-center gap-1 text-primary"><Loader2 className="w-3 h-3 animate-spin" />{analyzingSources.length} 个解析中</span>
                 )}
-              </motion.div>
-
-              {/* Stats */}
-              <div className="grid grid-cols-3 gap-2 mt-3">
-                {[
-                  { label: "资料来源", value: sources.length, icon: Layers },
-                  { label: "预估章节", value: Math.max(4, sources.length + 1), icon: FileText },
-                  { label: "预估字数", value: `${Math.max(2, sources.length) * 1.2}k`, icon: PenTool },
-                ].map((stat, i) => (
-                  <motion.div
-                    key={stat.label}
-                    initial={{ opacity: 0, y: 5 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.6 + i * 0.1 }}
-                    className="p-2.5 rounded-lg border border-border bg-card text-center"
-                  >
-                    <stat.icon className="w-3.5 h-3.5 text-primary mx-auto mb-1" />
-                    <div className="text-sm font-semibold text-foreground">{stat.value}</div>
-                    <div className="text-[10px] text-muted-foreground">{stat.label}</div>
-                  </motion.div>
-                ))}
               </div>
+              <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
+                onClick={() => setAppMode("quick-template")}
+                disabled={readySources.length === 0}
+                className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-all shadow-sm disabled:opacity-50 group">
+                下一步：选择模板 <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+              </motion.button>
             </div>
-
-            {/* Sample output cases */}
-            <div className="px-5 pb-4">
-              <div className="flex items-center gap-2 mb-3">
-                <Sparkles className="w-3.5 h-3.5 text-primary" />
-                <span className="text-xs font-medium text-foreground">案例参考</span>
-              </div>
-              <div className="space-y-2">
-                {SAMPLE_CASES.map((c, i) => (
-                  <motion.div
-                    key={c.title}
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.7 + i * 0.1 }}
-                    whileHover={{ scale: 1.02 }}
-                    className={`p-3 rounded-xl border cursor-pointer hover:shadow-sm transition-all ${c.color}`}
-                  >
-                    <div className="flex items-start gap-2.5">
-                      <div className="w-8 h-8 rounded-lg bg-white/80 flex items-center justify-center shrink-0">
-                        <c.icon className="w-4 h-4 text-primary" />
-                      </div>
-                      <div className="min-w-0">
-                        <p className="text-xs font-medium text-foreground truncate">{c.title}</p>
-                        <p className="text-[10px] text-muted-foreground mt-0.5">{c.type}</p>
-                        <div className="flex gap-1 mt-1.5">
-                          {c.tags.map(tag => (
-                            <span key={tag} className="px-1.5 py-0.5 rounded bg-white/60 text-[9px] text-muted-foreground">{tag}</span>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-            </div>
-
-            {/* Supported formats */}
-            <div className="px-5 pb-6">
-              <div className="p-3 rounded-xl border border-border bg-card">
-                <span className="text-[10px] font-medium text-muted-foreground block mb-2">支持的格式</span>
-                <div className="flex flex-wrap gap-1">
-                  {["PDF", "DOCX", "PPTX", "XLSX", "MD", "TXT", "JPG", "PNG", "MP3", "WAV", "MP4", "URL"].map(fmt => (
-                    <span key={fmt} className="px-1.5 py-0.5 rounded bg-accent text-[9px] text-muted-foreground font-mono">{fmt}</span>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </aside>
+          </div>
         </div>
       </AppLayout>
     );
   }
 
-  // ───── Quick Mode: Step 2 - AI Extracting + Naming ─────
-  if (appMode === "quick-extract") {
+  // ───── Quick Step 2: Template Selection ─────
+  if (appMode === "quick-template") {
     return (
       <AppLayout>
-        <div className="flex items-center justify-center h-[calc(100vh-56px)] bg-background">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="w-full max-w-2xl px-6"
-          >
-            {/* Step indicator */}
-            <div className="flex items-center justify-center gap-2 mb-8">
-              <div className="flex items-center gap-2 text-sm">
-                <span className="w-7 h-7 rounded-full bg-primary/20 text-primary flex items-center justify-center text-xs font-medium">✓</span>
-                <span className="text-muted-foreground">上传资料</span>
+        <div className="flex flex-col h-[calc(100vh-56px)] bg-background">
+          {/* Header */}
+          <div className="px-8 pt-6 pb-4 border-b border-border">
+            <div className="flex items-center gap-3 mb-5">
+              <button onClick={() => setAppMode("quick-upload")} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
+                <ChevronLeft className="w-4 h-4" /> 返回
+              </button>
+              <StepIndicator current={2} />
+            </div>
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+              <h1 className="text-xl font-bold text-foreground mb-1">选择输出模板</h1>
+              <p className="text-sm text-muted-foreground">选择一个常用模板，AI 将基于你的 {sources.length} 份资料生成对应格式的知识文档</p>
+            </motion.div>
+          </div>
+
+          {/* Main content */}
+          <div className="flex-1 overflow-y-auto">
+            <div className="max-w-4xl mx-auto px-8 py-6">
+              {/* Source summary bar */}
+              <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="flex items-center gap-3 mb-6 p-3 rounded-xl border border-border bg-card">
+                <Layers className="w-4 h-4 text-primary shrink-0" />
+                <span className="text-sm text-foreground font-medium">已上传 {sources.length} 份资料</span>
+                <div className="flex items-center gap-1.5 ml-auto">
+                  {Object.entries(typeStats).map(([type, count]) => {
+                    const Icon = FILE_TYPE_ICON[type] || File;
+                    const colorClass = FILE_TYPE_COLOR[type] || "text-muted-foreground bg-accent";
+                    return <span key={type} className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-medium ${colorClass}`}><Icon className="w-3 h-3" />{count}</span>;
+                  })}
+                </div>
+              </motion.div>
+
+              {/* Template grid */}
+              <div className="grid grid-cols-2 gap-4">
+                {OUTPUT_TEMPLATES.map((tpl, i) => {
+                  const isSelected = selectedTemplate === tpl.id;
+                  return (
+                    <motion.button
+                      key={tpl.id}
+                      initial={{ opacity: 0, y: 16 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.1 + i * 0.06 }}
+                      whileHover={{ scale: 1.01, y: -2 }}
+                      whileTap={{ scale: 0.99 }}
+                      onClick={() => setSelectedTemplate(isSelected ? null : tpl.id)}
+                      className={`relative text-left p-5 rounded-2xl border-2 transition-all ${
+                        isSelected
+                          ? "border-primary shadow-lg shadow-primary/10 bg-card"
+                          : "border-border bg-card hover:border-primary/30 hover:shadow-md"
+                      }`}
+                    >
+                      {/* Selected check */}
+                      {isSelected && (
+                        <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", stiffness: 300 }}
+                          className="absolute top-4 right-4 w-6 h-6 rounded-full bg-primary flex items-center justify-center">
+                          <Check className="w-3.5 h-3.5 text-primary-foreground" />
+                        </motion.div>
+                      )}
+
+                      {/* Icon + Title */}
+                      <div className="flex items-start gap-3 mb-3">
+                        <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${tpl.gradient} flex items-center justify-center shrink-0`}>
+                          <tpl.icon className="w-5 h-5 text-white" />
+                        </div>
+                        <div className="min-w-0">
+                          <h3 className="text-sm font-semibold text-foreground">{tpl.label}</h3>
+                          <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{tpl.desc}</p>
+                        </div>
+                      </div>
+
+                      {/* Preview structure */}
+                      <div className={`rounded-xl p-3 space-y-1.5 transition-colors ${isSelected ? tpl.color : "bg-accent/50"}`}>
+                        {tpl.preview.map((item, j) => (
+                          <motion.div
+                            key={j}
+                            initial={{ opacity: 0, x: -8 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: 0.2 + i * 0.06 + j * 0.04 }}
+                            className="flex items-center gap-2"
+                          >
+                            <div className={`w-1 h-1 rounded-full ${isSelected ? "bg-primary" : "bg-muted-foreground/30"}`} />
+                            <span className="text-[11px] text-muted-foreground">{item}</span>
+                          </motion.div>
+                        ))}
+                      </div>
+                    </motion.button>
+                  );
+                })}
               </div>
-              <div className="w-12 h-px bg-primary" />
-              <div className="flex items-center gap-2 text-sm">
-                <span className="w-7 h-7 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-medium">2</span>
-                <span className="text-foreground font-medium">AI 萃取</span>
-              </div>
-              <div className="w-12 h-px bg-border" />
-              <div className="flex items-center gap-2 text-sm">
-                <span className="w-7 h-7 rounded-full bg-accent text-muted-foreground flex items-center justify-center text-xs font-medium">3</span>
-                <span className="text-muted-foreground">确认发布</span>
+
+              {/* Title input - appears when template selected */}
+              <AnimatePresence>
+                {selectedTemplate && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="overflow-hidden mt-6"
+                  >
+                    <div className="p-5 rounded-2xl border border-border bg-card space-y-3">
+                      <div className="flex items-center gap-2">
+                        <PenTool className="w-4 h-4 text-primary" />
+                        <span className="text-sm font-medium text-foreground">为文档命名（可选）</span>
+                      </div>
+                      <input
+                        value={quickTitle}
+                        onChange={(e) => setQuickTitle(e.target.value)}
+                        className="w-full px-4 py-3 rounded-xl border border-border bg-background text-foreground text-sm outline-none focus:border-primary/50 transition-colors"
+                        placeholder="AI 将根据内容自动生成标题，你也可以自定义..."
+                      />
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          </div>
+
+          {/* Bottom action bar */}
+          <div className="px-8 py-4 border-t border-border bg-card/50">
+            <div className="max-w-4xl mx-auto flex items-center justify-between">
+              <button onClick={() => setAppMode("quick-upload")} className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
+                <ChevronLeft className="w-4 h-4" /> 上一步
+              </button>
+              <div className="flex items-center gap-3">
+                {selectedTemplate && currentTemplate && (
+                  <motion.span initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} className="text-xs text-muted-foreground flex items-center gap-1.5">
+                    <currentTemplate.icon className="w-3.5 h-3.5 text-primary" />
+                    已选：{currentTemplate.label}
+                  </motion.span>
+                )}
+                <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
+                  onClick={startGeneration}
+                  disabled={!selectedTemplate}
+                  className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-all shadow-md disabled:opacity-50">
+                  <Wand2 className="w-4 h-4" /> 确认生成
+                </motion.button>
               </div>
             </div>
-
-            <AnimatePresence mode="wait">
-              {quickStep === 0 ? (
-                /* Extracting animation */
-                <motion.div
-                  key="extracting"
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  className="text-center py-8"
-                >
-                  {/* Animated orbit */}
-                  <div className="relative w-32 h-32 mx-auto mb-8">
-                    <motion.div
-                      animate={{ rotate: 360 }}
-                      transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-                      className="absolute inset-0"
-                    >
-                      {[0, 1, 2, 3].map((i) => (
-                        <motion.div
-                          key={i}
-                          className="absolute w-8 h-8 rounded-lg bg-accent flex items-center justify-center"
-                          style={{
-                            top: `${50 + 45 * Math.sin((i * Math.PI) / 2)}%`,
-                            left: `${50 + 45 * Math.cos((i * Math.PI) / 2)}%`,
-                            transform: "translate(-50%, -50%)",
-                          }}
-                        >
-                          {[FileText, Image, Headphones, FileVideo][i] &&
-                            (() => { const Icon = [FileText, Image, Headphones, FileVideo][i]; return <Icon className="w-4 h-4 text-primary" />; })()
-                          }
-                        </motion.div>
-                      ))}
-                    </motion.div>
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <motion.div
-                        animate={{ scale: [1, 1.1, 1] }}
-                        transition={{ duration: 2, repeat: Infinity }}
-                        className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center"
-                      >
-                        <Wand2 className="w-8 h-8 text-primary" />
-                      </motion.div>
-                    </div>
-                  </div>
-
-                  <h2 className="text-xl font-bold text-foreground mb-2">AI 正在萃取知识</h2>
-                  <p className="text-sm text-muted-foreground mb-6">正在分析 {sources.length} 份资料，提炼核心内容...</p>
-                  <div className="max-w-xs mx-auto">
-                    <motion.div className="h-2 rounded-full bg-accent overflow-hidden">
-                      <motion.div
-                        className="h-full rounded-full bg-gradient-to-r from-primary to-primary/70"
-                        initial={{ width: "0%" }}
-                        animate={{ width: "100%" }}
-                        transition={{ duration: 3, ease: "easeInOut" }}
-                      />
-                    </motion.div>
-                  </div>
-                  <div className="mt-5 space-y-2">
-                    {[
-                      { text: "📄 解析文档结构与格式...", delay: 0 },
-                      { text: "🖼️ 识别图片与图表内容...", delay: 0.6 },
-                      { text: "🎙️ 转录音视频关键信息...", delay: 1.2 },
-                      { text: "🔍 交叉比对多源信息...", delay: 1.8 },
-                      { text: "🧠 生成结构化知识文档...", delay: 2.4 },
-                    ].map((step) => (
-                      <motion.p
-                        key={step.text}
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: step.delay }}
-                        className="text-xs text-muted-foreground"
-                      >
-                        {step.text}
-                      </motion.p>
-                    ))}
-                  </div>
-                </motion.div>
-              ) : (
-                /* Naming & confirmation */
-                <motion.div
-                  key="naming"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="space-y-6"
-                >
-                  <div className="text-center">
-                    <motion.div
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      transition={{ type: "spring", stiffness: 200 }}
-                      className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4"
-                    >
-                      <CheckCircle2 className="w-7 h-7 text-primary" />
-                    </motion.div>
-                    <h2 className="text-xl font-bold text-foreground mb-1">萃取完成！</h2>
-                    <p className="text-sm text-muted-foreground">AI 已从 {sources.length} 份资料中提炼出结构化知识</p>
-                  </div>
-
-                  {/* AI extracted summary with animation */}
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2 }}
-                    className="p-4 rounded-xl border border-border bg-card space-y-3"
-                  >
-                    <div className="flex items-center gap-2 text-sm">
-                      <Sparkles className="w-4 h-4 text-primary" />
-                      <span className="font-medium text-foreground">AI 萃取摘要</span>
-                    </div>
-                    <ul className="space-y-1.5 text-sm text-muted-foreground">
-                      {[
-                        "识别到 4 个核心章节",
-                        "提取 6 个关键数据指标",
-                        "归纳 3 条核心经验总结",
-                        "推荐标签：研发效能、DevOps、流程优化",
-                      ].map((item, i) => (
-                        <motion.li
-                          key={item}
-                          initial={{ opacity: 0, x: -10 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: 0.3 + i * 0.1 }}
-                          className="flex items-start gap-2"
-                        >
-                          <span className="text-primary mt-0.5">•</span>{item}
-                        </motion.li>
-                      ))}
-                    </ul>
-                  </motion.div>
-
-                  {/* Source summary */}
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.4 }}
-                    className="flex items-center gap-2 flex-wrap"
-                  >
-                    {Object.entries(typeStats).map(([type, count]) => {
-                      const Icon = FILE_TYPE_ICON[type] || File;
-                      const colorClass = FILE_TYPE_COLOR[type] || "text-muted-foreground bg-accent";
-                      return (
-                        <span key={type} className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium ${colorClass}`}>
-                          <Icon className="w-3.5 h-3.5" />{count} 份{type === "file" ? "文档" : type === "image" ? "图片" : type === "audio" ? "音频" : type === "video" ? "视频" : type === "url" ? "网页" : "笔记"}
-                        </span>
-                      );
-                    })}
-                  </motion.div>
-
-                  {/* Title naming */}
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-foreground">知识标题</label>
-                    <input
-                      value={quickTitle}
-                      onChange={(e) => setQuickTitle(e.target.value)}
-                      className="w-full px-4 py-3 rounded-xl border border-border bg-background text-foreground text-sm outline-none focus:border-primary/50 transition-colors"
-                      placeholder="为这份知识文档命名..."
-                    />
-                    <p className="text-xs text-muted-foreground">AI 已根据内容自动生成标题，你可以修改</p>
-                  </div>
-
-                  {/* Tool selection */}
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-foreground">选择包含的内容类型</label>
-                    <div className="grid grid-cols-3 gap-2">
-                      {tools.map((tool) => (
-                        <motion.button
-                          key={tool.id}
-                          whileTap={{ scale: 0.97 }}
-                          onClick={() => toggleTool(tool.id)}
-                          className={`flex items-center gap-2 p-2.5 rounded-xl border text-sm transition-all ${
-                            tool.checked ? `${tool.color} shadow-sm` : "bg-card border-border hover:border-primary/30"
-                          }`}
-                        >
-                          <div className={`w-4 h-4 rounded border-2 flex items-center justify-center shrink-0 transition-colors ${
-                            tool.checked ? "bg-primary border-primary" : "border-muted-foreground/30"
-                          }`}>
-                            {tool.checked && <Check className="w-2.5 h-2.5 text-primary-foreground" />}
-                          </div>
-                          <tool.icon className="w-3.5 h-3.5" />
-                          <span className="text-xs font-medium">{tool.label}</span>
-                        </motion.button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Actions */}
-                  <div className="flex items-center justify-between pt-2">
-                    <button
-                      onClick={() => setAppMode("quick-upload")}
-                      className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
-                    >
-                      <ChevronLeft className="w-4 h-4" /> 上一步
-                    </button>
-                    <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={startGeneration}
-                      disabled={checkedTools.length === 0}
-                      className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors shadow-md disabled:opacity-50"
-                    >
-                      <Wand2 className="w-4 h-4" /> 一键生成文档（{checkedTools.length} 项）
-                    </motion.button>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </motion.div>
+          </div>
         </div>
       </AppLayout>
     );
@@ -1082,64 +761,60 @@ const KnowledgeExtract = () => {
 
   // ───── Generating ─────
   if (appMode === "generating") {
-    const currentToolIdx = Math.floor((generatingProgress / 100) * checkedTools.length);
-    const currentTool = checkedTools[Math.min(currentToolIdx, checkedTools.length - 1)];
+    const steps = currentTemplate?.preview || ["📋 分析内容", "🧠 提炼知识", "📝 生成文档"];
+    const currentStepIdx = Math.floor((generatingProgress / 100) * steps.length);
     return (
       <AppLayout>
         <div className="flex items-center justify-center h-[calc(100vh-56px)] bg-background">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="w-full max-w-md text-center px-6"
-          >
-            <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-              className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-8"
-            >
-              <Wand2 className="w-10 h-10 text-primary" />
-            </motion.div>
-
-            <h2 className="text-xl font-bold text-foreground mb-2">AI 正在生成文档</h2>
-            <p className="text-sm text-muted-foreground mb-8">
-              结合 {selectedCount} 份资料{extractMode === "deep" ? "和对话内容" : ""}，使用 {checkedTools.length} 个工具生成
-            </p>
-
-            <div className="w-full h-2 rounded-full bg-accent overflow-hidden mb-4">
-              <motion.div
-                className="h-full rounded-full bg-gradient-to-r from-primary to-primary/70"
-                initial={{ width: "0%" }}
-                animate={{ width: `${generatingProgress}%` }}
-                transition={{ duration: 0.3 }}
-              />
+          <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="w-full max-w-lg text-center px-6">
+            {/* Animated icon */}
+            <div className="relative w-28 h-28 mx-auto mb-8">
+              <motion.div animate={{ rotate: 360 }} transition={{ duration: 10, repeat: Infinity, ease: "linear" }} className="absolute inset-0">
+                {sources.slice(0, 5).map((s, i) => {
+                  const Icon = FILE_TYPE_ICON[s.type] || File;
+                  const angle = (i / Math.min(sources.length, 5)) * Math.PI * 2;
+                  return (
+                    <motion.div key={s.id} className="absolute w-8 h-8 rounded-lg bg-accent flex items-center justify-center shadow-sm"
+                      style={{ top: `${50 + 42 * Math.sin(angle)}%`, left: `${50 + 42 * Math.cos(angle)}%`, transform: "translate(-50%, -50%)" }}>
+                      <Icon className="w-4 h-4 text-primary" />
+                    </motion.div>
+                  );
+                })}
+              </motion.div>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <motion.div animate={{ scale: [1, 1.12, 1] }} transition={{ duration: 2, repeat: Infinity }} className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center shadow-inner">
+                  <Wand2 className="w-7 h-7 text-primary" />
+                </motion.div>
+              </div>
             </div>
 
-            <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
-              {currentTool && (
-                <motion.span
-                  key={currentTool.id}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="flex items-center gap-1.5"
-                >
-                  <Loader2 className="w-3.5 h-3.5 animate-spin text-primary" />
-                  正在生成：{currentTool.label}...
-                </motion.span>
-              )}
+            <h2 className="text-xl font-bold text-foreground mb-2">AI 正在生成{currentTemplate?.label || "文档"}</h2>
+            <p className="text-sm text-muted-foreground mb-8">基于 {sources.length} 份资料，使用「{currentTemplate?.label}」模板生成中...</p>
+
+            <div className="w-full h-2.5 rounded-full bg-accent overflow-hidden mb-6">
+              <motion.div className="h-full rounded-full bg-gradient-to-r from-primary to-primary/70" initial={{ width: "0%" }} animate={{ width: `${generatingProgress}%` }} transition={{ duration: 0.3 }} />
             </div>
 
-            <div className="flex items-center justify-center gap-2 mt-6">
-              {checkedTools.map((tool, i) => (
+            <div className="space-y-2">
+              {steps.map((step, i) => (
                 <motion.div
-                  key={tool.id}
+                  key={i}
                   initial={{ opacity: 0.3 }}
                   animate={{
-                    opacity: i <= currentToolIdx ? 1 : 0.3,
-                    scale: i === currentToolIdx ? 1.1 : 1,
+                    opacity: i <= currentStepIdx ? 1 : 0.3,
+                    x: i === currentStepIdx ? [0, 3, 0] : 0,
                   }}
-                  className={`p-2 rounded-lg border ${tool.color}`}
+                  transition={i === currentStepIdx ? { x: { duration: 1, repeat: Infinity } } : {}}
+                  className="flex items-center gap-2 justify-center"
                 >
-                  <tool.icon className="w-4 h-4" />
+                  {i < currentStepIdx ? (
+                    <CheckCircle2 className="w-4 h-4 text-primary" />
+                  ) : i === currentStepIdx ? (
+                    <Loader2 className="w-4 h-4 text-primary animate-spin" />
+                  ) : (
+                    <div className="w-4 h-4 rounded-full border-2 border-muted-foreground/20" />
+                  )}
+                  <span className={`text-sm ${i <= currentStepIdx ? "text-foreground" : "text-muted-foreground"}`}>{step}</span>
                 </motion.div>
               ))}
             </div>
@@ -1149,77 +824,60 @@ const KnowledgeExtract = () => {
     );
   }
 
-  // ───── Result Page ─────
+  // ───── Result Preview ─────
   if (appMode === "result") {
     return (
       <AppLayout>
         <div className="flex flex-col h-[calc(100vh-56px)] bg-background">
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="px-6 py-3 border-b border-border flex items-center justify-between"
-          >
+          {/* Top bar */}
+          <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
+            className="flex items-center justify-between px-6 py-3 border-b border-border bg-card/80 backdrop-blur-sm">
             <div className="flex items-center gap-3">
-              <button
-                onClick={() => setAppMode(extractMode === "quick" ? "quick-extract" : "workspace")}
-                className="p-1.5 rounded-lg hover:bg-accent text-muted-foreground transition-colors"
-              >
-                <ChevronLeft className="w-4 h-4" />
+              <button onClick={() => setAppMode("quick-template")} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
+                <ChevronLeft className="w-4 h-4" /> 返回
               </button>
-              <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-                <BookOpen className="w-4 h-4 text-primary" />
-              </div>
-              <div>
-                <h2 className="text-sm font-semibold text-foreground">{quickTitle}</h2>
-                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <span>来源 {sources.length} 份资料</span>
-                  <span>·</span>
-                  <span>{checkedTools.length} 种内容类型</span>
-                </div>
-              </div>
+              <div className="h-5 w-px bg-border" />
+              <StepIndicator current={3} />
             </div>
             <div className="flex items-center gap-2">
-              <button
-                onClick={() => setIsEditing(!isEditing)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-sm transition-colors ${
-                  isEditing ? "bg-primary/10 border-primary/30 text-primary" : "border-border text-muted-foreground hover:text-foreground hover:bg-accent"
-                }`}
-              >
-                <Edit3 className="w-3.5 h-3.5" />
-                {isEditing ? "编辑中" : "编辑"}
+              <button onClick={() => setIsEditing(!isEditing)}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm transition-colors ${isEditing ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-accent"}`}>
+                <Edit3 className="w-3.5 h-3.5" />{isEditing ? "预览" : "编辑"}
               </button>
-              <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
+              <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
                 <Save className="w-3.5 h-3.5" /> 保存草稿
               </button>
-              <button className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors shadow-sm">
-                <Send className="w-3.5 h-3.5" /> 确认发布
-              </button>
+              <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
+                className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 shadow-sm transition-colors">
+                <CheckCircle2 className="w-3.5 h-3.5" /> 确认发布
+              </motion.button>
             </div>
           </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="flex-1 overflow-y-auto"
-          >
+          {/* Document preview */}
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="flex-1 overflow-y-auto">
             <div className="max-w-3xl mx-auto py-8 px-6">
+              {/* Template & source badge */}
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }}
+                className="flex items-center gap-3 mb-6">
+                {currentTemplate && (
+                  <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-medium ${currentTemplate.color}`}>
+                    <currentTemplate.icon className="w-3.5 h-3.5" />{currentTemplate.label}
+                  </span>
+                )}
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-accent text-xs text-muted-foreground">
+                  <Layers className="w-3 h-3" />基于 {sources.length} 份资料生成
+                </span>
+              </motion.div>
+
               {isEditing ? (
-                <textarea
-                  value={resultContent}
-                  onChange={(e) => setResultContent(e.target.value)}
-                  className="w-full min-h-[70vh] bg-transparent text-sm text-foreground leading-relaxed outline-none resize-none font-mono"
-                />
+                <textarea value={resultContent} onChange={(e) => setResultContent(e.target.value)}
+                  className="w-full min-h-[70vh] bg-transparent text-sm text-foreground leading-relaxed outline-none resize-none font-mono" />
               ) : (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.3 }}
-                  className="space-y-1"
-                >
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }} className="space-y-1">
                   {resultContent.split("\n").map((line, i) => {
                     if (line.startsWith("# ")) return <h1 key={i} className="text-2xl font-bold text-foreground mt-8 mb-4">{line.slice(2)}</h1>;
-                    if (line.startsWith("## ")) return <h2 key={i} className="text-xl font-semibold text-foreground mt-6 mb-3 flex items-center gap-2">{line.slice(3)}</h2>;
+                    if (line.startsWith("## ")) return <h2 key={i} className="text-xl font-semibold text-foreground mt-6 mb-3">{line.slice(3)}</h2>;
                     if (line.startsWith("### ")) return <h3 key={i} className="text-base font-medium text-foreground mt-4 mb-2">{line.slice(4)}</h3>;
                     if (line.startsWith("---")) return <hr key={i} className="border-border my-6" />;
                     if (line.startsWith("- ")) return <li key={i} className="text-sm text-foreground ml-4 mb-1.5 list-disc">{line.slice(2)}</li>;
@@ -1239,7 +897,7 @@ const KnowledgeExtract = () => {
     );
   }
 
-  // ───── Workspace (3-column) ─────
+  // ───── Deep mode: Workspace (3-column) ─────
   const suggestions = extractMode === "deep"
     ? [{ emoji: "🧠", text: "继续追问我" }, { emoji: "📝", text: "总结我的隐性知识" }]
     : [{ emoji: "📌", text: "帮我提炼核心观点" }, { emoji: "💬", text: "补充背景信息" }];
@@ -1255,48 +913,33 @@ const KnowledgeExtract = () => {
                 <h3 className="font-semibold text-sm text-foreground">来源</h3>
                 <span className="px-1.5 py-0.5 rounded bg-accent text-xs text-muted-foreground">{sources.length}</span>
               </div>
-              <button onClick={() => setShowAddSource(true)} className="p-1.5 rounded-lg hover:bg-accent text-muted-foreground hover:text-primary transition-colors">
-                <Plus className="w-4 h-4" />
-              </button>
+              <button onClick={() => setShowAddSource(true)} className="p-1.5 rounded-lg hover:bg-accent text-muted-foreground hover:text-primary transition-colors"><Plus className="w-4 h-4" /></button>
             </div>
             <div className="flex items-center gap-2 px-3 py-2 rounded-lg border border-border bg-card text-sm shadow-sm">
               <Search className="w-3.5 h-3.5 text-muted-foreground" />
               <input placeholder="搜索来源..." className="flex-1 bg-transparent text-foreground placeholder:text-muted-foreground outline-none text-sm" />
             </div>
           </div>
-
           <div className="flex-1 overflow-y-auto px-3 pb-3 space-y-1.5">
             {sources.map((source) => {
               const Icon = FILE_TYPE_ICON[source.type] || File;
               return (
-                <motion.div
-                  key={source.id}
-                  layout
-                  className={`flex items-center gap-2.5 px-3 py-3 rounded-xl border group transition-all cursor-pointer ${
-                    source.selected ? "bg-card border-primary/20 shadow-sm" : "bg-card/50 border-border hover:border-border"
-                  }`}
-                  onClick={() => toggleSource(source.id)}
-                >
-                  <div className={`w-4 h-4 rounded border-2 flex items-center justify-center shrink-0 transition-colors ${
-                    source.selected ? "bg-primary border-primary" : "border-muted-foreground/30"
-                  }`}>
+                <motion.div key={source.id} layout
+                  className={`flex items-center gap-2.5 px-3 py-3 rounded-xl border group transition-all cursor-pointer ${source.selected ? "bg-card border-primary/20 shadow-sm" : "bg-card/50 border-border hover:border-border"}`}
+                  onClick={() => toggleSource(source.id)}>
+                  <div className={`w-4 h-4 rounded border-2 flex items-center justify-center shrink-0 transition-colors ${source.selected ? "bg-primary border-primary" : "border-muted-foreground/30"}`}>
                     {source.selected && <CheckCircle2 className="w-3 h-3 text-primary-foreground" />}
                   </div>
                   <Icon className={`w-4 h-4 shrink-0 ${source.selected ? "text-primary" : "text-muted-foreground"}`} />
                   <div className="flex-1 min-w-0">
                     <span className="text-sm text-foreground truncate block">{source.name}</span>
-                    {source.status === "analyzing" && (
-                      <span className="text-xs text-primary flex items-center gap-1 mt-0.5"><Loader2 className="w-3 h-3 animate-spin" /> 解析中...</span>
-                    )}
+                    {source.status === "analyzing" && <span className="text-xs text-primary flex items-center gap-1 mt-0.5"><Loader2 className="w-3 h-3 animate-spin" /> 解析中...</span>}
                   </div>
-                  <button onClick={(e) => { e.stopPropagation(); removeSource(source.id); }} className="p-0.5 rounded opacity-0 group-hover:opacity-100 hover:bg-accent text-muted-foreground transition-all">
-                    <X className="w-3 h-3" />
-                  </button>
+                  <button onClick={(e) => { e.stopPropagation(); removeSource(source.id); }} className="p-0.5 rounded opacity-0 group-hover:opacity-100 hover:bg-accent text-muted-foreground transition-all"><X className="w-3 h-3" /></button>
                 </motion.div>
               );
             })}
           </div>
-
           <div className="px-4 py-3 border-t border-border">
             <div className="flex items-center justify-between text-xs text-muted-foreground">
               <span>已选中 {selectedCount} / {sources.length}</span>
@@ -1309,49 +952,26 @@ const KnowledgeExtract = () => {
         <div className="flex-1 min-w-0 flex flex-col bg-background">
           <div className="px-6 py-3 border-b border-border flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center">
-                <Sparkles className="w-4 h-4 text-primary" />
-              </div>
+              <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center"><Sparkles className="w-4 h-4 text-primary" /></div>
               <div>
                 <span className="font-semibold text-sm text-foreground">AI 知识萃取助手</span>
-                <p className="text-xs text-muted-foreground">
-                  {extractMode === "deep" ? "深度萃取 · 苏格拉底式追问" : "快速提炼 · 自动分析"} · {selectedCount} 个来源
-                </p>
+                <p className="text-xs text-muted-foreground">{extractMode === "deep" ? "深度萃取 · 苏格拉底式追问" : "快速提炼 · 自动分析"} · {selectedCount} 个来源</p>
               </div>
             </div>
-            <button
-              onClick={() => { setAppMode("select"); setChatMessages([]); }}
-              className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
-            >
+            <button onClick={() => { setAppMode("select"); setChatMessages([]); }} className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
               <RotateCcw className="w-3 h-3" /> 切换模式
             </button>
           </div>
-
           <div className="flex-1 overflow-y-auto px-6 py-5 space-y-4">
             {chatMessages.map((msg) => (
-              <motion.div
-                key={msg.id}
-                initial={{ opacity: 0, y: 6 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.25 }}
-                className={`flex ${msg.role === "user" ? "justify-end" : msg.role === "system" ? "justify-center" : "justify-start"}`}
-              >
+              <motion.div key={msg.id} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25 }}
+                className={`flex ${msg.role === "user" ? "justify-end" : msg.role === "system" ? "justify-center" : "justify-start"}`}>
                 {msg.role === "system" ? (
-                  <div className="px-3 py-1.5 rounded-full bg-accent text-xs text-muted-foreground flex items-center gap-1.5">
-                    <CheckCircle2 className="w-3 h-3 text-primary" />{msg.content}
-                  </div>
+                  <div className="px-3 py-1.5 rounded-full bg-accent text-xs text-muted-foreground flex items-center gap-1.5"><CheckCircle2 className="w-3 h-3 text-primary" />{msg.content}</div>
                 ) : (
                   <div className="flex gap-2.5 max-w-[85%]">
-                    {msg.role === "assistant" && (
-                      <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
-                        <Sparkles className="w-3.5 h-3.5 text-primary" />
-                      </div>
-                    )}
-                    <div className={`rounded-2xl px-4 py-3 text-sm leading-relaxed whitespace-pre-wrap ${
-                      msg.role === "user"
-                        ? "bg-primary text-primary-foreground rounded-br-md"
-                        : "bg-accent/80 text-foreground border border-border/50 rounded-bl-md shadow-sm"
-                    }`}>{msg.content}</div>
+                    {msg.role === "assistant" && <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 mt-0.5"><Sparkles className="w-3.5 h-3.5 text-primary" /></div>}
+                    <div className={`rounded-2xl px-4 py-3 text-sm leading-relaxed whitespace-pre-wrap ${msg.role === "user" ? "bg-primary text-primary-foreground rounded-br-md" : "bg-accent/80 text-foreground border border-border/50 rounded-bl-md shadow-sm"}`}>{msg.content}</div>
                   </div>
                 )}
               </motion.div>
@@ -1370,7 +990,6 @@ const KnowledgeExtract = () => {
             )}
             <div ref={chatEndRef} />
           </div>
-
           <div className="px-6 pb-3">
             <div className="flex flex-wrap gap-2">
               {suggestions.map((s) => (
@@ -1381,20 +1000,13 @@ const KnowledgeExtract = () => {
               ))}
             </div>
           </div>
-
           <div className="px-6 pb-5">
             <div className="flex items-center gap-3 px-4 py-3 rounded-2xl border border-border bg-card shadow-sm focus-within:border-primary/40 focus-within:shadow-md transition-all">
-              <input
-                value={chatInput} onChange={(e) => setChatInput(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && handleSend()}
+              <input value={chatInput} onChange={(e) => setChatInput(e.target.value)} onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && handleSend()}
                 placeholder={extractMode === "deep" ? "分享你的经验，AI 会通过追问帮你挖掘隐性知识..." : "补充信息或直接选择工具生成文档..."}
-                disabled={isAiTyping}
-                className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none disabled:opacity-50"
-              />
+                disabled={isAiTyping} className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none disabled:opacity-50" />
               <button onClick={handleSend} disabled={!chatInput.trim() || isAiTyping}
-                className="p-2 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 transition-colors disabled:opacity-30 shadow-sm">
-                <Send className="w-4 h-4" />
-              </button>
+                className="p-2 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 transition-colors disabled:opacity-30 shadow-sm"><Send className="w-4 h-4" /></button>
             </div>
           </div>
         </div>
@@ -1408,22 +1020,11 @@ const KnowledgeExtract = () => {
             </div>
             <p className="text-xs text-muted-foreground mt-1">选择要包含在文档中的内容类型</p>
           </div>
-
           <div className="flex-1 overflow-y-auto p-3 space-y-2">
             {tools.map((tool) => (
-              <motion.button
-                key={tool.id}
-                whileTap={{ scale: 0.98 }}
-                onClick={() => toggleTool(tool.id)}
-                className={`w-full flex items-center gap-3 p-3 rounded-xl border transition-all text-left ${
-                  tool.checked
-                    ? `${tool.color} shadow-sm`
-                    : "bg-card border-border hover:border-primary/30"
-                }`}
-              >
-                <div className={`w-5 h-5 rounded border-2 flex items-center justify-center shrink-0 transition-colors ${
-                  tool.checked ? "bg-primary border-primary" : "border-muted-foreground/30"
-                }`}>
+              <motion.button key={tool.id} whileTap={{ scale: 0.98 }} onClick={() => toggleTool(tool.id)}
+                className={`w-full flex items-center gap-3 p-3 rounded-xl border transition-all text-left ${tool.checked ? `${tool.color} shadow-sm` : "bg-card border-border hover:border-primary/30"}`}>
+                <div className={`w-5 h-5 rounded border-2 flex items-center justify-center shrink-0 transition-colors ${tool.checked ? "bg-primary border-primary" : "border-muted-foreground/30"}`}>
                   {tool.checked && <Check className="w-3 h-3 text-primary-foreground" />}
                 </div>
                 <tool.icon className="w-4 h-4 shrink-0" />
@@ -1433,12 +1034,8 @@ const KnowledgeExtract = () => {
                 </div>
               </motion.button>
             ))}
-
             <div className="mt-3 p-3 rounded-xl border border-border bg-card">
-              <div className="flex items-center gap-2 mb-2">
-                <Tag className="w-3.5 h-3.5 text-primary" />
-                <span className="text-xs font-medium text-foreground">推荐标签</span>
-              </div>
+              <div className="flex items-center gap-2 mb-2"><Tag className="w-3.5 h-3.5 text-primary" /><span className="text-xs font-medium text-foreground">推荐标签</span></div>
               <div className="flex flex-wrap gap-1.5">
                 {["研发效能", "DevOps", "自动化测试", "流程优化", "CI/CD"].map(tag => (
                   <span key={tag} className="px-2 py-0.5 rounded-md bg-primary/10 text-primary text-xs">{tag}</span>
@@ -1446,13 +1043,9 @@ const KnowledgeExtract = () => {
               </div>
             </div>
           </div>
-
           <div className="p-3 border-t border-border space-y-2">
-            <button
-              onClick={startGeneration}
-              disabled={checkedTools.length === 0}
-              className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors shadow-sm disabled:opacity-50"
-            >
+            <button onClick={startGeneration} disabled={checkedTools.length === 0}
+              className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors shadow-sm disabled:opacity-50">
               <Wand2 className="w-4 h-4" /> 开始生成（{checkedTools.length} 项）
             </button>
             <button className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-xl border border-border text-sm text-muted-foreground hover:text-foreground hover:border-primary/30 transition-colors">
@@ -1465,14 +1058,9 @@ const KnowledgeExtract = () => {
         <AnimatePresence>
           {showAddSource && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              className="absolute inset-0 z-50 flex items-center justify-center bg-foreground/40"
-              onClick={() => setShowAddSource(false)}>
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95, y: 12 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95, y: 12 }}
-                className="w-full max-w-[600px] bg-card rounded-2xl shadow-2xl border border-border overflow-hidden"
-                onClick={(e) => e.stopPropagation()}>
+              className="absolute inset-0 z-50 flex items-center justify-center bg-foreground/40" onClick={() => setShowAddSource(false)}>
+              <motion.div initial={{ opacity: 0, scale: 0.95, y: 12 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 12 }}
+                className="w-full max-w-[600px] bg-card rounded-2xl shadow-2xl border border-border overflow-hidden" onClick={(e) => e.stopPropagation()}>
                 <div className="relative px-8 pt-8 pb-4 text-center">
                   <button onClick={() => setShowAddSource(false)} className="absolute right-4 top-4 p-1.5 rounded-lg hover:bg-accent text-muted-foreground transition-colors"><X className="w-5 h-5" /></button>
                   <h2 className="text-xl font-semibold text-foreground">添加知识来源</h2>
@@ -1494,25 +1082,18 @@ const KnowledgeExtract = () => {
                     <p className="text-sm text-muted-foreground/70 mt-1">支持文档、图片、音频、视频等格式</p>
                   </div>
                 </div>
-                <div className="px-8 pb-8 grid grid-cols-4 gap-3">
+                <div className="px-8 pb-8 grid grid-cols-3 gap-2">
                   {[
-                    { icon: Upload, label: "上传文件", type: "file" as const, name: `文档_${sources.length + 1}.pdf` },
-                    { icon: Link2, label: "网页链接", type: "url" as const, name: "https://wiki.company.com" },
-                    { icon: HardDrive, label: "云盘", type: "file" as const, name: "云盘文档.pdf" },
-                    { icon: ClipboardPaste, label: "粘贴文本", type: "text" as const, name: "粘贴的笔记" },
-                  ].map(opt => (
-                    <button key={opt.label} onClick={() => addSource(opt.type, opt.name)} className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-border bg-background text-sm text-muted-foreground hover:text-foreground hover:border-primary/40 hover:bg-primary/5 transition-all">
-                      <opt.icon className="w-4 h-4" />{opt.label}
+                    { icon: FileText, label: "研发规范文档.pdf", type: "file" as const },
+                    { icon: Image, label: "架构设计图.png", type: "image" as const },
+                    { icon: FileAudio, label: "需求评审录音.mp3", type: "audio" as const },
+                  ].map((item) => (
+                    <button key={item.label} onClick={() => addSource(item.type, item.label)}
+                      className="flex items-center gap-2.5 p-3 rounded-xl border border-border bg-background hover:border-primary/30 hover:bg-primary/5 transition-all text-left">
+                      <item.icon className="w-4 h-4 text-primary shrink-0" />
+                      <span className="text-xs text-foreground truncate">{item.label}</span>
                     </button>
                   ))}
-                </div>
-                <div className="px-8 pb-6">
-                  <div className="flex items-center justify-between text-xs text-muted-foreground mb-2">
-                    <div className="h-1.5 flex-1 rounded-full bg-accent overflow-hidden mr-3">
-                      <div className="h-full rounded-full bg-primary transition-all" style={{ width: `${(sources.length / 300) * 100}%` }} />
-                    </div>
-                    <span>{sources.length} / 300</span>
-                  </div>
                 </div>
               </motion.div>
             </motion.div>
