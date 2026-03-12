@@ -947,7 +947,33 @@ const KnowledgeExtract = () => {
     );
   }
 
-  // ───── Result Preview ─────
+  // ───── Deep Step Indicator ─────
+  const DeepStepIndicator = ({ current }: { current: number }) => {
+    const steps = [
+      { n: 1, label: "知识发现" },
+      { n: 2, label: "结构化处理" },
+      { n: 3, label: "生成预览" },
+    ];
+    return (
+      <div className="flex items-center gap-2">
+        {steps.map((step, i) => (
+          <div key={step.n} className="flex items-center gap-2">
+            {i > 0 && <div className={`w-8 h-px ${step.n <= current ? "bg-primary" : "bg-border"}`} />}
+            <div className="flex items-center gap-1.5">
+              <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium transition-colors ${
+                step.n < current ? "bg-primary/20 text-primary" :
+                step.n === current ? "bg-primary text-primary-foreground" : "bg-accent text-muted-foreground"
+              }`}>
+                {step.n < current ? "✓" : step.n}
+              </span>
+              <span className={`text-xs font-medium ${step.n <= current ? "text-foreground" : "text-muted-foreground"}`}>{step.label}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
   if (appMode === "result") {
     return (
       <AppLayout>
