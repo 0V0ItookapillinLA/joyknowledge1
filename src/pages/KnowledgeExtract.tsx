@@ -20,6 +20,7 @@ interface Source {
   status: "ready" | "processing" | "analyzing";
   selected: boolean;
   size?: string;
+  favicon?: string;
 }
 
 interface ChatMessage {
@@ -47,8 +48,18 @@ interface OutputTemplate {
   gradient: string;
 }
 
-type AppMode = "select" | "workspace" | "generating" | "result" | "quick-upload" | "quick-template";
+interface SearchResult {
+  id: string;
+  title: string;
+  url: string;
+  desc: string;
+  source: string;
+}
+
+type AppMode = "select" | "workspace" | "generating" | "result" | "quick-upload" | "quick-template" | "deep-structuring";
 type ExtractMode = "quick" | "deep";
+type SearchScope = "web" | "enterprise";
+type SearchDepth = "fast" | "deep";
 
 /* ───── Mock Content ───── */
 const GENERATED_DOC = `# Q3季度研发效能提升专项总结
