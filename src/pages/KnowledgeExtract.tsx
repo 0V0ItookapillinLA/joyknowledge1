@@ -332,14 +332,8 @@ const KnowledgeExtract = () => {
 
   /* ───── Deep structuring ───── */
   const enterStructuringMode = () => {
-    const doc = GENERATED_DOC;
-    const paragraphs = doc.split("\n\n").filter(p => p.trim());
-    const mockedParagraphTools = Object.fromEntries(
-      paragraphs.map((_, idx) => [idx, ["report"]])
-    ) as Record<number, string[]>;
-
-    setInitialDoc(doc);
-    setParagraphTools(mockedParagraphTools);
+    setInitialDoc(GENERATED_DOC);
+    setParagraphTools({});
     setDropHighlight(null);
     setAppMode("deep-structuring");
   };
@@ -953,7 +947,33 @@ const KnowledgeExtract = () => {
     );
   }
 
-  // ───── Result Preview ─────
+  // ───── Deep Step Indicator ─────
+  const DeepStepIndicator = ({ current }: { current: number }) => {
+    const steps = [
+      { n: 1, label: "知识发现" },
+      { n: 2, label: "结构化处理" },
+      { n: 3, label: "生成预览" },
+    ];
+    return (
+      <div className="flex items-center gap-2">
+        {steps.map((step, i) => (
+          <div key={step.n} className="flex items-center gap-2">
+            {i > 0 && <div className={`w-8 h-px ${step.n <= current ? "bg-primary" : "bg-border"}`} />}
+            <div className="flex items-center gap-1.5">
+              <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium transition-colors ${
+                step.n < current ? "bg-primary/20 text-primary" :
+                step.n === current ? "bg-primary text-primary-foreground" : "bg-accent text-muted-foreground"
+              }`}>
+                {step.n < current ? "✓" : step.n}
+              </span>
+              <span className={`text-xs font-medium ${step.n <= current ? "text-foreground" : "text-muted-foreground"}`}>{step.label}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
   if (appMode === "result") {
     return (
       <AppLayout>
@@ -966,6 +986,7 @@ const KnowledgeExtract = () => {
                 <ChevronLeft className="w-4 h-4" /> 返回
               </button>
               {extractMode === "quick" && <><div className="h-5 w-px bg-border" /><StepIndicator current={3} /></>}
+              {extractMode === "deep" && <><div className="h-5 w-px bg-border" /><DeepStepIndicator current={3} /></>}
             </div>
             <div className="flex items-center gap-2">
               <button onClick={() => setIsEditing(!isEditing)}
@@ -1158,40 +1179,39 @@ const KnowledgeExtract = () => {
     );
   }
 
+
   // ───── Deep Structuring Mode ─────
   if (appMode === "deep-structuring") {
     const paragraphs = initialDoc.split("\n\n").filter(p => p.trim());
     return (
       <AppLayout>
-        <div className="flex h-[calc(100vh-56px)]">
-          {/* Left: Pure text document */}
-          <div className="flex-1 overflow-y-auto">
-            <div className="max-w-3xl mx-auto py-8 px-6">
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-3">
-                  <button onClick={() => setAppMode("workspace")} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
-                    <ChevronLeft className="w-4 h-4" /> 返回对话
-                  </button>
-                  <h2 className="text-lg font-bold text-foreground">纯文本初稿</h2>
-                </div>
-                <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={startGeneration}
-                  className="flex items-center gap-2 px-5 py-2 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 shadow-md">
-                  <Wand2 className="w-4 h-4" /> 最终生成
-                </motion.button>
-              </div>
-              <p className="text-sm text-muted-foreground mb-6">拖拽右侧工具到某一段文本上，会替换该段后方标签（已默认 mock 为“结构化文本”）</p>
+        <div className="flex flex-col h-[calc(100vh-56px)]">
+          {/* Header with step indicator */}
+          <div className="px-6 pt-4 pb-3 border-b border-border flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <button onClick={() => setAppMode("workspace")} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
+                <ChevronLeft className="w-4 h-4" /> 返回
+              </button>
+              <DeepStepIndicator current={2} />
+            </div>
+            <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={startGeneration}
+              className="flex items-center gap-2 px-5 py-2 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 shadow-md">
+              <Wand2 className="w-4 h-4" /> 最终生成
+            </motion.button>
+          </div>
 
-              {paragraphs.map((para, idx) => {
-                const assignedToolId = paragraphTools[idx]?.[0] || "report";
-                const assignedTool = tools.find(t => t.id === assignedToolId) || tools[0];
-                const isHighlighted = dropHighlight === idx;
-                return (
-                  <div key={idx} className="mb-4">
+          <div className="flex flex-1 overflow-hidden">
+            {/* Left: Word-style document */}
+            <div className="flex-1 overflow-y-auto">
+              <div className="max-w-3xl mx-auto py-8 px-10">
+                {paragraphs.map((para, idx) => {
+                  const assignedToolIds = paragraphTools[idx] || [];
+                  const assignedTool = assignedToolIds.length > 0 ? tools.find(t => t.id === assignedToolIds[0]) : null;
+                  const isHighlighted = dropHighlight === idx;
+                  return (
                     <div
-                      onDragOver={(e) => {
-                        e.preventDefault();
-                        setDropHighlight(idx);
-                      }}
+                      key={idx}
+                      onDragOver={(e) => { e.preventDefault(); setDropHighlight(idx); }}
                       onDragLeave={() => setDropHighlight(null)}
                       onDrop={(e) => {
                         e.preventDefault();
@@ -1199,60 +1219,63 @@ const KnowledgeExtract = () => {
                         const toolId = e.dataTransfer.getData("toolId");
                         if (toolId) addToolToParagraph(idx, toolId);
                       }}
-                      className={`px-4 py-3 rounded-xl border transition-all ${
-                        isHighlighted
-                          ? "border-primary bg-primary/5"
-                          : "border-border bg-card"
-                      }`}
+                      className={`py-2 transition-all ${isHighlighted ? "bg-primary/5 border-b-2 border-dashed border-primary" : "border-b border-transparent"}`}
                     >
                       <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">{para}</p>
+                      {assignedTool && (
+                        <motion.span
+                          initial={{ opacity: 0, scale: 0.8 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium mt-1.5 border ${assignedTool.color}`}
+                        >
+                          <assignedTool.icon className="w-3 h-3" />
+                          {assignedTool.label}
+                          <button
+                            onClick={() => setParagraphTools(prev => { const next = { ...prev }; delete next[idx]; return next; })}
+                            className="ml-0.5 p-0.5 rounded-full hover:bg-foreground/10 transition-colors"
+                          >
+                            <X className="w-2.5 h-2.5" />
+                          </button>
+                        </motion.span>
+                      )}
                     </div>
-
-                    <motion.div
-                      initial={{ opacity: 0, y: -4 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium border shadow-sm mt-2 ml-1"
-                    >
-                      <assignedTool.icon className="w-3.5 h-3.5" />
-                      <span>{assignedTool.label}</span>
-                    </motion.div>
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
             </div>
+
+            {/* Right: Draggable tools */}
+            <aside className="w-[260px] shrink-0 border-l border-border flex flex-col bg-muted/30">
+              <div className="px-4 pt-4 pb-3 border-b border-border">
+                <h3 className="font-semibold text-sm text-foreground">结构化工具</h3>
+                <p className="text-xs text-muted-foreground mt-1">拖拽到左侧段落，添加结构化标签</p>
+              </div>
+              <div className="flex-1 overflow-y-auto p-3 space-y-2">
+                {tools.map((tool) => (
+                  <div
+                    key={tool.id}
+                    draggable
+                    onDragStart={(e) => {
+                      e.dataTransfer.setData("toolId", tool.id);
+                      e.dataTransfer.effectAllowed = "copy";
+                      setDraggedTool(tool.id);
+                    }}
+                    onDragEnd={() => { setDraggedTool(null); setDropHighlight(null); }}
+                    className={`flex items-center gap-3 p-3 rounded-xl border cursor-grab active:cursor-grabbing transition-all ${
+                      draggedTool === tool.id ? "opacity-40 border-primary scale-95" : `${tool.color} hover:shadow-md hover:scale-[1.02]`
+                    }`}
+                  >
+                    <GripVertical className="w-3.5 h-3.5 text-muted-foreground/40 shrink-0" />
+                    <tool.icon className="w-4 h-4 shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <span className="text-sm font-medium block">{tool.label}</span>
+                      <span className="text-[10px] text-muted-foreground">{tool.desc}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </aside>
           </div>
-
-          {/* Right: Draggable tools */}
-          <aside className="w-[260px] shrink-0 border-l border-border flex flex-col bg-muted/30">
-            <div className="px-4 pt-4 pb-3 border-b border-border">
-              <h3 className="font-semibold text-sm text-foreground">结构化工具</h3>
-              <p className="text-xs text-muted-foreground mt-1">拖拽到左侧段落上，即可替换该段标签</p>
-            </div>
-            <div className="flex-1 overflow-y-auto p-3 space-y-2">
-              {tools.map((tool) => (
-                <div
-                  key={tool.id}
-                  draggable
-                  onDragStart={(e) => {
-                    e.dataTransfer.setData("toolId", tool.id);
-                    e.dataTransfer.effectAllowed = "copy";
-                    setDraggedTool(tool.id);
-                  }}
-                  onDragEnd={() => { setDraggedTool(null); setDropHighlight(null); }}
-                  className={`flex items-center gap-3 p-3 rounded-xl border cursor-grab active:cursor-grabbing transition-all ${
-                    draggedTool === tool.id ? "opacity-40 border-primary scale-95" : `${tool.color} hover:shadow-md hover:scale-[1.02]`
-                  }`}
-                >
-                  <GripVertical className="w-3.5 h-3.5 text-muted-foreground/40 shrink-0" />
-                  <tool.icon className="w-4 h-4 shrink-0" />
-                  <div className="flex-1 min-w-0">
-                    <span className="text-sm font-medium block">{tool.label}</span>
-                    <span className="text-[10px] text-muted-foreground">{tool.desc}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </aside>
         </div>
       </AppLayout>
     );
@@ -1459,15 +1482,18 @@ const KnowledgeExtract = () => {
         <div className="flex-1 min-w-0 flex flex-col bg-background">
           <div className="px-6 py-3 border-b border-border flex items-center justify-between">
             <div className="flex items-center gap-3">
+              <button onClick={() => { setAppMode("select"); setChatMessages([]); }} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
+                <ChevronLeft className="w-4 h-4" /> 返回
+              </button>
+              <DeepStepIndicator current={1} />
+            </div>
+            <div className="flex items-center gap-3">
               <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center"><Sparkles className="w-4 h-4 text-primary" /></div>
               <div>
                 <span className="font-semibold text-sm text-foreground">AI 知识萃取助手</span>
-                <p className="text-xs text-muted-foreground">深度萃取 · 苏格拉底式追问 · {selectedCount} 个来源</p>
+                <p className="text-xs text-muted-foreground">苏格拉底式追问 · {selectedCount} 个来源</p>
               </div>
             </div>
-            <button onClick={() => { setAppMode("select"); setChatMessages([]); }} className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
-              <RotateCcw className="w-3 h-3" /> 切换模式
-            </button>
           </div>
           <div className="flex-1 overflow-y-auto px-6 py-5 space-y-4">
             {chatMessages.map((msg) => (
