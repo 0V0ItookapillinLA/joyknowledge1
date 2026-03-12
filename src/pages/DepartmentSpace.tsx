@@ -210,7 +210,7 @@ const DepartmentSpace = () => {
 
             {/* Business scenarios table */}
             <div className="mb-8">
-              <h3 className="text-lg font-semibold text-foreground mb-4">• 按业务场景找人</h3>
+              <h3 className="text-sm font-semibold text-foreground mb-4">• 按业务场景找人</h3>
               <div className="border border-border rounded-lg overflow-hidden">
                 <table className="w-full text-sm">
                   <thead>
