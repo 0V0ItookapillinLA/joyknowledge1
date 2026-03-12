@@ -273,7 +273,7 @@ const KnowledgeExtract = () => {
   ]);
 
   const MOCK_SEARCH_RESULTS: SearchResult[] = [
-    { id: "sr1", title: "2024中国"大模型+知识管理"最佳实践案例TOP15重磅发布", url: "https://53ai.com/news/top15", desc: "这份报告为你揭示了大模型在知识管理领域的最佳实践案例。", source: "53AI" },
+    { id: "sr1", title: "2024中国大模型+知识管理最佳实践案例TOP15重磅发布", url: "https://53ai.com/news/top15", desc: "这份报告为你揭示了大模型在知识管理领域的最佳实践案例。", source: "53AI" },
     { id: "sr2", title: "《技术趋势2026》报告 | 德勤中国", url: "https://deloitte.com/cn/tech-trends", desc: "德勤发布的2026年技术趋势深度报告。", source: "Deloitte" },
     { id: "sr3", title: "人工智能知识管理：指南、策略与优势", url: "https://lark.com/ai-knowledge", desc: "全面解读AI驱动的知识管理指南与策略。", source: "Lark" },
     { id: "sr4", title: "大模型知识管理系统", url: "https://zte.com/km-system", desc: "中兴通讯大模型知识管理系统技术架构。", source: "ZTE" },
