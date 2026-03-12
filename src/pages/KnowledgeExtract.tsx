@@ -1490,19 +1490,11 @@ const KnowledgeExtract = () => {
 
         {/* ═══ Center: Chat (no right panel) ═══ */}
         <div className="flex-1 min-w-0 flex flex-col bg-background">
-          <div className="px-6 py-3 border-b border-border flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <button onClick={() => { setAppMode("select"); setChatMessages([]); }} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
-                <ChevronLeft className="w-4 h-4" /> 返回
-              </button>
-              <DeepStepIndicator current={1} />
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center"><Sparkles className="w-4 h-4 text-primary" /></div>
-              <div>
-                <span className="font-semibold text-sm text-foreground">AI 知识萃取助手</span>
-                <p className="text-xs text-muted-foreground">苏格拉底式追问 · {selectedCount} 个来源</p>
-              </div>
+          <div className="px-6 py-3 border-b border-border flex items-center gap-3">
+            <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center"><Sparkles className="w-4 h-4 text-primary" /></div>
+            <div>
+              <span className="font-semibold text-sm text-foreground">AI 知识萃取助手</span>
+              <p className="text-xs text-muted-foreground">苏格拉底式追问 · {selectedCount} 个来源</p>
             </div>
           </div>
           <div className="flex-1 overflow-y-auto px-6 py-5 space-y-4">
