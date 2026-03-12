@@ -149,7 +149,23 @@ const ExpertLibrary = () => {
 
           {/* Center: Profile + Cases */}
           <div className="flex-1 min-w-0 p-6">
-            {/* Profile hero */}
+            <PageHeader
+              title={selectedExpert.name}
+              breadcrumbs={[{ label: "专家书房", path: "/experts" }, { label: selectedExpert.name }]}
+              actions={
+                <div className="flex items-center gap-2">
+                  <button className="inline-flex items-center gap-2 px-4 py-1.5 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors">
+                    <UserPlus className="w-4 h-4" /> 关注专家
+                  </button>
+                  <button
+                    onClick={() => navigate(`/messages?to=${encodeURIComponent(selectedExpert.name)}`)}
+                    className="inline-flex items-center gap-2 px-4 py-1.5 rounded-lg border border-border text-sm text-foreground hover:border-primary/40 hover:text-primary transition-colors"
+                  >
+                    <Mail className="w-4 h-4" /> 发私信
+                  </button>
+                </div>
+              }
+            />
             <motion.div
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
