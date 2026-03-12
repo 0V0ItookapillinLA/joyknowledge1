@@ -327,7 +327,72 @@ const KnowledgeExtract = () => {
   const removeSource = (id: string) => setSources(prev => prev.filter(s => s.id !== id));
   const toggleTool = (id: string) => setTools(prev => prev.map(t => t.id === id ? { ...t, checked: !t.checked } : t));
 
-  /* ───── Chat ───── */
+  /* ───── Web search ───── */
+  const handleWebSearch = () => {
+    if (!webSearchQuery.trim() || isSearching) return;
+    setIsSearching(true);
+    setSearchComplete(false);
+    setSearchResults([]);
+    setSearchProgress([]);
+    const progressMsgs = searchDepth === "deep"
+      ? ["正在分析搜索意图...", "正在搜索相关网页...", "正在深度解析内容...", "正在提取关键信息..."]
+      : ["正在搜索相关网页...", "正在提取关键信息..."];
+    let idx = 0;
+    const interval = setInterval(() => {
+      if (idx < progressMsgs.length) {
+        setSearchProgress(prev => [...prev, progressMsgs[idx]]);
+        idx++;
+      } else {
+        clearInterval(interval);
+        setSearchResults(MOCK_SEARCH_RESULTS);
+        setIsSearching(false);
+        setSearchComplete(true);
+      }
+    }, searchDepth === "deep" ? 800 : 600);
+  };
+
+  const importSearchResults = () => {
+    searchResults.forEach((result, i) => {
+      setTimeout(() => {
+        const newSource: Source = { id: `search-${Date.now()}-${i}`, name: result.title, type: "url", status: "analyzing", selected: true };
+        setSources(prev => [...prev, newSource]);
+        setTimeout(() => {
+          setSources(prev => prev.map(s => s.id === newSource.id ? { ...s, status: "ready" } : s));
+        }, 1500 + Math.random() * 1000);
+      }, i * 200);
+    });
+    setSearchResults([]);
+    setSearchComplete(false);
+    setWebSearchQuery("");
+  };
+
+  const clearSearchResults = () => {
+    setSearchResults([]);
+    setSearchComplete(false);
+    setSearchProgress([]);
+  };
+
+  /* ───── Deep structuring ───── */
+  const enterStructuringMode = () => {
+    setInitialDoc(GENERATED_DOC);
+    setAppMode("deep-structuring");
+  };
+
+  const addToolToParagraph = (paragraphIdx: number, toolId: string) => {
+    setParagraphTools(prev => {
+      const existing = prev[paragraphIdx] || [];
+      if (existing.includes(toolId)) return prev;
+      return { ...prev, [paragraphIdx]: [...existing, toolId] };
+    });
+  };
+
+  const removeToolFromParagraph = (paragraphIdx: number, toolId: string) => {
+    setParagraphTools(prev => {
+      const existing = prev[paragraphIdx] || [];
+      return { ...prev, [paragraphIdx]: existing.filter(t => t !== toolId) };
+    });
+  };
+
   const handleSend = () => {
     if (!chatInput.trim() || isAiTyping) return;
     setChatMessages(prev => [...prev, { id: Date.now().toString(), role: "user", content: chatInput }]);
