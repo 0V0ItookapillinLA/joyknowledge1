@@ -332,14 +332,8 @@ const KnowledgeExtract = () => {
 
   /* ───── Deep structuring ───── */
   const enterStructuringMode = () => {
-    const doc = GENERATED_DOC;
-    const paragraphs = doc.split("\n\n").filter(p => p.trim());
-    const mockedParagraphTools = Object.fromEntries(
-      paragraphs.map((_, idx) => [idx, ["report"]])
-    ) as Record<number, string[]>;
-
-    setInitialDoc(doc);
-    setParagraphTools(mockedParagraphTools);
+    setInitialDoc(GENERATED_DOC);
+    setParagraphTools({});
     setDropHighlight(null);
     setAppMode("deep-structuring");
   };
