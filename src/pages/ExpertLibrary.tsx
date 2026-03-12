@@ -305,6 +305,7 @@ const ExpertLibrary = () => {
           <PageHeader
             title="企业专家库"
             subtitle="共 42 位认证专家"
+            hideBack
             breadcrumbs={[{ label: "专家书房" }]}
             actions={
               <button className="inline-flex items-center gap-2 px-4 py-1.5 rounded-lg border border-border text-sm text-muted-foreground hover:text-foreground transition-colors">

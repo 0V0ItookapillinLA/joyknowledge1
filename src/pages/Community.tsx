@@ -94,7 +94,7 @@ const Community = () => {
         <div className="flex-1 min-w-0 p-6">
           <PageHeader
             title="问答社区"
-            breadcrumbs={[{ label: "社区" }]}
+            hideBack
             actions={
               <div className="flex items-center gap-1 bg-accent rounded-lg p-0.5">
                 {FILTERS.map((f) => (

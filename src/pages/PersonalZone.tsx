@@ -64,7 +64,7 @@ const PersonalZone = () => {
         <div className="flex-1 min-w-0 p-6">
           <PageHeader
             title="个人中心"
-            breadcrumbs={[{ label: "个人专区" }]}
+            hideBack
             actions={
               <div className="flex gap-2">
                 <button className="px-4 py-1.5 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors">
