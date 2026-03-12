@@ -464,161 +464,136 @@ const KnowledgeExtract = () => {
     return (
       <AppLayout>
         <div className="flex flex-col h-[calc(100vh-56px)] bg-background">
-          {/* Header */}
-          <div className="px-8 pt-6 pb-4 border-b border-border">
-            <div className="flex items-center gap-3 mb-5">
+          {/* Header - compact */}
+          <div className="px-6 pt-4 pb-3 border-b border-border">
+            <div className="flex items-center gap-3 mb-3">
               <button onClick={() => setAppMode("select")} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
                 <ChevronLeft className="w-4 h-4" /> 返回
               </button>
               <StepIndicator current={1} />
             </div>
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-              <h1 className="text-xl font-bold text-foreground mb-1">上传你的知识资料</h1>
-              <p className="text-sm text-muted-foreground">支持本地文件和在线资源，可同时添加多种类型的资料</p>
+              <h1 className="text-lg font-bold text-foreground">上传你的知识资料</h1>
             </motion.div>
           </div>
 
           {/* Main content - two column layout */}
           <div className="flex-1 overflow-hidden flex">
-            {/* Left: Upload options */}
+            {/* Left: Upload options - all visible without scroll */}
             <div className="flex-1 overflow-y-auto border-r border-border">
-              <div className="px-6 py-5 space-y-5">
+              <div className="px-5 py-4 space-y-3">
 
-                {/* ── Section: 本地文件 ── */}
-                <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}>
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="flex items-center gap-2">
-                      <div className="w-6 h-6 rounded-md bg-primary/10 flex items-center justify-center">
-                        <Monitor className="w-3.5 h-3.5 text-primary" />
-                      </div>
-                      <h2 className="text-xs font-semibold text-foreground">本地文件</h2>
-                    </div>
+                {/* ── 本地文件 ── */}
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <Monitor className="w-3.5 h-3.5 text-primary" />
+                    <h2 className="text-xs font-semibold text-foreground">本地文件</h2>
                     <div className="flex-1 h-px bg-border" />
                   </div>
-                  <div className="grid grid-cols-2 gap-2.5">
+                  <div className="grid grid-cols-3 gap-2">
                     {LOCAL_UPLOAD_TYPES.map((opt, i) => (
                       <motion.button
                         key={opt.label}
-                        initial={{ opacity: 0, y: 8 }}
+                        initial={{ opacity: 0, y: 6 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.08 + i * 0.03 }}
-                        whileHover={{ scale: 1.02, y: -1 }}
-                        whileTap={{ scale: 0.98 }}
+                        transition={{ delay: 0.05 + i * 0.02 }}
+                        whileHover={{ scale: 1.03, y: -1 }}
+                        whileTap={{ scale: 0.97 }}
                         onClick={() => handleTypeClick(opt)}
-                        className="group relative flex items-start gap-2.5 p-3 rounded-xl border border-border bg-card hover:border-primary/40 hover:shadow-md transition-all text-left"
+                        className="group relative p-2.5 rounded-lg border border-border bg-card hover:border-primary/40 hover:shadow-sm transition-all text-left"
                       >
-                        <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${opt.gradient} flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform shadow-sm`}>
-                          <opt.icon className="w-4 h-4 text-white" />
+                        <div className="flex items-center gap-2 mb-1">
+                          <div className={`w-6 h-6 rounded-md bg-gradient-to-br ${opt.gradient} flex items-center justify-center shrink-0 shadow-sm`}>
+                            <opt.icon className="w-3 h-3 text-white" />
+                          </div>
+                          <span className="text-[11px] font-medium text-foreground truncate">{opt.label}</span>
                         </div>
-                        <div className="min-w-0 flex-1">
-                          <span className="text-xs font-medium text-foreground block leading-tight">{opt.label}</span>
-                          <span className="text-[10px] text-muted-foreground leading-snug mt-0.5 block line-clamp-2">{opt.desc}</span>
-                        </div>
-                        <Plus className="w-3.5 h-3.5 text-muted-foreground/20 group-hover:text-primary transition-colors absolute top-2.5 right-2.5" />
+                        <p className="text-[9px] text-muted-foreground leading-tight line-clamp-2">{opt.desc}</p>
                       </motion.button>
                     ))}
                   </div>
-                </motion.div>
+                </div>
 
-                {/* Drop zone */}
+                {/* Drop zone - compact */}
                 <motion.div
-                  initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.15 }}
+                  initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.15 }}
                   onDragOver={(e) => { e.preventDefault(); setIsDragOver(true); }}
                   onDragLeave={() => setIsDragOver(false)}
                   onDrop={(e) => { e.preventDefault(); setIsDragOver(false); quickAddSource("file", `拖放文件_${sources.length + 1}.pdf`); }}
-                  className={`relative border-2 border-dashed rounded-xl p-5 text-center transition-all cursor-pointer group ${
-                    isDragOver ? "border-primary bg-primary/5 scale-[1.01]" : "border-border hover:border-primary/40 hover:bg-accent/30"
+                  className={`relative border border-dashed rounded-lg px-4 py-3 text-center transition-all cursor-pointer ${
+                    isDragOver ? "border-primary bg-primary/5" : "border-border hover:border-primary/30 hover:bg-accent/20"
                   }`}
                 >
                   <AnimatePresence>
                     {isDragOver && (
-                      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 rounded-xl bg-primary/10 flex items-center justify-center z-10">
-                        <div className="text-center">
-                          <Upload className="w-10 h-10 text-primary mx-auto mb-1.5 animate-bounce" />
-                          <p className="text-sm font-semibold text-primary">松手即可上传</p>
-                        </div>
+                      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 rounded-lg bg-primary/10 flex items-center justify-center z-10">
+                        <Upload className="w-8 h-8 text-primary animate-bounce" />
                       </motion.div>
                     )}
                   </AnimatePresence>
-                  <Upload className="w-6 h-6 text-muted-foreground/40 mx-auto mb-1.5 group-hover:text-primary/60 transition-colors" />
-                  <p className="text-xs text-muted-foreground">拖动文件至此处上传</p>
-                  <p className="text-[10px] text-muted-foreground/60 mt-0.5">支持 pdf、docx、ppt、xlsx、csv、jpg、png、mp3、mp4 等</p>
+                  <div className="flex items-center justify-center gap-2">
+                    <Upload className="w-4 h-4 text-muted-foreground/50" />
+                    <span className="text-[11px] text-muted-foreground">拖动文件至此处，或点击上方类型按钮上传</span>
+                  </div>
                 </motion.div>
 
-                {/* ── Section: 在线资源 ── */}
-                <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="flex items-center gap-2">
-                      <div className="w-6 h-6 rounded-md bg-cyan-500/10 flex items-center justify-center">
-                        <Cloud className="w-3.5 h-3.5 text-cyan-600" />
-                      </div>
-                      <h2 className="text-xs font-semibold text-foreground">在线资源</h2>
-                    </div>
+                {/* ── 在线资源 ── */}
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <Cloud className="w-3.5 h-3.5 text-cyan-600" />
+                    <h2 className="text-xs font-semibold text-foreground">在线资源</h2>
                     <div className="flex-1 h-px bg-border" />
                   </div>
-                  <div className="grid grid-cols-1 gap-2.5">
+                  <div className="grid grid-cols-3 gap-2">
                     {ONLINE_UPLOAD_TYPES.map((opt, i) => (
                       <motion.button
                         key={opt.label}
-                        initial={{ opacity: 0, y: 8 }}
+                        initial={{ opacity: 0, y: 6 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.25 + i * 0.03 }}
-                        whileHover={{ scale: 1.01, y: -1 }}
-                        whileTap={{ scale: 0.98 }}
+                        transition={{ delay: 0.2 + i * 0.02 }}
+                        whileHover={{ scale: 1.03, y: -1 }}
+                        whileTap={{ scale: 0.97 }}
                         onClick={() => handleTypeClick(opt)}
-                        className="group relative flex items-start gap-2.5 p-3 rounded-xl border border-border bg-card hover:border-primary/40 hover:shadow-md transition-all text-left"
+                        className="group relative p-2.5 rounded-lg border border-border bg-card hover:border-primary/40 hover:shadow-sm transition-all text-left"
                       >
-                        <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${opt.gradient} flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform shadow-sm`}>
-                          <opt.icon className="w-4 h-4 text-white" />
+                        <div className="flex items-center gap-2 mb-1">
+                          <div className={`w-6 h-6 rounded-md bg-gradient-to-br ${opt.gradient} flex items-center justify-center shrink-0 shadow-sm`}>
+                            <opt.icon className="w-3 h-3 text-white" />
+                          </div>
+                          <span className="text-[11px] font-medium text-foreground truncate">{opt.label}</span>
                         </div>
-                        <div className="min-w-0 flex-1">
-                          <span className="text-xs font-medium text-foreground block leading-tight">{opt.label}</span>
-                          <span className="text-[10px] text-muted-foreground leading-snug mt-0.5 block line-clamp-2">{opt.desc}</span>
-                        </div>
-                        <Plus className="w-3.5 h-3.5 text-muted-foreground/20 group-hover:text-primary transition-colors absolute top-2.5 right-2.5" />
+                        <p className="text-[9px] text-muted-foreground leading-tight line-clamp-2">{opt.desc}</p>
                       </motion.button>
                     ))}
                   </div>
-                </motion.div>
+                </div>
 
-                {/* URL / Text input area */}
+                {/* URL input area */}
                 <AnimatePresence>
-                  {activeUploadType && (
+                  {activeUploadType === "url" && (
                     <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="overflow-hidden">
-                      <div className="p-4 rounded-xl border border-primary/20 bg-primary/5 space-y-3">
+                      <div className="p-3 rounded-lg border border-primary/20 bg-primary/5 space-y-2">
                         <div className="flex items-center justify-between">
-                          <span className="text-xs font-medium text-foreground flex items-center gap-2">
-                            {activeUploadType === "url" ? <><Globe className="w-3.5 h-3.5 text-primary" /> 输入链接</> : <><StickyNote className="w-3.5 h-3.5 text-primary" /> 粘贴文本</>}
+                          <span className="text-[11px] font-medium text-foreground flex items-center gap-1.5">
+                            <Globe className="w-3 h-3 text-primary" /> 输入链接
                           </span>
-                          <button onClick={() => setActiveUploadType(null)} className="p-1 rounded hover:bg-accent"><X className="w-3 h-3 text-muted-foreground" /></button>
+                          <button onClick={() => setActiveUploadType(null)} className="p-0.5 rounded hover:bg-accent"><X className="w-3 h-3 text-muted-foreground" /></button>
                         </div>
-                        {activeUploadType === "url" ? (
-                          <div className="space-y-2">
-                            <textarea
-                              placeholder={"每行一条 URL\nhttps://example.com/article\nhttps://docs.feishu.cn/wiki/xxx"}
-                              className="w-full h-20 px-3 py-2.5 rounded-lg border border-border bg-background text-xs outline-none focus:border-primary/50 resize-none"
-                              onKeyDown={(e) => {
-                                if (e.key === "Enter" && !e.shiftKey && (e.target as HTMLTextAreaElement).value.trim()) {
-                                  e.preventDefault();
-                                  const urls = (e.target as HTMLTextAreaElement).value.split("\n").filter(u => u.trim());
-                                  urls.forEach(url => quickAddSource("url", url.trim()));
-                                  (e.target as HTMLTextAreaElement).value = "";
-                                }
-                              }}
-                            />
-                            <div className="flex items-center justify-between">
-                              <span className="text-[10px] text-muted-foreground">按 Enter 提交</span>
-                              <button onClick={() => quickAddSource("url", "https://wiki.company.com/article")} className="px-3 py-1.5 rounded-lg bg-primary text-primary-foreground text-xs hover:bg-primary/90 transition-colors">添加</button>
-                            </div>
-                          </div>
-                        ) : (
-                          <div className="space-y-2">
-                            <textarea placeholder="粘贴笔记、会议记录或文本内容..." className="w-full h-20 px-3 py-2.5 rounded-lg border border-border bg-background text-xs outline-none focus:border-primary/50 resize-none" />
-                            <div className="flex items-center justify-end">
-                              <button onClick={() => quickAddSource("text", `粘贴笔记_${sources.length + 1}`)} className="px-3 py-1.5 rounded-lg bg-primary text-primary-foreground text-xs hover:bg-primary/90 transition-colors">添加</button>
-                            </div>
-                          </div>
-                        )}
+                        <textarea
+                          placeholder={"每行一条 URL\nhttps://example.com/article"}
+                          className="w-full h-16 px-3 py-2 rounded-md border border-border bg-background text-[11px] outline-none focus:border-primary/50 resize-none"
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter" && !e.shiftKey && (e.target as HTMLTextAreaElement).value.trim()) {
+                              e.preventDefault();
+                              const urls = (e.target as HTMLTextAreaElement).value.split("\n").filter(u => u.trim());
+                              urls.forEach(url => quickAddSource("url", url.trim()));
+                              (e.target as HTMLTextAreaElement).value = "";
+                            }
+                          }}
+                        />
+                        <div className="flex items-center justify-end">
+                          <button onClick={() => quickAddSource("url", "https://wiki.company.com/article")} className="px-3 py-1 rounded-md bg-primary text-primary-foreground text-[11px] hover:bg-primary/90 transition-colors">添加</button>
+                        </div>
                       </div>
                     </motion.div>
                   )}
