@@ -265,7 +265,7 @@ const DepartmentSpace = () => {
 
             {/* Team members */}
             <div>
-              <h3 className="text-lg font-semibold text-foreground mb-4">• 团队成员</h3>
+              <h3 className="text-sm font-semibold text-foreground mb-4">• 团队成员</h3>
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
                 {TEAM_MEMBERS.map((member) => (
                   <div key={member.name} className="flex flex-col items-center gap-2 p-4 rounded-lg border border-border hover:border-primary/30 transition-colors">
