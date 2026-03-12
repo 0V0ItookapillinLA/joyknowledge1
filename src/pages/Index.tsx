@@ -1,7 +1,7 @@
 // Index page
 import { useState, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Flame, Users, Sparkles, MessageSquare, Home as HomeIcon, ChevronDown, ChevronRight, Briefcase, ShoppingCart, Truck, Cpu, Heart, Factory, Building2, Shield, TrendingUp, Code2, CheckCircle2, CreditCard, Lightbulb, BarChart3, X, Grid3X3, ArrowRight } from "lucide-react";
+import { Flame, Users, Sparkles, MessageSquare, Home as HomeIcon, ChevronDown, ChevronRight, Briefcase, ShoppingCart, Truck, Cpu, Heart, Factory, Building2, Shield, TrendingUp, Code2, CheckCircle2, CreditCard, Lightbulb, BarChart3, X, Grid3X3, ArrowRight, Clock, MessageSquareText, Flag, Landmark, PieChart, Handshake, BookOpen, Rocket } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import AppLayout from "@/components/AppLayout";
 import CaseCard from "@/components/CaseCard";
@@ -40,13 +40,14 @@ const RECOMMENDED_TOPICS_ROW2 = [
 ];
 
 const HOT_ZONES = [
-  { label: "HR管理", emoji: "👥", navDomain: "HR管理", navFilters: [] },
-  { label: "领导力", emoji: "🎯", navDomain: "HR管理", navFilters: ["领导力发展"] },
-  { label: "绩效管理", emoji: "📊", navDomain: "HR管理", navFilters: ["绩效管理"] },
-  { label: "组织发展", emoji: "🏢", navDomain: "HR管理", navFilters: ["组织发展"] },
-  { label: "人才招聘", emoji: "🤝", navDomain: "HR管理", navFilters: ["人才招聘"] },
-  { label: "培训赋能", emoji: "📚", navDomain: "HR管理", navFilters: ["培训赋能"] },
-  { label: "AI应用", emoji: "🚀", navDomain: "全部领域", navFilters: [] },
+  { label: "HR 专区", icon: MessageSquareText, navDomain: "HR管理", navFilters: [], count: 1240, hot: true, hotViews: "9.8w", updatedAt: "10分钟前更新" },
+  { label: "领导力", icon: Flag, navDomain: "HR管理", navFilters: ["领导力发展"], count: 850, hot: false, hotViews: "", updatedAt: "1小时前更新" },
+  { label: "组织变革", icon: Landmark, navDomain: "HR管理", navFilters: ["组织发展"], count: 620, hot: false, hotViews: "", updatedAt: "昨天更新" },
+  { label: "绩效管理", icon: PieChart, navDomain: "HR管理", navFilters: ["绩效管理"], count: 1580, hot: true, hotViews: "10w+", updatedAt: "5分钟前更新" },
+  { label: "企业文化", icon: Handshake, navDomain: "HR管理", navFilters: [], count: 430, hot: false, hotViews: "", updatedAt: "3天前更新" },
+  { label: "人才发展", icon: Sparkles, navDomain: "HR管理", navFilters: ["人才招聘"], count: 760, hot: false, hotViews: "", updatedAt: "2小时前更新" },
+  { label: "薪酬福利", icon: CreditCard, navDomain: "HR管理", navFilters: ["培训赋能"], count: 920, hot: false, hotViews: "", updatedAt: "今天更新" },
+  { label: "数字化转型", icon: Rocket, navDomain: "全部领域", navFilters: [], count: 2100, hot: true, hotViews: "12w+", updatedAt: "刚刚更新" },
 ];
 
 const NAV_ITEMS = [
@@ -350,24 +351,52 @@ const Index = () => {
               </motion.div>
 
               <div className="px-6 pb-4">
-                <div className="mb-4">
+                <div className="flex items-baseline gap-3 mb-5">
                   <h2 className="text-lg font-semibold text-foreground">热门专区</h2>
                   <p className="text-sm text-muted-foreground">来自专业人士的精选观点与洞察</p>
                 </div>
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {HOT_ZONES.map((zone) => (
-                    <button
-                      key={zone.label}
-                      onClick={() => {
-                        const filters = zone.navFilters.length > 0 ? zone.navFilters.join(",") : "";
-                        navigate(`/knowledge?type=domain&value=${encodeURIComponent(zone.navDomain)}&label=${encodeURIComponent(zone.label)}${filters ? `&filters=${encodeURIComponent(filters)}` : ""}`);
-                      }}
-                      className="inline-flex items-center gap-1.5 px-4 py-2 rounded-md border border-border bg-card text-sm text-foreground hover:border-primary/40 hover:bg-primary/5 transition-colors"
-                    >
-                      <span>{zone.emoji}</span>
-                      {zone.label}
-                    </button>
-                  ))}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+                  {HOT_ZONES.map((zone) => {
+                    const IconComp = zone.icon;
+                    return (
+                      <button
+                        key={zone.label}
+                        onClick={() => {
+                          const filters = zone.navFilters.length > 0 ? zone.navFilters.join(",") : "";
+                          navigate(`/knowledge?type=domain&value=${encodeURIComponent(zone.navDomain)}&label=${encodeURIComponent(zone.label)}${filters ? `&filters=${encodeURIComponent(filters)}` : ""}`);
+                        }}
+                        className={`relative text-left p-4 rounded-xl border transition-all hover:shadow-md hover:-translate-y-0.5 group ${
+                          zone.hot
+                            ? "border-primary/30 bg-primary/[0.03] hover:border-primary/50"
+                            : "border-border bg-card hover:border-primary/30"
+                        }`}
+                      >
+                        {zone.hot && (
+                          <span className="absolute top-3 right-3 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-destructive/10 text-destructive text-[10px] font-semibold">
+                            <Flame className="w-3 h-3" /> HOT
+                          </span>
+                        )}
+                        <div className={`w-9 h-9 rounded-lg flex items-center justify-center mb-3 ${
+                          zone.hot ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"
+                        }`}>
+                          <IconComp className="w-4.5 h-4.5" />
+                        </div>
+                        <h3 className="font-semibold text-sm text-card-foreground mb-1.5">{zone.label}</h3>
+                        <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
+                          <span>{zone.count} 内容</span>
+                          {zone.hot && zone.hotViews && (
+                            <span className="inline-flex items-center gap-0.5 text-destructive font-medium">
+                              🔥 {zone.hotViews}
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-1 text-[11px] text-muted-foreground/70">
+                          <Clock className="w-3 h-3" />
+                          {zone.updatedAt}
+                        </div>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
 
