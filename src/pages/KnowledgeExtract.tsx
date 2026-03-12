@@ -221,6 +221,13 @@ const KnowledgeExtract = () => {
   const [publishSubmitted, setPublishSubmitted] = useState(false);
   const [dropHighlight, setDropHighlight] = useState<number | null>(null);
 
+  // Deep structuring tool workspace state
+  const [selectedStructTool, setSelectedStructTool] = useState<string | null>(null);
+  const [toolInputTexts, setToolInputTexts] = useState<Record<string, string>>({});
+  const [toolGenerating, setToolGenerating] = useState<string | null>(null);
+  const [toolResults, setToolResults] = useState<Record<string, string>>({});
+  const [toolGenProgress, setToolGenProgress] = useState(0);
+
   const [tools, setTools] = useState<ToolOption[]>([
     { id: "report", label: "结构化文本", desc: "按章节组织的完整文档", icon: FileText, checked: false, color: "text-blue-600 bg-blue-50 border-blue-200" },
     { id: "mindmap", label: "思维导图", desc: "知识脉络可视化", icon: GitBranch, checked: false, color: "text-green-600 bg-green-50 border-green-200" },
