@@ -64,7 +64,7 @@ type SearchDepth = "fast" | "deep";
 /* ───── Mock Content ───── */
 const GENERATED_DOC = `# Q3季度研发效能提升专项总结
 
-## 📋 概述
+## 概述
 本报告基于上传的研发效能报告和项目复盘会议纪要，结合 AI 深度分析生成。涵盖项目背景、实施过程、核心成果与经验反思。
 
 ---
@@ -85,72 +85,26 @@ const GENERATED_DOC = `# Q3季度研发效能提升专项总结
 采用 Jenkins + GitLab CI 构建自动化流水线，引入 SonarQube 进行代码质量管控。经过对比评估 3 种方案后，选择了渐进式迁移策略。
 
 ### 2.2 流程重构
-推行 Scrum + Kanban 混合敏捷模式，建立每日站会和 Sprint Review 机制。
+推行 Scrum + Kanban 混合敏捷模式，建立每日站会和 Sprint Review 机制。通过两周一个迭代的节奏逐步优化流程，确保团队适应性和可持续性。
 
 ## 3. 实施成果
 
-| 指标 | 改进前 | 改进后 | 变化幅度 |
-|------|--------|--------|----------|
-| 发布周期 | 14天 | 8.4天 | ↓ 40% |
-| Bug修复时长 | 48h | 12h | ↓ 75% |
-| 代码覆盖率 | 45% | 82% | ↑ 82% |
-| 需求交付率 | 65% | 91% | ↑ 40% |
+### 3.1 核心指标改进
+发布周期从 14 天缩短至 8.4 天，降幅达 40%。Bug 修复时长从 48 小时缩短至 12 小时，降幅 75%。代码覆盖率从 45% 提升至 82%，需求交付率从 65% 提升至 91%。
+
+### 3.2 团队效能变化
+团队满意度调研显示，流程满意度从改进前的 35% 提升至 78%。跨部门协作效率提升明显，需求对齐周期缩短了 60%。
 
 ## 4. 经验与反思
 
 ### 4.1 关键成功因素
-1. 高层支持与资源保障
-2. 渐进式推进，避免一刀切
-3. 数据驱动的持续优化
+高层支持与资源保障是首要因素。渐进式推进避免了一刀切带来的团队抵触情绪。数据驱动的持续优化确保了每个改进点都有据可依。
 
 ### 4.2 踩坑总结
-- 初期自动化测试覆盖率目标设定过高，导致团队抵触
-- 跨部门协作需要明确的接口人机制
+初期自动化测试覆盖率目标设定过高，导致团队抵触。跨部门协作需要明确的接口人机制，否则沟通成本反而增加。工具链的选型需要充分调研，避免中途更换带来的沉没成本。
 
----
-
-## 🧠 思维导图
-
-\`\`\`
-研发效能提升
-├── 流程优化
-│   ├── CI/CD 流水线搭建
-│   ├── 代码质量管控 (SonarQube)
-│   └── 自动化测试体系
-├── 团队协作
-│   ├── Scrum + Kanban
-│   ├── 每日站会 & Sprint Review
-│   └── 跨部门接口人机制
-└── 度量体系
-    ├── 发布频率 & 前置时间
-    ├── 代码覆盖率 & Bug 密度
-    └── 需求交付率
-\`\`\`
-
----
-
-## ⚡ 知识闪卡
-
-**卡片 1** — DevOps 核心原则
-> Q: DevOps 的三大支柱是什么？
-> A: 文化（Culture）、自动化（Automation）、度量（Measurement）
-
-**卡片 2** — 关键指标
-> Q: 项目发布周期改进了多少？
-> A: 从 14 天缩短至 8.4 天，缩短了 40%
-
-**卡片 3** — 方法论
-> Q: 项目采用了什么敏捷框架？
-> A: Scrum + Kanban 混合模式
-
-**卡片 4** — 代码质量
-> Q: 代码覆盖率提升了多少？
-> A: 从 45% 提升到 82%
-
----
-
-## 🏷️ 推荐标签
-研发效能 · DevOps · 自动化测试 · 流程优化 · CI/CD · 敏捷开发`;
+### 4.3 未来规划
+下一阶段将重点推进 AI 辅助代码审查和智能测试生成，预计可进一步提升 20% 的研发效率。同时计划将成功经验推广至其他 BU，形成集团级最佳实践。`;
 
 const SOCRATIC_RESPONSES = [
   "你提到了这个做法很有效，能具体说说**当时是什么契机**让你决定采用这种方式的吗？背后的思考过程是什么？",
@@ -1315,17 +1269,17 @@ const KnowledgeExtract = () => {
             </div>
             <div className="flex-1 overflow-y-auto p-3 space-y-2">
               {tools.map((tool) => (
-                <motion.div
+                <div
                   key={tool.id}
                   draggable
-                  onDragStart={(e: any) => {
+                  onDragStart={(e) => {
                     e.dataTransfer.setData("toolId", tool.id);
+                    e.dataTransfer.effectAllowed = "copy";
                     setDraggedTool(tool.id);
                   }}
                   onDragEnd={() => { setDraggedTool(null); setDropHighlight(null); }}
-                  whileHover={{ scale: 1.02, x: -4 }}
                   className={`flex items-center gap-3 p-3 rounded-xl border cursor-grab active:cursor-grabbing transition-all ${
-                    draggedTool === tool.id ? "opacity-40 border-primary scale-95" : `${tool.color} hover:shadow-md`
+                    draggedTool === tool.id ? "opacity-40 border-primary scale-95" : `${tool.color} hover:shadow-md hover:scale-[1.02]`
                   }`}
                 >
                   <GripVertical className="w-3.5 h-3.5 text-muted-foreground/40 shrink-0" />
@@ -1334,7 +1288,7 @@ const KnowledgeExtract = () => {
                     <span className="text-sm font-medium block">{tool.label}</span>
                     <span className="text-[10px] text-muted-foreground">{tool.desc}</span>
                   </div>
-                </motion.div>
+                </div>
               ))}
             </div>
             <div className="p-3 border-t border-border">
@@ -1369,7 +1323,7 @@ const KnowledgeExtract = () => {
             </div>
 
             {/* ── Enhanced search box ── */}
-            <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden">
+            <div className="rounded-xl border border-border bg-card shadow-sm">
               <div className="flex items-center gap-2 px-3 py-2.5">
                 <Search className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
                 <input
@@ -1395,7 +1349,7 @@ const KnowledgeExtract = () => {
                   <AnimatePresence>
                     {showScopeDropdown && (
                       <motion.div initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }}
-                        className="absolute top-full left-0 mt-1 w-28 bg-card rounded-lg border border-border shadow-lg z-20 overflow-hidden">
+                        className="absolute top-full left-0 mt-1 w-28 bg-card rounded-lg border border-border shadow-lg z-50 overflow-hidden">
                         {[{ value: "web" as const, label: "全网", icon: Globe }, { value: "enterprise" as const, label: "企业", icon: Building2 }].map(opt => (
                           <button key={opt.value} onClick={() => { setSearchScope(opt.value); setShowScopeDropdown(false); }}
                             className={`w-full flex items-center gap-2 px-3 py-2 text-xs hover:bg-accent transition-colors ${searchScope === opt.value ? "text-primary bg-primary/5" : "text-foreground"}`}>
@@ -1417,7 +1371,7 @@ const KnowledgeExtract = () => {
                   <AnimatePresence>
                     {showDepthDropdown && (
                       <motion.div initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }}
-                        className="absolute top-full left-0 mt-1 w-32 bg-card rounded-lg border border-border shadow-lg z-20 overflow-hidden">
+                        className="absolute top-full left-0 mt-1 w-32 bg-card rounded-lg border border-border shadow-lg z-50 overflow-hidden">
                         {[{ value: "fast" as const, label: "快速搜索" }, { value: "deep" as const, label: "深度搜索" }].map(opt => (
                           <button key={opt.value} onClick={() => { setSearchDepth(opt.value); setShowDepthDropdown(false); }}
                             className={`w-full flex items-center gap-2 px-3 py-2 text-xs hover:bg-accent transition-colors ${searchDepth === opt.value ? "text-primary bg-primary/5" : "text-foreground"}`}>
