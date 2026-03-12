@@ -332,23 +332,20 @@ const KnowledgeExtract = () => {
 
   /* ───── Deep structuring ───── */
   const enterStructuringMode = () => {
-    setInitialDoc(GENERATED_DOC);
+    const doc = GENERATED_DOC;
+    const paragraphs = doc.split("\n\n").filter(p => p.trim());
+    const mockedParagraphTools = Object.fromEntries(
+      paragraphs.map((_, idx) => [idx, ["report"]])
+    ) as Record<number, string[]>;
+
+    setInitialDoc(doc);
+    setParagraphTools(mockedParagraphTools);
+    setDropHighlight(null);
     setAppMode("deep-structuring");
   };
 
   const addToolToParagraph = (paragraphIdx: number, toolId: string) => {
-    setParagraphTools(prev => {
-      const existing = prev[paragraphIdx] || [];
-      if (existing.includes(toolId)) return prev;
-      return { ...prev, [paragraphIdx]: [...existing, toolId] };
-    });
-  };
-
-  const removeToolFromParagraph = (paragraphIdx: number, toolId: string) => {
-    setParagraphTools(prev => {
-      const existing = prev[paragraphIdx] || [];
-      return { ...prev, [paragraphIdx]: existing.filter(t => t !== toolId) };
-    });
+    setParagraphTools(prev => ({ ...prev, [paragraphIdx]: [toolId] }));
   };
 
   const handleSend = () => {
