@@ -960,6 +960,7 @@ const KnowledgeExtract = () => {
                 <ChevronLeft className="w-4 h-4" /> 返回
               </button>
               {extractMode === "quick" && <><div className="h-5 w-px bg-border" /><StepIndicator current={3} /></>}
+              {extractMode === "deep" && <><div className="h-5 w-px bg-border" /><DeepStepIndicator current={3} /></>}
             </div>
             <div className="flex items-center gap-2">
               <button onClick={() => setIsEditing(!isEditing)}
