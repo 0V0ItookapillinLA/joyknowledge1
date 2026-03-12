@@ -653,7 +653,7 @@ const KnowledgeExtract = () => {
                         whileHover={{ scale: 1.03, y: -1 }}
                         whileTap={{ scale: 0.97 }}
                         onClick={() => handleTypeClick(opt)}
-                        className="group relative p-2.5 rounded-lg border border-border bg-card hover:border-primary/40 hover:shadow-sm transition-all text-left"
+                        className={`group relative p-2.5 rounded-lg border bg-card hover:shadow-sm transition-all text-left ${selectedOnlineType === opt.label ? "border-primary bg-primary/5" : "border-border hover:border-primary/40"}`}
                       >
                         <div className="flex items-center gap-2 mb-1">
                           <div className={`w-6 h-6 rounded-md bg-gradient-to-br ${opt.gradient} flex items-center justify-center shrink-0 shadow-sm`}>
