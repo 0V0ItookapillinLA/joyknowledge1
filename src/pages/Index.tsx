@@ -355,7 +355,7 @@ const Index = () => {
                   <h2 className="text-lg font-semibold text-foreground">热门专区</h2>
                   <p className="text-sm text-muted-foreground">来自专业人士的精选观点与洞察</p>
                 </div>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
                   {HOT_ZONES.map((zone) => {
                     const IconComp = zone.icon;
                     return (
@@ -365,7 +365,7 @@ const Index = () => {
                           const filters = zone.navFilters.length > 0 ? zone.navFilters.join(",") : "";
                           navigate(`/knowledge?type=domain&value=${encodeURIComponent(zone.navDomain)}&label=${encodeURIComponent(zone.label)}${filters ? `&filters=${encodeURIComponent(filters)}` : ""}`);
                         }}
-                        className={`relative text-left p-4 rounded-xl border transition-all hover:shadow-md hover:-translate-y-0.5 group ${
+                        className={`relative text-left px-5 py-4 rounded-xl border transition-all hover:shadow-md hover:-translate-y-0.5 group ${
                           zone.hot
                             ? "border-primary/30 bg-primary/[0.03] hover:border-primary/50"
                             : "border-border bg-card hover:border-primary/30"
