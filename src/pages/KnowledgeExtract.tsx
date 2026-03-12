@@ -199,6 +199,7 @@ const KnowledgeExtract = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
   const [activeUploadType, setActiveUploadType] = useState<string | null>(null);
+  const [selectedOnlineType, setSelectedOnlineType] = useState<string | null>(null);
   const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
