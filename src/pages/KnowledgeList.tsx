@@ -3,6 +3,7 @@ import { useSearchParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ChevronDown, ChevronUp, ArrowLeft, Search, Eye, ThumbsUp, Layers, Building2, TrendingUp, Code2, CheckCircle2, CreditCard, Lightbulb, BarChart3, Users, X } from "lucide-react";
 import AppLayout from "@/components/AppLayout";
+import PageHeader from "@/components/PageHeader";
 import { MOCK_CASES } from "@/data/mockData";
 
 const DATE_OPTIONS = ["全部时间", "最近一周", "最近一月", "最近三月"];
