@@ -674,9 +674,9 @@ const KnowledgeExtract = () => {
                       <div className="p-3 rounded-lg border border-primary/20 bg-primary/5 space-y-2">
                         <div className="flex items-center justify-between">
                           <span className="text-[11px] font-medium text-foreground flex items-center gap-1.5">
-                            <Globe className="w-3 h-3 text-primary" /> 输入链接
+                            <Globe className="w-3 h-3 text-primary" /> 输入{selectedOnlineType || ""}链接
                           </span>
-                          <button onClick={() => setActiveUploadType(null)} className="p-0.5 rounded hover:bg-accent"><X className="w-3 h-3 text-muted-foreground" /></button>
+                          <button onClick={() => { setActiveUploadType(null); setSelectedOnlineType(null); }} className="p-0.5 rounded hover:bg-accent"><X className="w-3 h-3 text-muted-foreground" /></button>
                         </div>
                         <textarea
                           placeholder={"每行一条 URL\nhttps://example.com/article"}
