@@ -236,12 +236,12 @@ const KnowledgeExtract = () => {
   const [expandedResult, setExpandedResult] = useState<string | null>(null);
 
   const [tools, setTools] = useState<ToolOption[]>([
-    { id: "image", label: "图片", desc: "插入图片内容", icon: Image, checked: false, color: "text-emerald-600 bg-emerald-50 border-emerald-200" },
-    { id: "table", label: "表格", desc: "插入数据表格", icon: Table2, checked: false, color: "text-blue-600 bg-blue-50 border-blue-200" },
-    { id: "video", label: "视频", desc: "嵌入视频内容", icon: Video, checked: false, color: "text-purple-600 bg-purple-50 border-purple-200" },
-    { id: "columns", label: "分栏", desc: "多栏布局排版", icon: Columns, checked: false, color: "text-amber-600 bg-amber-50 border-amber-200" },
-    { id: "flowchart", label: "流程图", desc: "可视化流程步骤", icon: Workflow, checked: false, color: "text-rose-600 bg-rose-50 border-rose-200" },
-    { id: "uml", label: "UML", desc: "UML 结构图", icon: BoxSelect, checked: false, color: "text-cyan-600 bg-cyan-50 border-cyan-200" },
+    { id: "structured-text", label: "结构化文本", desc: "将内容转为结构化文本", icon: FileText, checked: false, color: "text-blue-600 bg-blue-50 border-blue-200" },
+    { id: "mindmap", label: "思维导图", desc: "生成思维导图", icon: GitBranch, checked: false, color: "text-purple-600 bg-purple-50 border-purple-200" },
+    { id: "flashcard", label: "知识闪卡", desc: "提炼知识闪卡", icon: Zap, checked: false, color: "text-amber-600 bg-amber-50 border-amber-200" },
+    { id: "chart", label: "数据图表", desc: "生成数据图表", icon: BarChart3, checked: false, color: "text-emerald-600 bg-emerald-50 border-emerald-200" },
+    { id: "audio", label: "音频概览", desc: "音频内容概览", icon: Mic, checked: false, color: "text-orange-600 bg-orange-50 border-orange-200" },
+    { id: "video", label: "视频概览", desc: "视频内容概览", icon: Video, checked: false, color: "text-rose-600 bg-rose-50 border-rose-200" },
   ]);
 
   const MOCK_SEARCH_RESULTS: SearchResult[] = [
