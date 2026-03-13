@@ -1745,10 +1745,18 @@ const KnowledgeExtract = () => {
                           </motion.div>
                         </div>
                       )}
+                      {source.status === "failed" && (
+                        <span className="text-xs text-destructive flex items-center gap-1 mt-0.5"><XCircle className="w-3 h-3" /> 解析失败</span>
+                      )}
                     </div>
                     {source.status === "ready" && (
                       <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }}>
                         <CheckCircle2 className="w-3.5 h-3.5 text-primary shrink-0" />
+                      </motion.span>
+                    )}
+                    {source.status === "failed" && (
+                      <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }}>
+                        <XCircle className="w-3.5 h-3.5 text-destructive shrink-0" />
                       </motion.span>
                     )}
                     <button onClick={(e) => { e.stopPropagation(); removeSource(source.id); }} className="p-0.5 rounded opacity-0 group-hover:opacity-100 hover:bg-accent text-muted-foreground transition-all"><X className="w-3 h-3" /></button>
