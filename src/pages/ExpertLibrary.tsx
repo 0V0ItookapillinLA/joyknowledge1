@@ -4,7 +4,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import AppLayout from "@/components/AppLayout";
 import PageHeader from "@/components/PageHeader";
 import { MOCK_EXPERTS, MOCK_CASES } from "@/data/mockData";
-import { ArrowLeft, UserPlus, Mail, Calendar, Heart, MessageCircle, ChevronDown, Star } from "lucide-react";
+import { ArrowLeft, UserPlus, Mail, Calendar, Heart, MessageCircle, ChevronDown, Star, X } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useToast } from "@/hooks/use-toast";
 
 import samAvatar from "@/assets/avatars/sam.jpg";
 import ericAvatar from "@/assets/avatars/eric.jpg";
