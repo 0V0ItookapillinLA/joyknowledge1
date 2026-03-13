@@ -1295,43 +1295,15 @@ const KnowledgeExtract = () => {
           </div>
 
           <div className="flex flex-1 overflow-hidden">
-            {/* Left: Word-style document - wider */}
+            {/* Left: Word-style document - directly editable */}
             <div className="w-[65%] shrink-0 overflow-y-auto">
               <div className="max-w-3xl mx-auto py-8 px-10">
-                {paragraphs.map((para, idx) => {
-                  const isHighlighted = dropHighlight === idx;
-                  return (
-                    <div
-                      key={idx}
-                      onDragOver={(e) => { e.preventDefault(); setDropHighlight(idx); }}
-                      onDragLeave={() => setDropHighlight(null)}
-                      onDrop={(e) => {
-                        e.preventDefault();
-                        setDropHighlight(null);
-                        const resultToolId = e.dataTransfer.getData("resultToolId");
-                        if (resultToolId && toolResults[resultToolId]) {
-                          const newParagraphs = [...paragraphs];
-                          newParagraphs.splice(idx + 1, 0, toolResults[resultToolId]);
-                          setInitialDoc(newParagraphs.join("\n\n"));
-                        }
-                      }}
-                      className={`py-2 transition-all ${isHighlighted ? "bg-primary/5 border-b-2 border-dashed border-primary" : "border-b border-transparent"}`}
-                    >
-                      {para.split("\n").map((line, li) => {
-                        if (line.startsWith("# ")) return <h1 key={li} className="text-2xl font-bold text-foreground mt-6 mb-3">{line.slice(2)}</h1>;
-                        if (line.startsWith("## ")) return <h2 key={li} className="text-lg font-semibold text-foreground mt-4 mb-2">{line.slice(3)}</h2>;
-                        if (line.startsWith("### ")) return <h3 key={li} className="text-base font-medium text-foreground mt-3 mb-1.5">{line.slice(4)}</h3>;
-                        if (line.startsWith("---")) return <hr key={li} className="border-border my-4" />;
-                        if (line.startsWith("- ")) return <li key={li} className="text-sm text-foreground ml-4 mb-1 list-disc">{line.slice(2)}</li>;
-                        if (line.startsWith("> ")) return <blockquote key={li} className="text-sm text-muted-foreground border-l-2 border-primary/30 pl-3 my-1 italic">{line.slice(2)}</blockquote>;
-                        if (line.startsWith("|")) return <p key={li} className="text-sm text-foreground font-mono bg-accent/50 px-3 py-1 rounded">{line}</p>;
-                        if (line.startsWith("├") || line.startsWith("│") || line.startsWith("└")) return <p key={li} className="text-sm text-foreground font-mono leading-relaxed">{line}</p>;
-                        if (line.trim() === "") return <div key={li} className="h-1" />;
-                        return <p key={li} className="text-sm text-foreground leading-relaxed">{line}</p>;
-                      })}
-                    </div>
-                  );
-                })}
+                <textarea
+                  value={initialDoc}
+                  onChange={(e) => setInitialDoc(e.target.value)}
+                  className="w-full min-h-[80vh] bg-transparent text-sm text-foreground leading-relaxed outline-none resize-none"
+                  placeholder="在此编辑文档内容..."
+                />
               </div>
             </div>
 
