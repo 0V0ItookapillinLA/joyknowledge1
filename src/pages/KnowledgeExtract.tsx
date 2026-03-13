@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Sparkles, Send, FileText, Tag, Upload, Link2,
-  X, File, CheckCircle2, Plus, Search, Loader2, Save, Zap,
+  X, File, CheckCircle2, XCircle, Plus, Search, Loader2, Save, Zap,
   Mic, Video, GitBranch, BarChart3, Globe, ArrowRight,
   ChevronLeft, Edit3, BookOpen, Wand2, MessageSquare, FileUp,
   Check, RotateCcw, Image, FileAudio, FileVideo,
