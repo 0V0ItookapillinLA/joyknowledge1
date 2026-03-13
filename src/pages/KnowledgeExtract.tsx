@@ -220,7 +220,7 @@ const KnowledgeExtract = () => {
   const [paragraphTools, setParagraphTools] = useState<Record<number, string[]>>({});
   const [draggedTool, setDraggedTool] = useState<string | null>(null);
   const [showPublishDialog, setShowPublishDialog] = useState(false);
-  const [publishTarget, setPublishTarget] = useState<"personal" | "bgbu" | null>(null);
+  const [publishTarget, setPublishTarget] = useState<"personal" | "bgbu" | null>("personal");
   const [publishSubmitted, setPublishSubmitted] = useState(false);
   const [dropHighlight, setDropHighlight] = useState<number | null>(null);
 
