@@ -1243,9 +1243,9 @@ const KnowledgeExtract = () => {
                           : "审批请求已发送给直属上级和 BG/BU 管理员，审批通过后将自动发布"
                         }
                       </p>
-                      <button onClick={() => { setShowPublishDialog(false); setPublishTarget(null); setPublishSubmitted(false); setAppMode("select"); }}
+                      <button onClick={() => { setShowPublishDialog(false); setPublishTarget("personal"); setPublishSubmitted(false); navigate("/case/1"); }}
                         className="px-6 py-2 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors">
-                        返回首页
+                        查看文章详情
                       </button>
                     </motion.div>
                   )}
