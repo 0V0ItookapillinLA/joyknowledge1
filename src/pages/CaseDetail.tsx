@@ -1,5 +1,5 @@
 import { useParams, Link } from "react-router-dom";
-import { ArrowLeft, Heart, MessageCircle, Bookmark, Share2, Eye, ThumbsUp, ChevronRight, List } from "lucide-react";
+import { ArrowLeft, Heart, MessageCircle, Bookmark, Share2, Eye, ThumbsUp, ThumbsDown, ChevronRight, List } from "lucide-react";
 import { motion } from "framer-motion";
 import { useState, useEffect, useRef } from "react";
 import AppLayout from "@/components/AppLayout";
