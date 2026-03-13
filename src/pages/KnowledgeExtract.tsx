@@ -279,9 +279,10 @@ const KnowledgeExtract = () => {
 
   /* ───── Source management ───── */
   const addSource = (type: Source["type"], name: string) => {
+    if (sources.length >= MAX_SOURCES) return;
     const sizes: Record<string, string> = { file: "1.2 MB", image: "3.8 MB", audio: "24.5 MB", video: "156 MB" };
     const newSource: Source = { id: Date.now().toString(), name, type, status: "analyzing", selected: true, size: sizes[type] || "" };
-    setSources(prev => [...prev, newSource]);
+    setSources(prev => prev.length >= MAX_SOURCES ? prev : [...prev, newSource]);
     setShowAddSource(false);
     setActiveUploadType(null);
     // Show parsing progress in chat
