@@ -63,6 +63,8 @@ type ExtractMode = "quick" | "deep";
 type SearchScope = "web" | "enterprise";
 type SearchDepth = "fast" | "deep";
 
+const MAX_SOURCES = 100;
+
 /* ───── Mock Content ───── */
 const GENERATED_DOC = `# Q3季度研发效能提升专项总结
 
