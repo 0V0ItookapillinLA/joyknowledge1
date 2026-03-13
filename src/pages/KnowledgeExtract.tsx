@@ -1125,7 +1125,7 @@ const KnowledgeExtract = () => {
           <AnimatePresence>
             {showPublishDialog && (
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/40" onClick={() => { setShowPublishDialog(false); setPublishTarget(null); setPublishSubmitted(false); }}>
+                className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/40" onClick={() => { setShowPublishDialog(false); setPublishTarget("personal"); setPublishSubmitted(false); }}>
                 <motion.div initial={{ opacity: 0, scale: 0.95, y: 12 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 12 }}
                   className="w-full max-w-lg bg-card rounded-2xl shadow-2xl border border-border overflow-hidden" onClick={(e) => e.stopPropagation()}>
 
