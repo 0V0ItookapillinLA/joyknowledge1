@@ -811,6 +811,10 @@ const KnowledgeExtract = () => {
                             <span className="shrink-0">
                               {s.status === "analyzing" ? (
                                 <Loader2 className="w-3 h-3 text-primary animate-spin" />
+                              ) : s.status === "failed" ? (
+                                <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }}>
+                                  <XCircle className="w-3.5 h-3.5 text-destructive" />
+                                </motion.span>
                               ) : (
                                 <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }}>
                                   <CheckCircle2 className="w-3.5 h-3.5 text-primary" />
