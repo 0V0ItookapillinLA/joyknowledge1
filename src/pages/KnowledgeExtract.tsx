@@ -10,7 +10,7 @@ import {
   Headphones, StickyNote, Layers, PenTool, Table2,
   HelpCircle, Monitor, Cloud, Landmark, Building2, ChevronDown,
   GripVertical, Trash2, Import, Shield, Users, Lock, UserCheck, Maximize2, Minimize2,
-  Home as HomeIcon, Star
+  Home as HomeIcon, Star, Columns, Workflow, BoxSelect
 } from "lucide-react";
 import AppLayout from "@/components/AppLayout";
 
@@ -202,7 +202,9 @@ const KnowledgeExtract = () => {
   const [pickerTab, setPickerTab] = useState("最近打开");
   const [pickerNav, setPickerNav] = useState("home");
   const [pendingUploadType, setPendingUploadType] = useState<string | null>(null);
+  const [deepSourceType, setDeepSourceType] = useState<"joyspace" | "local">("joyspace");
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const deepFileInputRef = useRef<HTMLInputElement>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   // Deep mode search state
@@ -233,12 +235,12 @@ const KnowledgeExtract = () => {
   const [expandedResult, setExpandedResult] = useState<string | null>(null);
 
   const [tools, setTools] = useState<ToolOption[]>([
-    { id: "report", label: "结构化文本", desc: "按章节组织的完整文档", icon: FileText, checked: false, color: "text-blue-600 bg-blue-50 border-blue-200" },
-    { id: "mindmap", label: "思维导图", desc: "知识脉络可视化", icon: GitBranch, checked: false, color: "text-green-600 bg-green-50 border-green-200" },
-    { id: "flashcard", label: "知识闪卡", desc: "核心知识点速记卡", icon: Zap, checked: false, color: "text-amber-600 bg-amber-50 border-amber-200" },
-    { id: "data", label: "数据图表", desc: "关键指标可视化", icon: BarChart3, checked: false, color: "text-rose-600 bg-rose-50 border-rose-200" },
-    { id: "audio", label: "音频概览", desc: "语音版内容摘要", icon: Mic, checked: false, color: "text-orange-600 bg-orange-50 border-orange-200" },
-    { id: "video", label: "视频概览", desc: "视频版知识讲解", icon: Video, checked: false, color: "text-purple-600 bg-purple-50 border-purple-200" },
+    { id: "image", label: "图片", desc: "插入图片内容", icon: Image, checked: false, color: "text-emerald-600 bg-emerald-50 border-emerald-200" },
+    { id: "table", label: "表格", desc: "插入数据表格", icon: Table2, checked: false, color: "text-blue-600 bg-blue-50 border-blue-200" },
+    { id: "video", label: "视频", desc: "嵌入视频内容", icon: Video, checked: false, color: "text-purple-600 bg-purple-50 border-purple-200" },
+    { id: "columns", label: "分栏", desc: "多栏布局排版", icon: Columns, checked: false, color: "text-amber-600 bg-amber-50 border-amber-200" },
+    { id: "flowchart", label: "流程图", desc: "可视化流程步骤", icon: Workflow, checked: false, color: "text-rose-600 bg-rose-50 border-rose-200" },
+    { id: "uml", label: "UML", desc: "UML 结构图", icon: BoxSelect, checked: false, color: "text-cyan-600 bg-cyan-50 border-cyan-200" },
   ]);
 
   const MOCK_SEARCH_RESULTS: SearchResult[] = [
@@ -354,12 +356,12 @@ const KnowledgeExtract = () => {
   };
 
   const TOOL_MOCK_RESULTS: Record<string, string> = {
-    report: "## 结构化分析结果\n\n### 核心要点\n1. 研发效能提升关键在于自动化流水线建设\n2. 渐进式推进策略有效降低团队抵触\n3. 数据驱动优化确保改进点有据可依\n\n### 详细分析\n该段落涉及技术选型与流程重构两个维度...",
-    mindmap: "🗺️ 思维导图\n\n├── 项目背景\n│   ├── 业务挑战\n│   │   ├── 交付周期长\n│   │   ├── 质量不稳定\n│   │   └── 协作低效\n│   └── 目标设定\n│       ├── 发布周期缩短30%\n│       └── 代码覆盖率80%+\n├── 解决方案\n│   ├── Jenkins + GitLab CI\n│   └── Scrum + Kanban\n└── 实施成果\n    ├── 发布周期↓40%\n    └── Bug修复↓75%",
-    flashcard: "⚡ 知识闪卡\n\n【卡片1】渐进式迁移策略\nQ: 为什么选择渐进式而非一刀切？\nA: 避免团队抵触情绪，确保适应性和可持续性\n\n【卡片2】数据驱动优化\nQ: 如何确保改进有效？\nA: 每个改进点都有数据支撑，持续跟踪核心指标\n\n【卡片3】跨部门协作\nQ: 协作效率提升的关键？\nA: 明确接口人机制，缩短需求对齐周期",
-    data: "📊 数据图表摘要\n\n| 指标 | 改进前 | 改进后 | 变化 |\n|------|--------|--------|------|\n| 发布周期 | 14天 | 8.4天 | ↓40% |\n| Bug修复时长 | 48h | 12h | ↓75% |\n| 代码覆盖率 | 45% | 82% | ↑82% |\n| 需求交付率 | 65% | 91% | ↑40% |\n| 满意度 | 35% | 78% | ↑123% |",
-    audio: "🎙️ 音频概览脚本\n\n大家好，今天为大家分享Q3研发效能提升的核心经验。\n\n首先是背景：我们团队面临交付周期长、质量不稳定的挑战...\n\n关键举措包括引入CI/CD流水线和混合敏捷模式...\n\n最终成果：发布周期缩短40%，团队满意度翻倍。",
-    video: "🎬 视频概览脚本\n\n[开场] 标题卡：Q3研发效能提升总结\n[场景1] 问题展示：72%开发者认为流程有瓶颈\n[场景2] 方案解析：Jenkins + GitLab CI 自动化\n[场景3] 成果数据：核心指标全面提升\n[结尾] 下一步：AI辅助代码审查",
+    image: "🖼️ 图片内容\n\n已根据文本描述生成配图建议：\n1. 研发效能提升趋势图 - 展示改进前后的核心指标对比\n2. 团队协作流程图 - 可视化展示 Scrum + Kanban 混合模式\n3. 技术架构图 - Jenkins + GitLab CI 自动化流水线架构",
+    table: "📊 数据表格\n\n| 指标 | 改进前 | 改进后 | 变化 |\n|------|--------|--------|------|\n| 发布周期 | 14天 | 8.4天 | ↓40% |\n| Bug修复时长 | 48h | 12h | ↓75% |\n| 代码覆盖率 | 45% | 82% | ↑82% |\n| 需求交付率 | 65% | 91% | ↑40% |\n| 满意度 | 35% | 78% | ↑123% |",
+    video: "🎬 视频嵌入建议\n\n[视频1] Sprint Review 录屏 - 展示迭代成果\n[视频2] 团队分享会实录 - 经验传承\n[视频3] 工具演示 - CI/CD 流水线操作指南",
+    columns: "📐 分栏布局\n\n【左栏 - 问题与挑战】\n• 交付周期长\n• 质量不稳定\n• 跨部门协作低效\n• 72%开发者认为有瓶颈\n\n【右栏 - 解决方案】\n• Jenkins + GitLab CI\n• SonarQube 代码质量\n• Scrum + Kanban 混合\n• 两周迭代节奏",
+    flowchart: "📋 流程图\n\n开始 → 需求分析 → 方案设计 → 技术评审\n  ↓\n代码开发 → 自动化测试 → Code Review → CI构建\n  ↓\n集成测试 → 预发布验证 → 正式发布 → 监控反馈\n  ↓\n迭代优化 → Sprint Review → 经验沉淀",
+    uml: "📐 UML 结构图\n\n┌──────────────┐     ┌──────────────┐\n│  ProductOwner │────▶│  SprintBacklog│\n└──────────────┘     └──────────────┘\n        │                    │\n        ▼                    ▼\n┌──────────────┐     ┌──────────────┐\n│  ScrumMaster  │────▶│  DailyStandup │\n└──────────────┘     └──────────────┘\n        │                    │\n        ▼                    ▼\n┌──────────────┐     ┌──────────────┐\n│  DevTeam      │────▶│  Deliverable  │\n└──────────────┘     └──────────────┘",
   };
 
   const handleToolGenerate = (toolId: string) => {
@@ -538,11 +540,13 @@ const KnowledgeExtract = () => {
       if (opt.type === "url") {
         setSelectedOnlineType(opt.label);
         setActiveUploadType("url");
+        setPendingUploadType(null);
       } else if (opt.type === "text") {
         setActiveUploadType(activeUploadType === "text" ? null : "text");
+        setPendingUploadType(null);
       } else {
-        // Set pending type and show the upload zone highlighted
-        setPendingUploadType(opt.type);
+        // Single-select: use label as unique key
+        setPendingUploadType(opt.label);
         setActiveUploadType(opt.type);
       }
     };
@@ -556,8 +560,11 @@ const KnowledgeExtract = () => {
     const handleFileSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
       const files = e.target.files;
       if (files && files.length > 0) {
+        // Find the actual type from the selected label
+        const selectedOpt = LOCAL_UPLOAD_TYPES.find(t => t.label === pendingUploadType);
+        const fileType = selectedOpt?.type || "file";
         Array.from(files).forEach(file => {
-          quickAddSource(pendingUploadType as Source["type"], file.name);
+          quickAddSource(fileType as Source["type"], file.name);
         });
       }
       setPendingUploadType(null);
@@ -615,7 +622,7 @@ const KnowledgeExtract = () => {
                         whileTap={{ scale: 0.97 }}
                         onClick={() => handleTypeClick(opt)}
                         className={`group relative p-2.5 rounded-lg border bg-card hover:shadow-sm transition-all text-left ${
-                          pendingUploadType === opt.type && activeUploadType === opt.type ? "border-primary bg-primary/5 shadow-sm" : "border-border hover:border-primary/40"
+                          pendingUploadType === opt.label ? "border-primary bg-primary/5 shadow-sm" : "border-border hover:border-primary/40"
                         }`}
                       >
                         <div className="flex items-center gap-2 mb-1">
@@ -635,7 +642,12 @@ const KnowledgeExtract = () => {
                   multiple
                   className="hidden"
                   onChange={handleFileSelected}
-                  accept={pendingUploadType === "video" ? "video/*" : pendingUploadType === "audio" ? "audio/*" : ".pdf,.doc,.docx,.xls,.xlsx,.csv,.ppt,.pptx,.txt,.md"}
+                  accept={(() => {
+                    const selectedOpt = LOCAL_UPLOAD_TYPES.find(t => t.label === pendingUploadType);
+                    if (selectedOpt?.type === "video") return "video/*";
+                    if (selectedOpt?.type === "audio") return "audio/*";
+                    return ".pdf,.doc,.docx,.xls,.xlsx,.csv,.ppt,.pptx,.txt,.md";
+                  })()}
                 />
                 <motion.div
                   initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.15 }}
@@ -1280,8 +1292,8 @@ const KnowledgeExtract = () => {
           </div>
 
           <div className="flex flex-1 overflow-hidden">
-            {/* Left: Word-style document */}
-            <div className="w-[55%] shrink-0 overflow-y-auto">
+            {/* Left: Word-style document - wider */}
+            <div className="w-[65%] shrink-0 overflow-y-auto">
               <div className="max-w-3xl mx-auto py-8 px-10">
                 {paragraphs.map((para, idx) => {
                   const isHighlighted = dropHighlight === idx;
@@ -1295,7 +1307,6 @@ const KnowledgeExtract = () => {
                         setDropHighlight(null);
                         const resultToolId = e.dataTransfer.getData("resultToolId");
                         if (resultToolId && toolResults[resultToolId]) {
-                          // Insert tool result after this paragraph
                           const newParagraphs = [...paragraphs];
                           newParagraphs.splice(idx + 1, 0, toolResults[resultToolId]);
                           setInitialDoc(newParagraphs.join("\n\n"));
@@ -1303,7 +1314,6 @@ const KnowledgeExtract = () => {
                       }}
                       className={`py-2 transition-all ${isHighlighted ? "bg-primary/5 border-b-2 border-dashed border-primary" : "border-b border-transparent"}`}
                     >
-                      {/* Render paragraph as markdown-like */}
                       {para.split("\n").map((line, li) => {
                         if (line.startsWith("# ")) return <h1 key={li} className="text-2xl font-bold text-foreground mt-6 mb-3">{line.slice(2)}</h1>;
                         if (line.startsWith("## ")) return <h2 key={li} className="text-lg font-semibold text-foreground mt-4 mb-2">{line.slice(3)}</h2>;
@@ -1322,17 +1332,14 @@ const KnowledgeExtract = () => {
               </div>
             </div>
 
-            {/* Right: Tool grid + workspace */}
+            {/* Right: Tool bar + workspace - compact */}
             <aside className="flex-1 min-w-0 border-l border-border flex flex-col bg-muted/30">
-              {/* Tool grid header */}
-              <div className="px-4 pt-4 pb-3 border-b border-border">
-                <h3 className="font-semibold text-sm text-foreground">结构化工具</h3>
-                <p className="text-xs text-muted-foreground mt-1">点击工具开始处理，可复制左侧文本粘贴到下方</p>
-              </div>
-
-              {/* 2x3 tool grid */}
-              <div className="px-3 pt-3 pb-2">
-                <div className="grid grid-cols-3 gap-2">
+              {/* Compact tool row */}
+              <div className="px-3 pt-3 pb-2 border-b border-border">
+                <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground mb-2">
+                  <Layers className="w-3 h-3" /> 结构化工具
+                </div>
+                <div className="flex items-center gap-1.5">
                   {tools.map((tool) => {
                     const isSelected = selectedStructTool === tool.id;
                     const hasResult = !!toolResults[tool.id];
@@ -1340,29 +1347,24 @@ const KnowledgeExtract = () => {
                     return (
                       <motion.button
                         key={tool.id}
-                        whileHover={{ scale: 1.03 }}
-                        whileTap={{ scale: 0.97 }}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
                         onClick={() => setSelectedStructTool(isSelected ? null : tool.id)}
-                        className={`relative flex flex-col items-center gap-1.5 p-3 rounded-xl border transition-all text-center ${
+                        className={`relative flex items-center gap-1 px-2.5 py-1.5 rounded-lg border transition-all text-center whitespace-nowrap ${
                           isSelected
-                            ? "border-primary bg-primary/5 shadow-md"
+                            ? "border-primary bg-primary/5 shadow-sm"
                             : hasResult
-                            ? `${tool.color} border-2`
-                            : "border-border bg-card hover:border-primary/30 hover:shadow-sm"
+                            ? `${tool.color} border`
+                            : "border-border bg-card hover:border-primary/30"
                         }`}
                       >
-                        {hasResult && (
-                          <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-primary flex items-center justify-center">
-                            <Check className="w-2.5 h-2.5 text-primary-foreground" />
+                        {(hasResult || isGenerating) && (
+                          <div className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-primary flex items-center justify-center">
+                            {isGenerating ? <Loader2 className="w-2 h-2 text-primary-foreground animate-spin" /> : <Check className="w-2 h-2 text-primary-foreground" />}
                           </div>
                         )}
-                        {isGenerating && (
-                          <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-primary flex items-center justify-center">
-                            <Loader2 className="w-2.5 h-2.5 text-primary-foreground animate-spin" />
-                          </div>
-                        )}
-                        <tool.icon className={`w-5 h-5 ${isSelected ? "text-primary" : "text-muted-foreground"}`} />
-                        <span className={`text-[11px] font-medium ${isSelected ? "text-primary" : "text-foreground"}`}>{tool.label}</span>
+                        <tool.icon className={`w-3.5 h-3.5 ${isSelected ? "text-primary" : "text-muted-foreground"}`} />
+                        <span className={`text-[10px] font-medium ${isSelected ? "text-primary" : "text-foreground"}`}>{tool.label}</span>
                       </motion.button>
                     );
                   })}
@@ -1879,87 +1881,136 @@ const KnowledgeExtract = () => {
                 className="w-full max-w-[780px] h-[560px] bg-card rounded-2xl shadow-2xl border border-border overflow-hidden flex flex-col" onClick={(e) => e.stopPropagation()}>
                 {/* Header */}
                 <div className="px-5 py-3 border-b border-border bg-muted/30 flex items-center justify-between shrink-0">
-                  <span className="text-sm font-semibold text-foreground">请选择</span>
-                  <div className="flex-1 max-w-[320px] mx-4">
-                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-border bg-background text-sm">
-                      <Search className="w-3.5 h-3.5 text-muted-foreground" />
-                      <input placeholder="搜索或粘贴链接" className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground" />
+                  <div className="flex items-center gap-3">
+                    <span className="text-sm font-semibold text-foreground">添加来源</span>
+                    <div className="flex items-center gap-1 p-0.5 rounded-lg bg-accent">
+                      <button onClick={() => setDeepSourceType("joyspace")}
+                        className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${deepSourceType === "joyspace" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}>
+                        <BookOpen className="w-3 h-3 inline mr-1" />JoySpace
+                      </button>
+                      <button onClick={() => setDeepSourceType("local")}
+                        className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${deepSourceType === "local" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}>
+                        <Monitor className="w-3 h-3 inline mr-1" />本地文件
+                      </button>
                     </div>
                   </div>
-                  <button onClick={() => { setShowAddSource(false); setPickerSelected([]); setPickerTab("最近打开"); setPickerNav("home"); }} className="p-1 rounded hover:bg-accent text-muted-foreground"><X className="w-4 h-4" /></button>
+                  {deepSourceType === "joyspace" && (
+                    <div className="flex-1 max-w-[280px] mx-4">
+                      <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-border bg-background text-sm">
+                        <Search className="w-3.5 h-3.5 text-muted-foreground" />
+                        <input placeholder="搜索或粘贴链接" className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground" />
+                      </div>
+                    </div>
+                  )}
+                  <button onClick={() => { setShowAddSource(false); setPickerSelected([]); setPickerTab("最近打开"); setPickerNav("home"); setDeepSourceType("joyspace"); }} className="p-1 rounded hover:bg-accent text-muted-foreground"><X className="w-4 h-4" /></button>
                 </div>
 
                 {/* Body */}
                 <div className="flex flex-1 overflow-hidden">
-                  {/* Left nav */}
-                  <div className="w-[180px] shrink-0 border-r border-border py-3 px-2 overflow-y-auto">
-                    {FILE_PICKER_NAV.map(nav => (
-                      <button key={nav.key}
-                        onClick={() => setPickerNav(nav.key)}
-                        className={`flex items-center gap-2.5 w-full px-3 py-2 rounded-md text-sm transition-colors ${pickerNav === nav.key ? "text-primary bg-primary/10 font-medium" : "text-muted-foreground hover:text-foreground hover:bg-accent"}`}>
-                        <nav.icon className="w-4 h-4" />{nav.label}
-                      </button>
-                    ))}
-                    <div className="mt-3 mb-1 px-3">
-                      <span className="text-[10px] text-muted-foreground uppercase tracking-wider">知识库</span>
-                    </div>
-                    {FILE_PICKER_KB.map(kb => (
-                      <button key={kb.key}
-                        onClick={() => setPickerNav(kb.key)}
-                        className={`flex items-center gap-2.5 w-full px-3 py-2 rounded-md text-sm transition-colors ${pickerNav === kb.key ? "text-primary bg-primary/10 font-medium" : "text-muted-foreground hover:text-foreground hover:bg-accent"}`}>
-                        <kb.icon className={`w-4 h-4 ${pickerNav === kb.key ? "text-primary" : "text-primary"}`} />
-                        <span className="truncate">{kb.label}</span>
-                      </button>
-                    ))}
-                  </div>
-
-                  {/* Right content */}
-                  <div className="flex-1 flex flex-col min-w-0">
-                    {/* Tabs */}
-                    <div className="flex items-center gap-6 px-5 pt-3 border-b border-border">
-                      {TAB_KEYS.map((tab) => (
-                        <button key={tab}
-                          onClick={() => setPickerTab(tab)}
-                          className={`pb-2.5 text-sm font-medium transition-colors ${pickerTab === tab ? "text-foreground border-b-2 border-primary" : "text-muted-foreground hover:text-foreground"}`}>
-                          {tab}
-                        </button>
-                      ))}
-                    </div>
-
-                    {/* File list */}
-                    <div className="flex-1 overflow-y-auto">
-                      {(FILE_PICKER_TABS_DATA[pickerTab] || []).map((file, i) => {
-                        const fileKey = `${pickerTab}-${file.label}-${i}`;
-                        const isSelected = pickerSelected.includes(fileKey);
-                        const formatColors: Record<string, string> = {
-                          sheet: "text-emerald-600",
-                          doc: "text-blue-600",
-                          ppt: "text-orange-600",
-                        };
-                        return (
-                          <button key={fileKey}
-                            onClick={() => {
-                              setPickerSelected(prev => isSelected ? prev.filter(k => k !== fileKey) : [...prev, fileKey]);
-                            }}
-                            className={`flex items-center gap-3 w-full px-5 py-3 transition-colors text-left border-b border-border/50 group ${isSelected ? "bg-primary/5" : "hover:bg-accent/50"}`}>
-                            <div className={`w-4 h-4 rounded border shrink-0 flex items-center justify-center transition-colors ${isSelected ? "border-primary bg-primary" : "border-border group-hover:border-primary/40"}`}>
-                              {isSelected && <Check className="w-3 h-3 text-primary-foreground" />}
-                            </div>
-                            <file.icon className={`w-5 h-5 shrink-0 ${formatColors[file.format] || "text-muted-foreground"}`} />
-                            <span className="text-sm text-foreground truncate flex-1">{file.label}</span>
-                            <span className="text-xs text-muted-foreground shrink-0">可阅读 ▾</span>
+                  {deepSourceType === "joyspace" ? (
+                    <>
+                      {/* Left nav */}
+                      <div className="w-[180px] shrink-0 border-r border-border py-3 px-2 overflow-y-auto">
+                        {FILE_PICKER_NAV.map(nav => (
+                          <button key={nav.key}
+                            onClick={() => setPickerNav(nav.key)}
+                            className={`flex items-center gap-2.5 w-full px-3 py-2 rounded-md text-sm transition-colors ${pickerNav === nav.key ? "text-primary bg-primary/10 font-medium" : "text-muted-foreground hover:text-foreground hover:bg-accent"}`}>
+                            <nav.icon className="w-4 h-4" />{nav.label}
                           </button>
-                        );
-                      })}
+                        ))}
+                        <div className="mt-3 mb-1 px-3">
+                          <span className="text-[10px] text-muted-foreground uppercase tracking-wider">知识库</span>
+                        </div>
+                        {FILE_PICKER_KB.map(kb => (
+                          <button key={kb.key}
+                            onClick={() => setPickerNav(kb.key)}
+                            className={`flex items-center gap-2.5 w-full px-3 py-2 rounded-md text-sm transition-colors ${pickerNav === kb.key ? "text-primary bg-primary/10 font-medium" : "text-muted-foreground hover:text-foreground hover:bg-accent"}`}>
+                            <kb.icon className={`w-4 h-4 ${pickerNav === kb.key ? "text-primary" : "text-primary"}`} />
+                            <span className="truncate">{kb.label}</span>
+                          </button>
+                        ))}
+                      </div>
+
+                      {/* Right content */}
+                      <div className="flex-1 flex flex-col min-w-0">
+                        {/* Tabs */}
+                        <div className="flex items-center gap-6 px-5 pt-3 border-b border-border">
+                          {TAB_KEYS.map((tab) => (
+                            <button key={tab}
+                              onClick={() => setPickerTab(tab)}
+                              className={`pb-2.5 text-sm font-medium transition-colors ${pickerTab === tab ? "text-foreground border-b-2 border-primary" : "text-muted-foreground hover:text-foreground"}`}>
+                              {tab}
+                            </button>
+                          ))}
+                        </div>
+
+                        {/* File list */}
+                        <div className="flex-1 overflow-y-auto">
+                          {(FILE_PICKER_TABS_DATA[pickerTab] || []).map((file, i) => {
+                            const fileKey = `${pickerTab}-${file.label}-${i}`;
+                            const isSelected = pickerSelected.includes(fileKey);
+                            const formatColors: Record<string, string> = {
+                              sheet: "text-emerald-600",
+                              doc: "text-blue-600",
+                              ppt: "text-orange-600",
+                            };
+                            return (
+                              <button key={fileKey}
+                                onClick={() => {
+                                  setPickerSelected(prev => isSelected ? prev.filter(k => k !== fileKey) : [...prev, fileKey]);
+                                }}
+                                className={`flex items-center gap-3 w-full px-5 py-3 transition-colors text-left border-b border-border/50 group ${isSelected ? "bg-primary/5" : "hover:bg-accent/50"}`}>
+                                <div className={`w-4 h-4 rounded border shrink-0 flex items-center justify-center transition-colors ${isSelected ? "border-primary bg-primary" : "border-border group-hover:border-primary/40"}`}>
+                                  {isSelected && <Check className="w-3 h-3 text-primary-foreground" />}
+                                </div>
+                                <file.icon className={`w-5 h-5 shrink-0 ${formatColors[file.format] || "text-muted-foreground"}`} />
+                                <span className="text-sm text-foreground truncate flex-1">{file.label}</span>
+                                <span className="text-xs text-muted-foreground shrink-0">可阅读 ▾</span>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    /* Local file upload */
+                    <div className="flex-1 flex flex-col items-center justify-center p-8">
+                      <input
+                        ref={deepFileInputRef}
+                        type="file"
+                        multiple
+                        className="hidden"
+                        onChange={(e) => {
+                          const files = e.target.files;
+                          if (files && files.length > 0) {
+                            Array.from(files).forEach(file => addSource("file", file.name));
+                          }
+                          if (deepFileInputRef.current) deepFileInputRef.current.value = "";
+                        }}
+                        accept=".pdf,.doc,.docx,.xls,.xlsx,.csv,.ppt,.pptx,.txt,.md,video/*,audio/*"
+                      />
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+                        onClick={() => deepFileInputRef.current?.click()}
+                        className="w-full max-w-md border-2 border-dashed border-border rounded-2xl p-12 text-center cursor-pointer hover:border-primary/40 hover:bg-primary/5 transition-all"
+                      >
+                        <div className="w-16 h-16 rounded-2xl bg-accent flex items-center justify-center mx-auto mb-4">
+                          <Upload className="w-8 h-8 text-muted-foreground/50" />
+                        </div>
+                        <p className="text-sm font-medium text-foreground mb-1">点击选择本地文件</p>
+                        <p className="text-xs text-muted-foreground">支持文档、表格、PPT、音视频等格式</p>
+                        <p className="text-[10px] text-muted-foreground mt-2">PDF, DOC, DOCX, XLS, XLSX, CSV, PPT, PPTX, TXT, MD, 音视频</p>
+                      </motion.div>
                     </div>
-                  </div>
+                  )}
                 </div>
 
-                {/* Footer */}
+                {/* Footer - only for JoySpace mode */}
+                {deepSourceType === "joyspace" && (
                 <div className="px-5 py-3 border-t border-border flex items-center justify-between shrink-0 bg-muted/20">
                   <span className="text-xs text-muted-foreground">已选择 {pickerSelected.length} 项</span>
                   <div className="flex items-center gap-2">
-                    <button onClick={() => { setShowAddSource(false); setPickerSelected([]); setPickerTab("最近打开"); setPickerNav("home"); }} className="px-4 py-1.5 rounded-lg border border-border text-sm text-muted-foreground hover:text-foreground transition-colors">取消</button>
+                    <button onClick={() => { setShowAddSource(false); setPickerSelected([]); setPickerTab("最近打开"); setPickerNav("home"); setDeepSourceType("joyspace"); }} className="px-4 py-1.5 rounded-lg border border-border text-sm text-muted-foreground hover:text-foreground transition-colors">取消</button>
                     <button
                       disabled={pickerSelected.length === 0}
                       onClick={() => {
@@ -1971,6 +2022,7 @@ const KnowledgeExtract = () => {
                         setPickerSelected([]);
                         setPickerTab("最近打开");
                         setPickerNav("home");
+                        setDeepSourceType("joyspace");
                         setShowAddSource(false);
                       }}
                       className="px-4 py-1.5 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors disabled:opacity-40">
@@ -1978,6 +2030,7 @@ const KnowledgeExtract = () => {
                     </button>
                   </div>
                 </div>
+                )}
               </motion.div>
             </motion.div>
             );
