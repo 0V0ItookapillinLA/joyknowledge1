@@ -4,7 +4,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import AppLayout from "@/components/AppLayout";
 import PageHeader from "@/components/PageHeader";
 import { MOCK_EXPERTS, MOCK_CASES } from "@/data/mockData";
-import { ArrowLeft, UserPlus, Mail, Calendar, Heart, MessageCircle, ChevronDown, Star } from "lucide-react";
+import { ArrowLeft, UserPlus, Mail, Calendar, Heart, MessageCircle, ChevronDown, Star, X } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useToast } from "@/hooks/use-toast";
 
 import samAvatar from "@/assets/avatars/sam.jpg";
 import ericAvatar from "@/assets/avatars/eric.jpg";
@@ -34,6 +36,26 @@ const ExpertLibrary = () => {
   const [selectedDomain, setSelectedDomain] = useState("全部领域");
   const [selectedExpert, setSelectedExpert] = useState<typeof MOCK_EXPERTS[0] | null>(null);
   const [sortBy, setSortBy] = useState("按热度排序");
+  const [showRatingDialog, setShowRatingDialog] = useState(false);
+  const [ratingScore, setRatingScore] = useState(0);
+  const [hoverScore, setHoverScore] = useState(0);
+  const [ratingComment, setRatingComment] = useState("");
+  const { toast } = useToast();
+
+  const handleSubmitRating = () => {
+    if (ratingScore === 0) return;
+    toast({ title: "评分成功", description: `您为 ${selectedExpert?.name} 打了 ${ratingScore} 分` });
+    setShowRatingDialog(false);
+    setRatingScore(0);
+    setHoverScore(0);
+    setRatingComment("");
+  };
+
+  const handleViewAllCases = () => {
+    if (selectedExpert) {
+      navigate(`/?author=${encodeURIComponent(selectedExpert.name)}`);
+    }
+  };
 
   useEffect(() => {
     const expertId = searchParams.get("id");
@@ -202,13 +224,19 @@ const ExpertLibrary = () => {
                   <p className="text-xs text-muted-foreground mt-0.5">专家评分</p>
                 </div>
               </div>
+              <button
+                onClick={() => setShowRatingDialog(true)}
+                className="mt-4 inline-flex items-center gap-1.5 px-4 py-1.5 rounded-lg border border-primary/30 text-primary text-sm font-medium hover:bg-primary/5 transition-colors"
+              >
+                <Star className="w-4 h-4" /> 我要评分
+              </button>
             </motion.div>
 
             {/* Cases */}
             <div>
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-sm font-semibold text-foreground">已发布案例</h2>
-                <button className="text-sm text-primary hover:underline">查看全部</button>
+                <button onClick={handleViewAllCases} className="text-sm text-primary hover:underline">查看全部</button>
               </div>
 
               <div className="space-y-4">
@@ -272,6 +300,52 @@ const ExpertLibrary = () => {
             </div>
           </aside>
         </div>
+
+        {/* Rating Dialog */}
+        <Dialog open={showRatingDialog} onOpenChange={setShowRatingDialog}>
+          <DialogContent className="sm:max-w-[400px]">
+            <DialogHeader>
+              <DialogTitle className="text-center">为 {selectedExpert.name} 评分</DialogTitle>
+            </DialogHeader>
+            <div className="flex flex-col items-center gap-4 py-4">
+              <div className="flex items-center gap-2">
+                {[1, 2, 3, 4, 5].map((score) => (
+                  <button
+                    key={score}
+                    onClick={() => setRatingScore(score)}
+                    onMouseEnter={() => setHoverScore(score)}
+                    onMouseLeave={() => setHoverScore(0)}
+                    className="p-1 transition-transform hover:scale-110"
+                  >
+                    <Star
+                      className={`w-8 h-8 transition-colors ${
+                        score <= (hoverScore || ratingScore)
+                          ? "text-amber-400 fill-amber-400"
+                          : "text-border"
+                      }`}
+                    />
+                  </button>
+                ))}
+              </div>
+              <p className="text-sm text-muted-foreground">
+                {ratingScore > 0 ? `${ratingScore} 分` : "请选择评分"}
+              </p>
+              <textarea
+                value={ratingComment}
+                onChange={(e) => setRatingComment(e.target.value)}
+                placeholder="写下您的评价（选填）"
+                className="w-full h-24 rounded-lg border border-border bg-background px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary/30"
+              />
+              <button
+                onClick={handleSubmitRating}
+                disabled={ratingScore === 0}
+                className="w-full py-2.5 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                提交评分
+              </button>
+            </div>
+          </DialogContent>
+        </Dialog>
       </AppLayout>
     );
   }
