@@ -1290,8 +1290,8 @@ const KnowledgeExtract = () => {
           </div>
 
           <div className="flex flex-1 overflow-hidden">
-            {/* Left: Word-style document */}
-            <div className="w-[55%] shrink-0 overflow-y-auto">
+            {/* Left: Word-style document - wider */}
+            <div className="w-[65%] shrink-0 overflow-y-auto">
               <div className="max-w-3xl mx-auto py-8 px-10">
                 {paragraphs.map((para, idx) => {
                   const isHighlighted = dropHighlight === idx;
@@ -1305,7 +1305,6 @@ const KnowledgeExtract = () => {
                         setDropHighlight(null);
                         const resultToolId = e.dataTransfer.getData("resultToolId");
                         if (resultToolId && toolResults[resultToolId]) {
-                          // Insert tool result after this paragraph
                           const newParagraphs = [...paragraphs];
                           newParagraphs.splice(idx + 1, 0, toolResults[resultToolId]);
                           setInitialDoc(newParagraphs.join("\n\n"));
@@ -1313,7 +1312,6 @@ const KnowledgeExtract = () => {
                       }}
                       className={`py-2 transition-all ${isHighlighted ? "bg-primary/5 border-b-2 border-dashed border-primary" : "border-b border-transparent"}`}
                     >
-                      {/* Render paragraph as markdown-like */}
                       {para.split("\n").map((line, li) => {
                         if (line.startsWith("# ")) return <h1 key={li} className="text-2xl font-bold text-foreground mt-6 mb-3">{line.slice(2)}</h1>;
                         if (line.startsWith("## ")) return <h2 key={li} className="text-lg font-semibold text-foreground mt-4 mb-2">{line.slice(3)}</h2>;
@@ -1332,16 +1330,13 @@ const KnowledgeExtract = () => {
               </div>
             </div>
 
-            {/* Right: Tool grid + workspace */}
+            {/* Right: Tool bar + workspace - compact */}
             <aside className="flex-1 min-w-0 border-l border-border flex flex-col bg-muted/30">
-              {/* Tool grid header */}
-              <div className="px-4 pt-4 pb-3 border-b border-border">
-                <h3 className="font-semibold text-sm text-foreground">结构化工具</h3>
-                <p className="text-xs text-muted-foreground mt-1">点击工具开始处理，可复制左侧文本粘贴到下方</p>
-              </div>
-
-              {/* 2x3 tool grid */}
-              <div className="px-3 pt-3 pb-2">
+              {/* Compact tool row */}
+              <div className="px-3 pt-3 pb-2 border-b border-border">
+                <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground mb-2">
+                  <Layers className="w-3 h-3" /> 结构化工具
+                </div>
                 <div className="grid grid-cols-3 gap-2">
                   {tools.map((tool) => {
                     const isSelected = selectedStructTool === tool.id;
