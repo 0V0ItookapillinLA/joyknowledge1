@@ -536,20 +536,33 @@ const KnowledgeExtract = () => {
     const handleTypeClick = (opt: { type: string; comingSoon?: boolean; label: string }) => {
       if ((opt as any).comingSoon) return;
       if (opt.type === "url") {
-        // Always keep URL input open, just track which online type is selected
         setSelectedOnlineType(opt.label);
         setActiveUploadType("url");
       } else if (opt.type === "text") {
         setActiveUploadType(activeUploadType === "text" ? null : "text");
       } else {
-        const names: Record<string, string> = {
-          file: `文档_${sources.length + 1}.pdf`,
-          image: `截图_${sources.length + 1}.png`,
-          audio: `会议录音_${sources.length + 1}.mp3`,
-          video: `培训视频_${sources.length + 1}.mp4`,
-        };
-        quickAddSource(opt.type as Source["type"], names[opt.type] || `${opt.label}_${sources.length + 1}`);
+        // Set pending type and show the upload zone highlighted
+        setPendingUploadType(opt.type);
+        setActiveUploadType(opt.type);
       }
+    };
+
+    const handleUploadZoneClick = () => {
+      if (pendingUploadType) {
+        fileInputRef.current?.click();
+      }
+    };
+
+    const handleFileSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const files = e.target.files;
+      if (files && files.length > 0) {
+        Array.from(files).forEach(file => {
+          quickAddSource(pendingUploadType as Source["type"], file.name);
+        });
+      }
+      setPendingUploadType(null);
+      setActiveUploadType(null);
+      if (fileInputRef.current) fileInputRef.current.value = "";
     };
 
     return (
