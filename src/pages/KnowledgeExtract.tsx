@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Sparkles, Send, FileText, Tag, Upload, Link2,
-  X, File, CheckCircle2, Plus, Search, Loader2, Save, Zap,
+  X, File, CheckCircle2, XCircle, Plus, Search, Loader2, Save, Zap,
   Mic, Video, GitBranch, BarChart3, Globe, ArrowRight,
   ChevronLeft, Edit3, BookOpen, Wand2, MessageSquare, FileUp,
   Check, RotateCcw, Image, FileAudio, FileVideo,
@@ -19,7 +19,7 @@ interface Source {
   id: string;
   name: string;
   type: "file" | "url" | "text" | "case" | "image" | "audio" | "video";
-  status: "ready" | "processing" | "analyzing";
+  status: "ready" | "processing" | "analyzing" | "failed";
   selected: boolean;
   size?: string;
   favicon?: string;
@@ -195,8 +195,9 @@ const KnowledgeExtract = () => {
   const [resultContent, setResultContent] = useState(GENERATED_DOC);
   const [isEditing, setIsEditing] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
-  const [activeUploadType, setActiveUploadType] = useState<string | null>(null);
+  const [activeUploadType, setActiveUploadType] = useState<string | null>("file");
   const [selectedOnlineType, setSelectedOnlineType] = useState<string | null>(null);
+  const [defaultsApplied, setDefaultsApplied] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
   const [pickerSelected, setPickerSelected] = useState<string[]>([]);
   const [pickerTab, setPickerTab] = useState("最近打开");
@@ -259,6 +260,10 @@ const KnowledgeExtract = () => {
   const enterWorkspace = (mode: ExtractMode) => {
     setExtractMode(mode);
     if (mode === "quick") {
+      // Set defaults: local files → 本地非结构化文档, online → JoySpace
+      setPendingUploadType("本地非结构化文档");
+      setActiveUploadType("file");
+      setSelectedOnlineType(null);
       setAppMode("quick-upload");
       return;
     }
@@ -328,7 +333,9 @@ const KnowledgeExtract = () => {
         const newSource: Source = { id: `search-${Date.now()}-${i}`, name: result.title, type: "url", status: "analyzing", selected: true };
         setSources(prev => [...prev, newSource]);
         setTimeout(() => {
-          setSources(prev => prev.map(s => s.id === newSource.id ? { ...s, status: "ready" } : s));
+          // Randomly make some imports fail (about 30% chance)
+          const isFailed = Math.random() < 0.3;
+          setSources(prev => prev.map(s => s.id === newSource.id ? { ...s, status: isFailed ? "failed" : "ready" } : s));
         }, 1500 + Math.random() * 1000);
       }, i * 200);
     });
@@ -804,6 +811,10 @@ const KnowledgeExtract = () => {
                             <span className="shrink-0">
                               {s.status === "analyzing" ? (
                                 <Loader2 className="w-3 h-3 text-primary animate-spin" />
+                              ) : s.status === "failed" ? (
+                                <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }}>
+                                  <XCircle className="w-3.5 h-3.5 text-destructive" />
+                                </motion.span>
                               ) : (
                                 <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }}>
                                   <CheckCircle2 className="w-3.5 h-3.5 text-primary" />
@@ -1287,7 +1298,7 @@ const KnowledgeExtract = () => {
             </div>
             <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={startGeneration}
               className="flex items-center gap-2 px-5 py-2 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 shadow-md">
-              <Wand2 className="w-4 h-4" /> 最终生成
+              <Wand2 className="w-4 h-4" /> 生成预览
             </motion.button>
           </div>
 
@@ -1734,10 +1745,18 @@ const KnowledgeExtract = () => {
                           </motion.div>
                         </div>
                       )}
+                      {source.status === "failed" && (
+                        <span className="text-xs text-destructive flex items-center gap-1 mt-0.5"><XCircle className="w-3 h-3" /> 解析失败</span>
+                      )}
                     </div>
                     {source.status === "ready" && (
                       <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }}>
                         <CheckCircle2 className="w-3.5 h-3.5 text-primary shrink-0" />
+                      </motion.span>
+                    )}
+                    {source.status === "failed" && (
+                      <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }}>
+                        <XCircle className="w-3.5 h-3.5 text-destructive shrink-0" />
                       </motion.span>
                     )}
                     <button onClick={(e) => { e.stopPropagation(); removeSource(source.id); }} className="p-0.5 rounded opacity-0 group-hover:opacity-100 hover:bg-accent text-muted-foreground transition-all"><X className="w-3 h-3" /></button>
