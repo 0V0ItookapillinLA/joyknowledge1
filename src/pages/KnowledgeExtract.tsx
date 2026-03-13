@@ -815,7 +815,7 @@ const KnowledgeExtract = () => {
             {/* Right: Added files */}
             <div className="w-[360px] shrink-0 overflow-y-auto flex flex-col">
               <div className="px-5 py-4 border-b border-border">
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between mb-2.5">
                   <div className="flex items-center gap-2">
                     <span className="text-xs font-semibold text-foreground">已添加资料</span>
                     <span className="px-1.5 py-0.5 rounded-md bg-primary/10 text-primary text-[10px] font-medium">{sources.length}</span>
@@ -829,6 +829,20 @@ const KnowledgeExtract = () => {
                       })}
                     </div>
                   )}
+                </div>
+                {/* Source limit progress bar */}
+                <div className="flex items-center gap-2.5">
+                  <div className="flex-1 h-1.5 rounded-full bg-accent overflow-hidden">
+                    <motion.div
+                      className={`h-full rounded-full transition-colors ${sources.length >= MAX_SOURCES ? "bg-destructive" : "bg-primary"}`}
+                      initial={{ width: "0%" }}
+                      animate={{ width: `${Math.min((sources.length / MAX_SOURCES) * 100, 100)}%` }}
+                      transition={{ duration: 0.3 }}
+                    />
+                  </div>
+                  <span className={`text-[11px] font-medium shrink-0 ${sources.length >= MAX_SOURCES ? "text-destructive" : "text-muted-foreground"}`}>
+                    {sources.length} / {MAX_SOURCES}
+                  </span>
                 </div>
               </div>
 
