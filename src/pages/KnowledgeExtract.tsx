@@ -956,8 +956,13 @@ const KnowledgeExtract = () => {
 
   // ───── Generating ─────
   if (appMode === "generating") {
-    const steps = currentTemplate?.preview || ["📋 分析内容", "🧠 提炼知识", "📝 生成文档"];
+    const deepGenSteps = ["📋 分析对话内容", "🧠 提炼隐性知识", "📝 生成结构化初稿"];
+    const steps = extractMode === "deep" ? deepGenSteps : (currentTemplate?.preview || ["📋 分析内容", "🧠 提炼知识", "📝 生成文档"]);
     const currentStepIdx = Math.floor((generatingProgress / 100) * steps.length);
+    const genTitle = extractMode === "deep" ? "AI 正在生成结构化初稿" : `AI 正在生成${currentTemplate?.label || "文档"}`;
+    const genDesc = extractMode === "deep"
+      ? `基于 ${chatMessages.filter(m => m.role === "user").length} 轮对话，正在提炼并生成初稿...`
+      : `基于 ${sources.length} 份资料，使用「${currentTemplate?.label}」模板生成中...`;
     return (
       <AppLayout>
         <div className="flex items-center justify-center h-[calc(100vh-56px)] bg-background">
@@ -965,16 +970,28 @@ const KnowledgeExtract = () => {
             {/* Animated icon */}
             <div className="relative w-28 h-28 mx-auto mb-8">
               <motion.div animate={{ rotate: 360 }} transition={{ duration: 10, repeat: Infinity, ease: "linear" }} className="absolute inset-0">
-                {sources.slice(0, 5).map((s, i) => {
-                  const Icon = FILE_TYPE_ICON[s.type] || File;
-                  const angle = (i / Math.min(sources.length, 5)) * Math.PI * 2;
-                  return (
-                    <motion.div key={s.id} className="absolute w-8 h-8 rounded-lg bg-accent flex items-center justify-center shadow-sm"
-                      style={{ top: `${50 + 42 * Math.sin(angle)}%`, left: `${50 + 42 * Math.cos(angle)}%`, transform: "translate(-50%, -50%)" }}>
-                      <Icon className="w-4 h-4 text-primary" />
-                    </motion.div>
-                  );
-                })}
+                {extractMode === "deep" ? (
+                  [MessageSquare, BookOpen, Sparkles, Wand2, FileText].map((Icon, i) => {
+                    const angle = (i / 5) * Math.PI * 2;
+                    return (
+                      <motion.div key={i} className="absolute w-8 h-8 rounded-lg bg-accent flex items-center justify-center shadow-sm"
+                        style={{ top: `${50 + 42 * Math.sin(angle)}%`, left: `${50 + 42 * Math.cos(angle)}%`, transform: "translate(-50%, -50%)" }}>
+                        <Icon className="w-4 h-4 text-primary" />
+                      </motion.div>
+                    );
+                  })
+                ) : (
+                  sources.slice(0, 5).map((s, i) => {
+                    const Icon = FILE_TYPE_ICON[s.type] || File;
+                    const angle = (i / Math.min(sources.length, 5)) * Math.PI * 2;
+                    return (
+                      <motion.div key={s.id} className="absolute w-8 h-8 rounded-lg bg-accent flex items-center justify-center shadow-sm"
+                        style={{ top: `${50 + 42 * Math.sin(angle)}%`, left: `${50 + 42 * Math.cos(angle)}%`, transform: "translate(-50%, -50%)" }}>
+                        <Icon className="w-4 h-4 text-primary" />
+                      </motion.div>
+                    );
+                  })
+                )}
               </motion.div>
               <div className="absolute inset-0 flex items-center justify-center">
                 <motion.div animate={{ scale: [1, 1.12, 1] }} transition={{ duration: 2, repeat: Infinity }} className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center shadow-inner">
@@ -983,8 +1000,8 @@ const KnowledgeExtract = () => {
               </div>
             </div>
 
-            <h2 className="text-xl font-bold text-foreground mb-2">AI 正在生成{currentTemplate?.label || "文档"}</h2>
-            <p className="text-sm text-muted-foreground mb-8">基于 {sources.length} 份资料，使用「{currentTemplate?.label}」模板生成中...</p>
+            <h2 className="text-xl font-bold text-foreground mb-2">{genTitle}</h2>
+            <p className="text-sm text-muted-foreground mb-8">{genDesc}</p>
 
             <div className="w-full h-2.5 rounded-full bg-accent overflow-hidden mb-6">
               <motion.div className="h-full rounded-full bg-gradient-to-r from-primary to-primary/70" initial={{ width: "0%" }} animate={{ width: `${generatingProgress}%` }} transition={{ duration: 0.3 }} />
