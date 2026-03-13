@@ -538,11 +538,13 @@ const KnowledgeExtract = () => {
       if (opt.type === "url") {
         setSelectedOnlineType(opt.label);
         setActiveUploadType("url");
+        setPendingUploadType(null);
       } else if (opt.type === "text") {
         setActiveUploadType(activeUploadType === "text" ? null : "text");
+        setPendingUploadType(null);
       } else {
-        // Set pending type and show the upload zone highlighted
-        setPendingUploadType(opt.type);
+        // Single-select: use label as unique key
+        setPendingUploadType(opt.label);
         setActiveUploadType(opt.type);
       }
     };
