@@ -2005,11 +2005,12 @@ const KnowledgeExtract = () => {
                   )}
                 </div>
 
-                {/* Footer */}
+                {/* Footer - only for JoySpace mode */}
+                {deepSourceType === "joyspace" && (
                 <div className="px-5 py-3 border-t border-border flex items-center justify-between shrink-0 bg-muted/20">
                   <span className="text-xs text-muted-foreground">已选择 {pickerSelected.length} 项</span>
                   <div className="flex items-center gap-2">
-                    <button onClick={() => { setShowAddSource(false); setPickerSelected([]); setPickerTab("最近打开"); setPickerNav("home"); }} className="px-4 py-1.5 rounded-lg border border-border text-sm text-muted-foreground hover:text-foreground transition-colors">取消</button>
+                    <button onClick={() => { setShowAddSource(false); setPickerSelected([]); setPickerTab("最近打开"); setPickerNav("home"); setDeepSourceType("joyspace"); }} className="px-4 py-1.5 rounded-lg border border-border text-sm text-muted-foreground hover:text-foreground transition-colors">取消</button>
                     <button
                       disabled={pickerSelected.length === 0}
                       onClick={() => {
@@ -2021,6 +2022,7 @@ const KnowledgeExtract = () => {
                         setPickerSelected([]);
                         setPickerTab("最近打开");
                         setPickerNav("home");
+                        setDeepSourceType("joyspace");
                         setShowAddSource(false);
                       }}
                       className="px-4 py-1.5 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors disabled:opacity-40">
@@ -2028,6 +2030,7 @@ const KnowledgeExtract = () => {
                     </button>
                   </div>
                 </div>
+                )}
               </motion.div>
             </motion.div>
             );
