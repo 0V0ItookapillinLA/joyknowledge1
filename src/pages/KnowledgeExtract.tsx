@@ -1341,12 +1341,11 @@ const KnowledgeExtract = () => {
 
             {/* Right: Tool bar + workspace - compact */}
             <aside className="flex-1 min-w-0 border-l border-border flex flex-col bg-muted/30">
-              {/* Compact tool row */}
-              <div className="px-3 pt-3 pb-2 border-b border-border">
-                <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground mb-2">
-                  <Layers className="w-3 h-3" /> 结构化工具
-                </div>
-                <div className="flex items-center gap-1.5">
+              {/* Tool grid header */}
+              <div className="px-4 pt-4 pb-3 border-b border-border">
+                <h3 className="text-sm font-semibold text-foreground mb-1">结构化工具</h3>
+                <p className="text-xs text-muted-foreground mb-3">点击工具开始处理，可复制左侧文本粘贴到下方</p>
+                <div className="grid grid-cols-3 gap-2">
                   {tools.map((tool) => {
                     const isSelected = selectedStructTool === tool.id;
                     const hasResult = !!toolResults[tool.id];
@@ -1354,15 +1353,15 @@ const KnowledgeExtract = () => {
                     return (
                       <motion.button
                         key={tool.id}
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
+                        whileHover={{ scale: 1.03 }}
+                        whileTap={{ scale: 0.97 }}
                         onClick={() => setSelectedStructTool(isSelected ? null : tool.id)}
-                        className={`relative flex items-center gap-1 px-2.5 py-1.5 rounded-lg border transition-all text-center whitespace-nowrap ${
+                        className={`relative flex flex-col items-center gap-1.5 px-3 py-3 rounded-xl border-2 transition-all ${
                           isSelected
                             ? "border-primary bg-primary/5 shadow-sm"
                             : hasResult
-                            ? `${tool.color} border`
-                            : "border-border bg-card hover:border-primary/30"
+                            ? "border-primary/30 bg-primary/5"
+                            : "border-border bg-card hover:border-primary/30 hover:shadow-sm"
                         }`}
                       >
                         {(hasResult || isGenerating) && (
@@ -1370,8 +1369,8 @@ const KnowledgeExtract = () => {
                             {isGenerating ? <Loader2 className="w-2 h-2 text-primary-foreground animate-spin" /> : <Check className="w-2 h-2 text-primary-foreground" />}
                           </div>
                         )}
-                        <tool.icon className={`w-3.5 h-3.5 ${isSelected ? "text-primary" : "text-muted-foreground"}`} />
-                        <span className={`text-[10px] font-medium ${isSelected ? "text-primary" : "text-foreground"}`}>{tool.label}</span>
+                        <tool.icon className={`w-5 h-5 ${isSelected ? "text-primary" : "text-muted-foreground"}`} />
+                        <span className={`text-xs font-medium ${isSelected ? "text-primary" : "text-foreground"}`}>{tool.label}</span>
                       </motion.button>
                     );
                   })}
