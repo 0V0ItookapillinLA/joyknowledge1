@@ -19,7 +19,7 @@ interface Source {
   id: string;
   name: string;
   type: "file" | "url" | "text" | "case" | "image" | "audio" | "video";
-  status: "ready" | "processing" | "analyzing";
+  status: "ready" | "processing" | "analyzing" | "failed";
   selected: boolean;
   size?: string;
   favicon?: string;
