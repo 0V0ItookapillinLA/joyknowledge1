@@ -195,8 +195,9 @@ const KnowledgeExtract = () => {
   const [resultContent, setResultContent] = useState(GENERATED_DOC);
   const [isEditing, setIsEditing] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
-  const [activeUploadType, setActiveUploadType] = useState<string | null>(null);
+  const [activeUploadType, setActiveUploadType] = useState<string | null>("file");
   const [selectedOnlineType, setSelectedOnlineType] = useState<string | null>(null);
+  const [defaultsApplied, setDefaultsApplied] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
   const [pickerSelected, setPickerSelected] = useState<string[]>([]);
   const [pickerTab, setPickerTab] = useState("最近打开");
