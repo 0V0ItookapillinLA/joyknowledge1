@@ -260,6 +260,10 @@ const KnowledgeExtract = () => {
   const enterWorkspace = (mode: ExtractMode) => {
     setExtractMode(mode);
     if (mode === "quick") {
+      // Set defaults: local files → 本地非结构化文档, online → JoySpace
+      setPendingUploadType("本地非结构化文档");
+      setActiveUploadType("file");
+      setSelectedOnlineType(null);
       setAppMode("quick-upload");
       return;
     }
