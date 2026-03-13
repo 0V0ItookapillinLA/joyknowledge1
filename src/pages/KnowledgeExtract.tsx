@@ -574,8 +574,7 @@ const KnowledgeExtract = () => {
           quickAddSource(fileType as Source["type"], file.name);
         });
       }
-      setPendingUploadType(null);
-      setActiveUploadType(null);
+      // Keep the current selection active after upload
       if (fileInputRef.current) fileInputRef.current.value = "";
     };
 
