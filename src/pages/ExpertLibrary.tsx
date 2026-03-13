@@ -300,6 +300,52 @@ const ExpertLibrary = () => {
             </div>
           </aside>
         </div>
+
+        {/* Rating Dialog */}
+        <Dialog open={showRatingDialog} onOpenChange={setShowRatingDialog}>
+          <DialogContent className="sm:max-w-[400px]">
+            <DialogHeader>
+              <DialogTitle className="text-center">为 {selectedExpert.name} 评分</DialogTitle>
+            </DialogHeader>
+            <div className="flex flex-col items-center gap-4 py-4">
+              <div className="flex items-center gap-2">
+                {[1, 2, 3, 4, 5].map((score) => (
+                  <button
+                    key={score}
+                    onClick={() => setRatingScore(score)}
+                    onMouseEnter={() => setHoverScore(score)}
+                    onMouseLeave={() => setHoverScore(0)}
+                    className="p-1 transition-transform hover:scale-110"
+                  >
+                    <Star
+                      className={`w-8 h-8 transition-colors ${
+                        score <= (hoverScore || ratingScore)
+                          ? "text-amber-400 fill-amber-400"
+                          : "text-border"
+                      }`}
+                    />
+                  </button>
+                ))}
+              </div>
+              <p className="text-sm text-muted-foreground">
+                {ratingScore > 0 ? `${ratingScore} 分` : "请选择评分"}
+              </p>
+              <textarea
+                value={ratingComment}
+                onChange={(e) => setRatingComment(e.target.value)}
+                placeholder="写下您的评价（选填）"
+                className="w-full h-24 rounded-lg border border-border bg-background px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary/30"
+              />
+              <button
+                onClick={handleSubmitRating}
+                disabled={ratingScore === 0}
+                className="w-full py-2.5 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                提交评分
+              </button>
+            </div>
+          </DialogContent>
+        </Dialog>
       </AppLayout>
     );
   }
