@@ -1011,7 +1011,6 @@ const KnowledgeExtract = () => {
     const steps = [
       { n: 1, label: "知识发现" },
       { n: 2, label: "结构化处理" },
-      { n: 3, label: "生成预览" },
     ];
     return (
       <div className="flex items-center gap-2">
