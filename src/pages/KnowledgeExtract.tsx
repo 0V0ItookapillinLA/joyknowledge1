@@ -1881,80 +1881,128 @@ const KnowledgeExtract = () => {
                 className="w-full max-w-[780px] h-[560px] bg-card rounded-2xl shadow-2xl border border-border overflow-hidden flex flex-col" onClick={(e) => e.stopPropagation()}>
                 {/* Header */}
                 <div className="px-5 py-3 border-b border-border bg-muted/30 flex items-center justify-between shrink-0">
-                  <span className="text-sm font-semibold text-foreground">请选择</span>
-                  <div className="flex-1 max-w-[320px] mx-4">
-                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-border bg-background text-sm">
-                      <Search className="w-3.5 h-3.5 text-muted-foreground" />
-                      <input placeholder="搜索或粘贴链接" className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground" />
+                  <div className="flex items-center gap-3">
+                    <span className="text-sm font-semibold text-foreground">添加来源</span>
+                    <div className="flex items-center gap-1 p-0.5 rounded-lg bg-accent">
+                      <button onClick={() => setDeepSourceType("joyspace")}
+                        className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${deepSourceType === "joyspace" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}>
+                        <BookOpen className="w-3 h-3 inline mr-1" />JoySpace
+                      </button>
+                      <button onClick={() => setDeepSourceType("local")}
+                        className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${deepSourceType === "local" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}>
+                        <Monitor className="w-3 h-3 inline mr-1" />本地文件
+                      </button>
                     </div>
                   </div>
-                  <button onClick={() => { setShowAddSource(false); setPickerSelected([]); setPickerTab("最近打开"); setPickerNav("home"); }} className="p-1 rounded hover:bg-accent text-muted-foreground"><X className="w-4 h-4" /></button>
+                  {deepSourceType === "joyspace" && (
+                    <div className="flex-1 max-w-[280px] mx-4">
+                      <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-border bg-background text-sm">
+                        <Search className="w-3.5 h-3.5 text-muted-foreground" />
+                        <input placeholder="搜索或粘贴链接" className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground" />
+                      </div>
+                    </div>
+                  )}
+                  <button onClick={() => { setShowAddSource(false); setPickerSelected([]); setPickerTab("最近打开"); setPickerNav("home"); setDeepSourceType("joyspace"); }} className="p-1 rounded hover:bg-accent text-muted-foreground"><X className="w-4 h-4" /></button>
                 </div>
 
                 {/* Body */}
                 <div className="flex flex-1 overflow-hidden">
-                  {/* Left nav */}
-                  <div className="w-[180px] shrink-0 border-r border-border py-3 px-2 overflow-y-auto">
-                    {FILE_PICKER_NAV.map(nav => (
-                      <button key={nav.key}
-                        onClick={() => setPickerNav(nav.key)}
-                        className={`flex items-center gap-2.5 w-full px-3 py-2 rounded-md text-sm transition-colors ${pickerNav === nav.key ? "text-primary bg-primary/10 font-medium" : "text-muted-foreground hover:text-foreground hover:bg-accent"}`}>
-                        <nav.icon className="w-4 h-4" />{nav.label}
-                      </button>
-                    ))}
-                    <div className="mt-3 mb-1 px-3">
-                      <span className="text-[10px] text-muted-foreground uppercase tracking-wider">知识库</span>
-                    </div>
-                    {FILE_PICKER_KB.map(kb => (
-                      <button key={kb.key}
-                        onClick={() => setPickerNav(kb.key)}
-                        className={`flex items-center gap-2.5 w-full px-3 py-2 rounded-md text-sm transition-colors ${pickerNav === kb.key ? "text-primary bg-primary/10 font-medium" : "text-muted-foreground hover:text-foreground hover:bg-accent"}`}>
-                        <kb.icon className={`w-4 h-4 ${pickerNav === kb.key ? "text-primary" : "text-primary"}`} />
-                        <span className="truncate">{kb.label}</span>
-                      </button>
-                    ))}
-                  </div>
-
-                  {/* Right content */}
-                  <div className="flex-1 flex flex-col min-w-0">
-                    {/* Tabs */}
-                    <div className="flex items-center gap-6 px-5 pt-3 border-b border-border">
-                      {TAB_KEYS.map((tab) => (
-                        <button key={tab}
-                          onClick={() => setPickerTab(tab)}
-                          className={`pb-2.5 text-sm font-medium transition-colors ${pickerTab === tab ? "text-foreground border-b-2 border-primary" : "text-muted-foreground hover:text-foreground"}`}>
-                          {tab}
-                        </button>
-                      ))}
-                    </div>
-
-                    {/* File list */}
-                    <div className="flex-1 overflow-y-auto">
-                      {(FILE_PICKER_TABS_DATA[pickerTab] || []).map((file, i) => {
-                        const fileKey = `${pickerTab}-${file.label}-${i}`;
-                        const isSelected = pickerSelected.includes(fileKey);
-                        const formatColors: Record<string, string> = {
-                          sheet: "text-emerald-600",
-                          doc: "text-blue-600",
-                          ppt: "text-orange-600",
-                        };
-                        return (
-                          <button key={fileKey}
-                            onClick={() => {
-                              setPickerSelected(prev => isSelected ? prev.filter(k => k !== fileKey) : [...prev, fileKey]);
-                            }}
-                            className={`flex items-center gap-3 w-full px-5 py-3 transition-colors text-left border-b border-border/50 group ${isSelected ? "bg-primary/5" : "hover:bg-accent/50"}`}>
-                            <div className={`w-4 h-4 rounded border shrink-0 flex items-center justify-center transition-colors ${isSelected ? "border-primary bg-primary" : "border-border group-hover:border-primary/40"}`}>
-                              {isSelected && <Check className="w-3 h-3 text-primary-foreground" />}
-                            </div>
-                            <file.icon className={`w-5 h-5 shrink-0 ${formatColors[file.format] || "text-muted-foreground"}`} />
-                            <span className="text-sm text-foreground truncate flex-1">{file.label}</span>
-                            <span className="text-xs text-muted-foreground shrink-0">可阅读 ▾</span>
+                  {deepSourceType === "joyspace" ? (
+                    <>
+                      {/* Left nav */}
+                      <div className="w-[180px] shrink-0 border-r border-border py-3 px-2 overflow-y-auto">
+                        {FILE_PICKER_NAV.map(nav => (
+                          <button key={nav.key}
+                            onClick={() => setPickerNav(nav.key)}
+                            className={`flex items-center gap-2.5 w-full px-3 py-2 rounded-md text-sm transition-colors ${pickerNav === nav.key ? "text-primary bg-primary/10 font-medium" : "text-muted-foreground hover:text-foreground hover:bg-accent"}`}>
+                            <nav.icon className="w-4 h-4" />{nav.label}
                           </button>
-                        );
-                      })}
+                        ))}
+                        <div className="mt-3 mb-1 px-3">
+                          <span className="text-[10px] text-muted-foreground uppercase tracking-wider">知识库</span>
+                        </div>
+                        {FILE_PICKER_KB.map(kb => (
+                          <button key={kb.key}
+                            onClick={() => setPickerNav(kb.key)}
+                            className={`flex items-center gap-2.5 w-full px-3 py-2 rounded-md text-sm transition-colors ${pickerNav === kb.key ? "text-primary bg-primary/10 font-medium" : "text-muted-foreground hover:text-foreground hover:bg-accent"}`}>
+                            <kb.icon className={`w-4 h-4 ${pickerNav === kb.key ? "text-primary" : "text-primary"}`} />
+                            <span className="truncate">{kb.label}</span>
+                          </button>
+                        ))}
+                      </div>
+
+                      {/* Right content */}
+                      <div className="flex-1 flex flex-col min-w-0">
+                        {/* Tabs */}
+                        <div className="flex items-center gap-6 px-5 pt-3 border-b border-border">
+                          {TAB_KEYS.map((tab) => (
+                            <button key={tab}
+                              onClick={() => setPickerTab(tab)}
+                              className={`pb-2.5 text-sm font-medium transition-colors ${pickerTab === tab ? "text-foreground border-b-2 border-primary" : "text-muted-foreground hover:text-foreground"}`}>
+                              {tab}
+                            </button>
+                          ))}
+                        </div>
+
+                        {/* File list */}
+                        <div className="flex-1 overflow-y-auto">
+                          {(FILE_PICKER_TABS_DATA[pickerTab] || []).map((file, i) => {
+                            const fileKey = `${pickerTab}-${file.label}-${i}`;
+                            const isSelected = pickerSelected.includes(fileKey);
+                            const formatColors: Record<string, string> = {
+                              sheet: "text-emerald-600",
+                              doc: "text-blue-600",
+                              ppt: "text-orange-600",
+                            };
+                            return (
+                              <button key={fileKey}
+                                onClick={() => {
+                                  setPickerSelected(prev => isSelected ? prev.filter(k => k !== fileKey) : [...prev, fileKey]);
+                                }}
+                                className={`flex items-center gap-3 w-full px-5 py-3 transition-colors text-left border-b border-border/50 group ${isSelected ? "bg-primary/5" : "hover:bg-accent/50"}`}>
+                                <div className={`w-4 h-4 rounded border shrink-0 flex items-center justify-center transition-colors ${isSelected ? "border-primary bg-primary" : "border-border group-hover:border-primary/40"}`}>
+                                  {isSelected && <Check className="w-3 h-3 text-primary-foreground" />}
+                                </div>
+                                <file.icon className={`w-5 h-5 shrink-0 ${formatColors[file.format] || "text-muted-foreground"}`} />
+                                <span className="text-sm text-foreground truncate flex-1">{file.label}</span>
+                                <span className="text-xs text-muted-foreground shrink-0">可阅读 ▾</span>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    /* Local file upload */
+                    <div className="flex-1 flex flex-col items-center justify-center p-8">
+                      <input
+                        ref={deepFileInputRef}
+                        type="file"
+                        multiple
+                        className="hidden"
+                        onChange={(e) => {
+                          const files = e.target.files;
+                          if (files && files.length > 0) {
+                            Array.from(files).forEach(file => addSource("file", file.name));
+                          }
+                          if (deepFileInputRef.current) deepFileInputRef.current.value = "";
+                        }}
+                        accept=".pdf,.doc,.docx,.xls,.xlsx,.csv,.ppt,.pptx,.txt,.md,video/*,audio/*"
+                      />
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+                        onClick={() => deepFileInputRef.current?.click()}
+                        className="w-full max-w-md border-2 border-dashed border-border rounded-2xl p-12 text-center cursor-pointer hover:border-primary/40 hover:bg-primary/5 transition-all"
+                      >
+                        <div className="w-16 h-16 rounded-2xl bg-accent flex items-center justify-center mx-auto mb-4">
+                          <Upload className="w-8 h-8 text-muted-foreground/50" />
+                        </div>
+                        <p className="text-sm font-medium text-foreground mb-1">点击选择本地文件</p>
+                        <p className="text-xs text-muted-foreground">支持文档、表格、PPT、音视频等格式</p>
+                        <p className="text-[10px] text-muted-foreground mt-2">PDF, DOC, DOCX, XLS, XLSX, CSV, PPT, PPTX, TXT, MD, 音视频</p>
+                      </motion.div>
                     </div>
-                  </div>
+                  )}
                 </div>
 
                 {/* Footer */}
