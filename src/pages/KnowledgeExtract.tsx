@@ -1910,10 +1910,24 @@ const KnowledgeExtract = () => {
               })}
             </AnimatePresence>
           </div>
-          <div className="px-4 py-3 border-t border-border">
+          <div className="px-4 py-3 border-t border-border space-y-2">
             <div className="flex items-center justify-between text-xs text-muted-foreground">
               <span>已选中 {selectedCount} / {sources.length}</span>
               <button onClick={() => setSources(prev => prev.map(s => ({ ...s, selected: true })))} className="text-primary hover:underline">全选</button>
+            </div>
+            {/* Source limit progress bar */}
+            <div className="flex items-center gap-2.5">
+              <div className="flex-1 h-1.5 rounded-full bg-accent overflow-hidden">
+                <motion.div
+                  className={`h-full rounded-full transition-colors ${sources.length >= MAX_SOURCES ? "bg-destructive" : "bg-primary"}`}
+                  initial={{ width: "0%" }}
+                  animate={{ width: `${Math.min((sources.length / MAX_SOURCES) * 100, 100)}%` }}
+                  transition={{ duration: 0.3 }}
+                />
+              </div>
+              <span className={`text-[11px] font-medium shrink-0 ${sources.length >= MAX_SOURCES ? "text-destructive" : "text-muted-foreground"}`}>
+                {sources.length} / {MAX_SOURCES}
+              </span>
             </div>
           </div>
         </aside>
