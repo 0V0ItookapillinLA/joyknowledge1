@@ -876,6 +876,23 @@ const KnowledgeExtract = () => {
                   </div>
                 )}
               </div>
+           </div>
+           </div>
+
+          {/* Source limit progress bar */}
+          <div className="px-5 py-3 border-t border-border bg-card/60">
+            <div className="flex items-center gap-3">
+              <div className="flex-1 h-2 rounded-full bg-accent overflow-hidden">
+                <motion.div
+                  className={`h-full rounded-full transition-colors ${sources.length >= MAX_SOURCES ? "bg-destructive" : "bg-primary"}`}
+                  initial={{ width: "0%" }}
+                  animate={{ width: `${Math.min((sources.length / MAX_SOURCES) * 100, 100)}%` }}
+                  transition={{ duration: 0.3 }}
+                />
+              </div>
+              <span className={`text-xs font-medium shrink-0 ${sources.length >= MAX_SOURCES ? "text-destructive" : "text-muted-foreground"}`}>
+                {sources.length} / {MAX_SOURCES}
+              </span>
             </div>
           </div>
 
