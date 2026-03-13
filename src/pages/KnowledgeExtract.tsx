@@ -236,12 +236,12 @@ const KnowledgeExtract = () => {
   const [expandedResult, setExpandedResult] = useState<string | null>(null);
 
   const [tools, setTools] = useState<ToolOption[]>([
-    { id: "image", label: "图片", desc: "插入图片内容", icon: Image, checked: false, color: "text-emerald-600 bg-emerald-50 border-emerald-200" },
-    { id: "table", label: "表格", desc: "插入数据表格", icon: Table2, checked: false, color: "text-blue-600 bg-blue-50 border-blue-200" },
-    { id: "video", label: "视频", desc: "嵌入视频内容", icon: Video, checked: false, color: "text-purple-600 bg-purple-50 border-purple-200" },
-    { id: "columns", label: "分栏", desc: "多栏布局排版", icon: Columns, checked: false, color: "text-amber-600 bg-amber-50 border-amber-200" },
-    { id: "flowchart", label: "流程图", desc: "可视化流程步骤", icon: Workflow, checked: false, color: "text-rose-600 bg-rose-50 border-rose-200" },
-    { id: "uml", label: "UML", desc: "UML 结构图", icon: BoxSelect, checked: false, color: "text-cyan-600 bg-cyan-50 border-cyan-200" },
+    { id: "structured-text", label: "结构化文本", desc: "将内容转为结构化文本", icon: FileText, checked: false, color: "text-blue-600 bg-blue-50 border-blue-200" },
+    { id: "mindmap", label: "思维导图", desc: "生成思维导图", icon: GitBranch, checked: false, color: "text-purple-600 bg-purple-50 border-purple-200" },
+    { id: "flashcard", label: "知识闪卡", desc: "提炼知识闪卡", icon: Zap, checked: false, color: "text-amber-600 bg-amber-50 border-amber-200" },
+    { id: "chart", label: "数据图表", desc: "生成数据图表", icon: BarChart3, checked: false, color: "text-emerald-600 bg-emerald-50 border-emerald-200" },
+    { id: "audio", label: "音频概览", desc: "音频内容概览", icon: Mic, checked: false, color: "text-orange-600 bg-orange-50 border-orange-200" },
+    { id: "video", label: "视频概览", desc: "视频内容概览", icon: Video, checked: false, color: "text-rose-600 bg-rose-50 border-rose-200" },
   ]);
 
   const MOCK_SEARCH_RESULTS: SearchResult[] = [
@@ -282,11 +282,18 @@ const KnowledgeExtract = () => {
     setSources(prev => [...prev, newSource]);
     setShowAddSource(false);
     setActiveUploadType(null);
-    setChatMessages(prev => [...prev, { id: `sys-${Date.now()}`, role: "system", content: `正在解析新来源：${name}...` }]);
+    // Show parsing progress in chat
+    setChatMessages(prev => [...prev, { id: `sys-parse-start-${Date.now()}`, role: "system", content: `📄 正在解析「${name}」...` }]);
+    setTimeout(() => {
+      setChatMessages(prev => [...prev, { id: `sys-parse-step1-${Date.now()}`, role: "system", content: `🔍 正在识别「${name}」的文档结构...` }]);
+    }, 800);
+    setTimeout(() => {
+      setChatMessages(prev => [...prev, { id: `sys-parse-step2-${Date.now()}`, role: "system", content: `📊 正在提取「${name}」的关键内容...` }]);
+    }, 1500);
     setTimeout(() => {
       setSources(prev => prev.map(s => s.id === newSource.id ? { ...s, status: "ready" } : s));
-      setChatMessages(prev => [...prev, { id: `ai-${Date.now()}`, role: "assistant", content: `✅ 已完成「${name}」的解析，新增内容已纳入分析范围。` }]);
-    }, 2000);
+      setChatMessages(prev => [...prev, { id: `ai-${Date.now()}`, role: "system", content: `✅「${name}」解析完成，已纳入分析范围` }]);
+    }, 2200);
   };
 
   const quickAddSource = (type: Source["type"], name: string) => {
@@ -376,12 +383,12 @@ const KnowledgeExtract = () => {
   };
 
   const TOOL_MOCK_RESULTS: Record<string, string> = {
-    image: "🖼️ 图片内容\n\n已根据文本描述生成配图建议：\n1. 研发效能提升趋势图 - 展示改进前后的核心指标对比\n2. 团队协作流程图 - 可视化展示 Scrum + Kanban 混合模式\n3. 技术架构图 - Jenkins + GitLab CI 自动化流水线架构",
-    table: "📊 数据表格\n\n| 指标 | 改进前 | 改进后 | 变化 |\n|------|--------|--------|------|\n| 发布周期 | 14天 | 8.4天 | ↓40% |\n| Bug修复时长 | 48h | 12h | ↓75% |\n| 代码覆盖率 | 45% | 82% | ↑82% |\n| 需求交付率 | 65% | 91% | ↑40% |\n| 满意度 | 35% | 78% | ↑123% |",
-    video: "🎬 视频嵌入建议\n\n[视频1] Sprint Review 录屏 - 展示迭代成果\n[视频2] 团队分享会实录 - 经验传承\n[视频3] 工具演示 - CI/CD 流水线操作指南",
-    columns: "📐 分栏布局\n\n【左栏 - 问题与挑战】\n• 交付周期长\n• 质量不稳定\n• 跨部门协作低效\n• 72%开发者认为有瓶颈\n\n【右栏 - 解决方案】\n• Jenkins + GitLab CI\n• SonarQube 代码质量\n• Scrum + Kanban 混合\n• 两周迭代节奏",
-    flowchart: "📋 流程图\n\n开始 → 需求分析 → 方案设计 → 技术评审\n  ↓\n代码开发 → 自动化测试 → Code Review → CI构建\n  ↓\n集成测试 → 预发布验证 → 正式发布 → 监控反馈\n  ↓\n迭代优化 → Sprint Review → 经验沉淀",
-    uml: "📐 UML 结构图\n\n┌──────────────┐     ┌──────────────┐\n│  ProductOwner │────▶│  SprintBacklog│\n└──────────────┘     └──────────────┘\n        │                    │\n        ▼                    ▼\n┌──────────────┐     ┌──────────────┐\n│  ScrumMaster  │────▶│  DailyStandup │\n└──────────────┘     └──────────────┘\n        │                    │\n        ▼                    ▼\n┌──────────────┐     ┌──────────────┐\n│  DevTeam      │────▶│  Deliverable  │\n└──────────────┘     └──────────────┘",
+    "structured-text": "📝 结构化文本\n\n已将内容转化为结构化格式：\n\n一、项目背景\n  1.1 业务挑战与痛点\n  1.2 目标设定与预期\n\n二、实施方案\n  2.1 技术选型与评估\n  2.2 流程重构设计\n\n三、成果与反思\n  3.1 核心指标改进\n  3.2 经验与教训",
+    mindmap: "🧠 思维导图\n\n研发效能提升\n├── 背景\n│   ├── 交付周期长\n│   ├── 质量不稳定\n│   └── 协作低效\n├── 方案\n│   ├── CI/CD 流水线\n│   ├── 敏捷混合模式\n│   └── 代码质量管控\n└── 成果\n    ├── 发布周期 ↓40%\n    ├── Bug修复 ↓75%\n    └── 满意度 ↑123%",
+    flashcard: "⚡ 知识闪卡\n\n【卡片1】渐进式变革\nQ: 为什么渐进式推进比一刀切更有效？\nA: 避免团队抵触，让团队逐步适应变化\n\n【卡片2】数据驱动\nQ: 如何确保改进有据可依？\nA: 通过量化指标持续跟踪每个改进点\n\n【卡片3】接口人机制\nQ: 跨部门协作的关键是什么？\nA: 明确接口人机制，避免沟通成本增加",
+    chart: "📊 数据图表\n\n| 指标 | 改进前 | 改进后 | 变化 |\n|------|--------|--------|------|\n| 发布周期 | 14天 | 8.4天 | ↓40% |\n| Bug修复时长 | 48h | 12h | ↓75% |\n| 代码覆盖率 | 45% | 82% | ↑82% |\n| 需求交付率 | 65% | 91% | ↑40% |\n| 满意度 | 35% | 78% | ↑123% |",
+    audio: "🎧 音频概览\n\n[音频1] Sprint Review 录音 - 核心讨论要点提取\n  • 本迭代完成 12 个需求，3 个延期\n  • 自动化测试覆盖率达标\n\n[音频2] 复盘会议录音 - 关键决策记录\n  • 决定采用渐进式迁移策略\n  • 确认接口人机制方案",
+    video: "🎬 视频概览\n\n[视频1] Sprint Review 录屏 - 展示迭代成果\n[视频2] 团队分享会实录 - 经验传承\n[视频3] 工具演示 - CI/CD 流水线操作指南",
   };
 
   const handleToolGenerate = (toolId: string) => {
@@ -424,6 +431,20 @@ const KnowledgeExtract = () => {
     }, 1500);
   };
 
+  const DEEP_CONTINUE_RESPONSES = [
+    "好的，让我继续挖掘。\n\n你在刚才提到了团队协作——**你认为跨部门沟通中最容易被忽视的环节是什么？**",
+    "让我换个角度追问。\n\n在这个过程中，**有没有某个关键转折点**，让你的思路发生了根本性的改变？",
+    "很好，我们继续深入。\n\n你提到的这些经验中，**哪些是只有亲历者才能体会到的「隐性感知」**？",
+    "我想从另一个维度来探索。\n\n如果时间回到项目开始之前，**你会做出哪些不同的决策？**为什么？",
+    "继续挖掘一下。\n\n在推进过程中，**你是如何判断事情正在朝正确方向发展的？**有没有一些非正式的信号或指标？",
+  ];
+
+  const DEEP_SUMMARY_RESPONSES = [
+    "## 🧠 隐性知识萃取总结\n\n1. **决策直觉**：倾向于「先小范围试点，再逐步推广」\n2. **团队管理**：「数据说话」比「行政命令」更能推动变革\n3. **风险感知**：能提前识别软性风险并渐进式化解\n4. **方法论迁移**：善于将成功经验抽象后跨场景应用\n\n> 准备好后可以点击「生成初稿」按钮。",
+    "## 🧠 隐性知识提炼\n\n1. **模式识别**：能快速从碎片信息中识别出系统性问题\n2. **节奏把控**：对变革推进的节奏有精准的直觉判断\n3. **关系洞察**：善于在复杂利益关系中找到共赢方案\n4. **复盘能力**：习惯性地从失败中提取可复用的认知框架\n\n> 如果你觉得信息已经充分，可以点击「生成初稿」。",
+    "## 🧠 知识图谱梳理\n\n1. **情境判断力**：能根据不同场景灵活调整策略\n2. **隐性规则感知**：对组织内非正式规则有深刻理解\n3. **经验传递**：擅长将抽象经验转化为具体可操作的步骤\n4. **预见性思维**：能基于历史经验预判潜在风险\n\n> 你的隐性知识已经初步梳理完成，可以选择继续深入或生成初稿。",
+  ];
+
   const handleSuggestionClick = (text: string) => {
     setChatInput(text);
     setTimeout(() => {
@@ -431,16 +452,26 @@ const KnowledgeExtract = () => {
       setChatInput("");
       setIsAiTyping(true);
       setTimeout(() => {
-        const deepMap: Record<string, string> = {
-          "继续追问我": "好的，让我继续挖掘。\n\n你在刚才提到了团队协作——**你认为跨部门沟通中最容易被忽视的环节是什么？**",
-          "总结我的隐性知识": "## 🧠 隐性知识萃取总结\n\n1. **决策直觉**：倾向于「先小范围试点，再逐步推广」\n2. **团队管理**：「数据说话」比「行政命令」更能推动变革\n3. **风险感知**：能提前识别软性风险并渐进式化解\n4. **方法论迁移**：善于将成功经验抽象后跨场景应用\n\n> 准备好后可以选择工具并开始生成文档。",
-        };
-        const quickMap: Record<string, string> = {
-          "帮我提炼核心观点": "## 📌 核心观点\n\n1. DevOps 流水线是效能提升的关键基础设施\n2. 渐进式推进比一刀切更适合组织变革\n3. 数据驱动是持续优化的核心方法论\n4. 跨部门协作需要明确的机制保障\n\n准备好后请选择右侧工具并点击生成。",
-          "补充背景信息": "好的，请告诉我更多关于项目的背景信息。",
-        };
-        const map = extractMode === "deep" ? deepMap : quickMap;
-        const response = map[text] || (extractMode === "deep" ? SOCRATIC_RESPONSES[socraticIndex % SOCRATIC_RESPONSES.length] : QUICK_RESPONSES[quickIndex % QUICK_RESPONSES.length]);
+        let response: string;
+        if (extractMode === "deep") {
+          if (text === "继续追问我") {
+            response = DEEP_CONTINUE_RESPONSES[socraticIndex % DEEP_CONTINUE_RESPONSES.length];
+            setSocraticIndex(prev => prev + 1);
+          } else if (text === "总结我的隐性知识") {
+            response = DEEP_SUMMARY_RESPONSES[quickIndex % DEEP_SUMMARY_RESPONSES.length];
+            setQuickIndex(prev => prev + 1);
+          } else {
+            response = SOCRATIC_RESPONSES[socraticIndex % SOCRATIC_RESPONSES.length];
+            setSocraticIndex(prev => prev + 1);
+          }
+        } else {
+          const quickMap: Record<string, string> = {
+            "帮我提炼核心观点": "## 📌 核心观点\n\n1. DevOps 流水线是效能提升的关键基础设施\n2. 渐进式推进比一刀切更适合组织变革\n3. 数据驱动是持续优化的核心方法论\n4. 跨部门协作需要明确的机制保障\n\n准备好后请选择右侧工具并点击生成。",
+            "补充背景信息": "好的，请告诉我更多关于项目的背景信息。",
+          };
+          response = quickMap[text] || QUICK_RESPONSES[quickIndex % QUICK_RESPONSES.length];
+          setQuickIndex(prev => prev + 1);
+        }
         setChatMessages(prev => [...prev, { id: (Date.now() + 1).toString(), role: "assistant", content: response }]);
         setIsAiTyping(false);
       }, 1500);
@@ -1283,10 +1314,6 @@ const KnowledgeExtract = () => {
               <DeepStepIndicator current={2} />
             </div>
             <div className="flex items-center gap-2">
-              <button onClick={() => setIsEditing(!isEditing)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm transition-colors ${isEditing ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-accent"}`}>
-                <Edit3 className="w-3.5 h-3.5" />{isEditing ? "预览" : "编辑"}
-              </button>
               <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
                 <Save className="w-3.5 h-3.5" /> 保存草稿
               </button>
@@ -1299,54 +1326,25 @@ const KnowledgeExtract = () => {
           </div>
 
           <div className="flex flex-1 overflow-hidden">
-            {/* Left: Word-style document - wider */}
+            {/* Left: Word-style document - directly editable */}
             <div className="w-[65%] shrink-0 overflow-y-auto">
               <div className="max-w-3xl mx-auto py-8 px-10">
-                {paragraphs.map((para, idx) => {
-                  const isHighlighted = dropHighlight === idx;
-                  return (
-                    <div
-                      key={idx}
-                      onDragOver={(e) => { e.preventDefault(); setDropHighlight(idx); }}
-                      onDragLeave={() => setDropHighlight(null)}
-                      onDrop={(e) => {
-                        e.preventDefault();
-                        setDropHighlight(null);
-                        const resultToolId = e.dataTransfer.getData("resultToolId");
-                        if (resultToolId && toolResults[resultToolId]) {
-                          const newParagraphs = [...paragraphs];
-                          newParagraphs.splice(idx + 1, 0, toolResults[resultToolId]);
-                          setInitialDoc(newParagraphs.join("\n\n"));
-                        }
-                      }}
-                      className={`py-2 transition-all ${isHighlighted ? "bg-primary/5 border-b-2 border-dashed border-primary" : "border-b border-transparent"}`}
-                    >
-                      {para.split("\n").map((line, li) => {
-                        if (line.startsWith("# ")) return <h1 key={li} className="text-2xl font-bold text-foreground mt-6 mb-3">{line.slice(2)}</h1>;
-                        if (line.startsWith("## ")) return <h2 key={li} className="text-lg font-semibold text-foreground mt-4 mb-2">{line.slice(3)}</h2>;
-                        if (line.startsWith("### ")) return <h3 key={li} className="text-base font-medium text-foreground mt-3 mb-1.5">{line.slice(4)}</h3>;
-                        if (line.startsWith("---")) return <hr key={li} className="border-border my-4" />;
-                        if (line.startsWith("- ")) return <li key={li} className="text-sm text-foreground ml-4 mb-1 list-disc">{line.slice(2)}</li>;
-                        if (line.startsWith("> ")) return <blockquote key={li} className="text-sm text-muted-foreground border-l-2 border-primary/30 pl-3 my-1 italic">{line.slice(2)}</blockquote>;
-                        if (line.startsWith("|")) return <p key={li} className="text-sm text-foreground font-mono bg-accent/50 px-3 py-1 rounded">{line}</p>;
-                        if (line.startsWith("├") || line.startsWith("│") || line.startsWith("└")) return <p key={li} className="text-sm text-foreground font-mono leading-relaxed">{line}</p>;
-                        if (line.trim() === "") return <div key={li} className="h-1" />;
-                        return <p key={li} className="text-sm text-foreground leading-relaxed">{line}</p>;
-                      })}
-                    </div>
-                  );
-                })}
+                <textarea
+                  value={initialDoc}
+                  onChange={(e) => setInitialDoc(e.target.value)}
+                  className="w-full min-h-[80vh] bg-transparent text-sm text-foreground leading-relaxed outline-none resize-none"
+                  placeholder="在此编辑文档内容..."
+                />
               </div>
             </div>
 
             {/* Right: Tool bar + workspace - compact */}
             <aside className="flex-1 min-w-0 border-l border-border flex flex-col bg-muted/30">
-              {/* Compact tool row */}
-              <div className="px-3 pt-3 pb-2 border-b border-border">
-                <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground mb-2">
-                  <Layers className="w-3 h-3" /> 结构化工具
-                </div>
-                <div className="flex items-center gap-1.5">
+              {/* Tool grid header */}
+              <div className="px-4 pt-4 pb-3 border-b border-border">
+                <h3 className="text-sm font-semibold text-foreground mb-1">结构化工具</h3>
+                <p className="text-xs text-muted-foreground mb-3">点击工具开始处理，可复制左侧文本粘贴到下方</p>
+                <div className="grid grid-cols-3 gap-2">
                   {tools.map((tool) => {
                     const isSelected = selectedStructTool === tool.id;
                     const hasResult = !!toolResults[tool.id];
@@ -1354,15 +1352,15 @@ const KnowledgeExtract = () => {
                     return (
                       <motion.button
                         key={tool.id}
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
+                        whileHover={{ scale: 1.03 }}
+                        whileTap={{ scale: 0.97 }}
                         onClick={() => setSelectedStructTool(isSelected ? null : tool.id)}
-                        className={`relative flex items-center gap-1 px-2.5 py-1.5 rounded-lg border transition-all text-center whitespace-nowrap ${
+                        className={`relative flex flex-col items-center gap-1.5 px-3 py-3 rounded-xl border-2 transition-all ${
                           isSelected
                             ? "border-primary bg-primary/5 shadow-sm"
                             : hasResult
-                            ? `${tool.color} border`
-                            : "border-border bg-card hover:border-primary/30"
+                            ? "border-primary/30 bg-primary/5"
+                            : "border-border bg-card hover:border-primary/30 hover:shadow-sm"
                         }`}
                       >
                         {(hasResult || isGenerating) && (
@@ -1370,8 +1368,8 @@ const KnowledgeExtract = () => {
                             {isGenerating ? <Loader2 className="w-2 h-2 text-primary-foreground animate-spin" /> : <Check className="w-2 h-2 text-primary-foreground" />}
                           </div>
                         )}
-                        <tool.icon className={`w-3.5 h-3.5 ${isSelected ? "text-primary" : "text-muted-foreground"}`} />
-                        <span className={`text-[10px] font-medium ${isSelected ? "text-primary" : "text-foreground"}`}>{tool.label}</span>
+                        <tool.icon className={`w-5 h-5 ${isSelected ? "text-primary" : "text-muted-foreground"}`} />
+                        <span className={`text-xs font-medium ${isSelected ? "text-primary" : "text-foreground"}`}>{tool.label}</span>
                       </motion.button>
                     );
                   })}
