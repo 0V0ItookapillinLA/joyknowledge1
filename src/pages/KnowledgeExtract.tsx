@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Sparkles, Send, FileText, Tag, Upload, Link2,
@@ -124,18 +125,17 @@ const QUICK_RESPONSES = [
 
 /* ───── Upload categories ───── */
 const LOCAL_UPLOAD_TYPES = [
-  { icon: FileText, label: "本地非结构化文档", desc: "根据上传的文件，进行解析和切分处理", type: "file" as const, gradient: "from-blue-500 to-indigo-600" },
-  { icon: Table2, label: "表格", desc: "根据上传的表格数据，按照索引列进行分块和解析处理", type: "file" as const, gradient: "from-emerald-500 to-teal-600" },
-  { icon: HelpCircle, label: "QA 文件", desc: "CSV、Excel 文件，只包含 Question、Answer 两列数据", type: "file" as const, gradient: "from-amber-500 to-orange-500" },
-  { icon: Image, label: "图片", desc: "JPG、PNG、截图等，OCR 识别与内容提取", type: "image" as const, gradient: "from-pink-500 to-rose-600" },
-  { icon: FileVideo, label: "视频", desc: "根据上传的视频数据，进行视频、文字识别，再对图片、文本进行解析和切分处理", type: "video" as const, gradient: "from-purple-500 to-violet-600" },
-  { icon: Headphones, label: "音频", desc: "根据上传的音频数据，进行 ASR 文本识别，再对文本进行解析和切分处理", type: "audio" as const, gradient: "from-orange-500 to-amber-600" },
+  { icon: FileText, label: "本地非结构化文档", desc: "根据上传的文件，进行解析和切分处理", type: "file" as const, color: "text-blue-600" },
+  { icon: Table2, label: "表格", desc: "根据上传的表格数据，按照索引列进行分块和解析处理", type: "file" as const, color: "text-emerald-600" },
+  { icon: HelpCircle, label: "QA 文件", desc: "CSV、Excel 文件，只包含 Question、Answer 两列数据", type: "file" as const, color: "text-amber-600" },
+  { icon: FileVideo, label: "视频", desc: "根据上传的视频数据，进行视频、文字识别，再对图片、文本进行解析和切分处理", type: "video" as const, color: "text-purple-600" },
+  { icon: Headphones, label: "音频", desc: "根据上传的音频数据，进行 ASR 文本识别，再对文本进行解析和切分处理", type: "audio" as const, color: "text-orange-600" },
 ];
 
 const ONLINE_UPLOAD_TYPES = [
-  { icon: BookOpen, label: "JoySpace", desc: "获取 JoySpace 文档或目录下文档内容，进行解析和切分处理，支持设置自动更新", type: "url" as const, gradient: "from-red-400 to-red-600" },
-  { icon: Globe, label: "网页", desc: "获取上传 URL 的网页数据，进行解析和切分处理，支持设置自动更新", type: "url" as const, gradient: "from-blue-500 to-blue-700" },
-  { icon: Landmark, label: "神灯文章", desc: "获取神灯文章文档或目录下文档内容，进行解析和切分处理，支持设置自动更新", type: "url" as const, gradient: "from-amber-500 to-amber-700" },
+  { icon: BookOpen, label: "JoySpace", desc: "获取 JoySpace 文档或目录下文档内容，进行解析和切分处理，支持设置自动更新", type: "url" as const, color: "text-red-600" },
+  { icon: Globe, label: "网页", desc: "获取上传 URL 的网页数据，进行解析和切分处理，支持设置自动更新", type: "url" as const, color: "text-blue-600" },
+  { icon: Landmark, label: "神灯文章", desc: "获取神灯文章文档或目录下文档内容，进行解析和切分处理，支持设置自动更新", type: "url" as const, color: "text-amber-600" },
 ];
 
 const FILE_TYPE_ICON: Record<string, typeof FileText> = {
@@ -178,6 +178,7 @@ const OUTPUT_TEMPLATES: OutputTemplate[] = [
 
 /* ───── Component ───── */
 const KnowledgeExtract = () => {
+  const navigate = useNavigate();
   const [appMode, setAppMode] = useState<AppMode>("select");
   const [extractMode, setExtractMode] = useState<ExtractMode>("quick");
 
@@ -200,6 +201,8 @@ const KnowledgeExtract = () => {
   const [pickerSelected, setPickerSelected] = useState<string[]>([]);
   const [pickerTab, setPickerTab] = useState("最近打开");
   const [pickerNav, setPickerNav] = useState("home");
+  const [pendingUploadType, setPendingUploadType] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   // Deep mode search state
@@ -217,7 +220,7 @@ const KnowledgeExtract = () => {
   const [paragraphTools, setParagraphTools] = useState<Record<number, string[]>>({});
   const [draggedTool, setDraggedTool] = useState<string | null>(null);
   const [showPublishDialog, setShowPublishDialog] = useState(false);
-  const [publishTarget, setPublishTarget] = useState<"personal" | "bgbu" | null>(null);
+  const [publishTarget, setPublishTarget] = useState<"personal" | "bgbu" | null>("personal");
   const [publishSubmitted, setPublishSubmitted] = useState(false);
   const [dropHighlight, setDropHighlight] = useState<number | null>(null);
 
@@ -533,20 +536,33 @@ const KnowledgeExtract = () => {
     const handleTypeClick = (opt: { type: string; comingSoon?: boolean; label: string }) => {
       if ((opt as any).comingSoon) return;
       if (opt.type === "url") {
-        // Always keep URL input open, just track which online type is selected
         setSelectedOnlineType(opt.label);
         setActiveUploadType("url");
       } else if (opt.type === "text") {
         setActiveUploadType(activeUploadType === "text" ? null : "text");
       } else {
-        const names: Record<string, string> = {
-          file: `文档_${sources.length + 1}.pdf`,
-          image: `截图_${sources.length + 1}.png`,
-          audio: `会议录音_${sources.length + 1}.mp3`,
-          video: `培训视频_${sources.length + 1}.mp4`,
-        };
-        quickAddSource(opt.type as Source["type"], names[opt.type] || `${opt.label}_${sources.length + 1}`);
+        // Set pending type and show the upload zone highlighted
+        setPendingUploadType(opt.type);
+        setActiveUploadType(opt.type);
       }
+    };
+
+    const handleUploadZoneClick = () => {
+      if (pendingUploadType) {
+        fileInputRef.current?.click();
+      }
+    };
+
+    const handleFileSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const files = e.target.files;
+      if (files && files.length > 0) {
+        Array.from(files).forEach(file => {
+          quickAddSource(pendingUploadType as Source["type"], file.name);
+        });
+      }
+      setPendingUploadType(null);
+      setActiveUploadType(null);
+      if (fileInputRef.current) fileInputRef.current.value = "";
     };
 
     return (
@@ -598,12 +614,12 @@ const KnowledgeExtract = () => {
                         whileHover={{ scale: 1.03, y: -1 }}
                         whileTap={{ scale: 0.97 }}
                         onClick={() => handleTypeClick(opt)}
-                        className="group relative p-2.5 rounded-lg border border-border bg-card hover:border-primary/40 hover:shadow-sm transition-all text-left"
+                        className={`group relative p-2.5 rounded-lg border bg-card hover:shadow-sm transition-all text-left ${
+                          pendingUploadType === opt.type && activeUploadType === opt.type ? "border-primary bg-primary/5 shadow-sm" : "border-border hover:border-primary/40"
+                        }`}
                       >
                         <div className="flex items-center gap-2 mb-1">
-                          <div className={`w-6 h-6 rounded-md bg-gradient-to-br ${opt.gradient} flex items-center justify-center shrink-0 shadow-sm`}>
-                            <opt.icon className="w-3 h-3 text-white" />
-                          </div>
+                          <opt.icon className={`w-5 h-5 shrink-0 ${opt.color}`} />
                           <span className="text-[11px] font-medium text-foreground truncate">{opt.label}</span>
                         </div>
                         <p className="text-[9px] text-muted-foreground leading-tight line-clamp-2">{opt.desc}</p>
@@ -612,26 +628,54 @@ const KnowledgeExtract = () => {
                   </div>
                 </div>
 
-                {/* Drop zone - compact */}
+                {/* Upload zone - larger and more prominent */}
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  multiple
+                  className="hidden"
+                  onChange={handleFileSelected}
+                  accept={pendingUploadType === "video" ? "video/*" : pendingUploadType === "audio" ? "audio/*" : ".pdf,.doc,.docx,.xls,.xlsx,.csv,.ppt,.pptx,.txt,.md"}
+                />
                 <motion.div
                   initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.15 }}
                   onDragOver={(e) => { e.preventDefault(); setIsDragOver(true); }}
                   onDragLeave={() => setIsDragOver(false)}
-                  onDrop={(e) => { e.preventDefault(); setIsDragOver(false); quickAddSource("file", `拖放文件_${sources.length + 1}.pdf`); }}
-                  className={`relative border border-dashed rounded-lg px-4 py-3 text-center transition-all cursor-pointer ${
-                    isDragOver ? "border-primary bg-primary/5" : "border-border hover:border-primary/30 hover:bg-accent/20"
+                  onDrop={(e) => {
+                    e.preventDefault(); setIsDragOver(false);
+                    const files = e.dataTransfer.files;
+                    if (files.length > 0) {
+                      Array.from(files).forEach(file => quickAddSource("file", file.name));
+                    }
+                  }}
+                  onClick={handleUploadZoneClick}
+                  className={`relative border-2 border-dashed rounded-xl px-6 py-8 text-center transition-all cursor-pointer ${
+                    pendingUploadType
+                      ? "border-primary bg-primary/5 shadow-sm"
+                      : isDragOver
+                      ? "border-primary bg-primary/5"
+                      : "border-border hover:border-primary/30 hover:bg-accent/20"
                   }`}
                 >
                   <AnimatePresence>
                     {isDragOver && (
-                      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 rounded-lg bg-primary/10 flex items-center justify-center z-10">
-                        <Upload className="w-8 h-8 text-primary animate-bounce" />
+                      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 rounded-xl bg-primary/10 flex items-center justify-center z-10">
+                        <Upload className="w-10 h-10 text-primary animate-bounce" />
                       </motion.div>
                     )}
                   </AnimatePresence>
-                  <div className="flex items-center justify-center gap-2">
-                    <Upload className="w-4 h-4 text-muted-foreground/50" />
-                    <span className="text-[11px] text-muted-foreground">拖动文件至此处，或点击上方类型按钮上传</span>
+                  <div className="flex flex-col items-center gap-2">
+                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${pendingUploadType ? "bg-primary/10" : "bg-accent"}`}>
+                      <Upload className={`w-6 h-6 ${pendingUploadType ? "text-primary" : "text-muted-foreground/50"}`} />
+                    </div>
+                    <div>
+                      <p className={`text-sm font-medium ${pendingUploadType ? "text-primary" : "text-muted-foreground"}`}>
+                        {pendingUploadType ? "点击此处选择文件上传" : "拖动文件至此处"}
+                      </p>
+                      <p className="text-[11px] text-muted-foreground mt-0.5">
+                        {pendingUploadType ? "或拖动文件到此区域" : "请先点击上方文件类型"}
+                      </p>
+                    </div>
                   </div>
                 </motion.div>
 
@@ -655,9 +699,7 @@ const KnowledgeExtract = () => {
                         className={`group relative p-2.5 rounded-lg border bg-card hover:shadow-sm transition-all text-left ${selectedOnlineType === opt.label ? "border-primary bg-primary/5" : "border-border hover:border-primary/40"}`}
                       >
                         <div className="flex items-center gap-2 mb-1">
-                          <div className={`w-6 h-6 rounded-md bg-gradient-to-br ${opt.gradient} flex items-center justify-center shrink-0 shadow-sm`}>
-                            <opt.icon className="w-3 h-3 text-white" />
-                          </div>
+                          <opt.icon className={`w-5 h-5 shrink-0 ${opt.color}`} />
                           <span className="text-[11px] font-medium text-foreground truncate">{opt.label}</span>
                         </div>
                         <p className="text-[9px] text-muted-foreground leading-tight line-clamp-2">{opt.desc}</p>
@@ -1083,14 +1125,14 @@ const KnowledgeExtract = () => {
           <AnimatePresence>
             {showPublishDialog && (
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/40" onClick={() => { setShowPublishDialog(false); setPublishTarget(null); setPublishSubmitted(false); }}>
+                className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/40" onClick={() => { setShowPublishDialog(false); setPublishTarget("personal"); setPublishSubmitted(false); }}>
                 <motion.div initial={{ opacity: 0, scale: 0.95, y: 12 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 12 }}
                   className="w-full max-w-lg bg-card rounded-2xl shadow-2xl border border-border overflow-hidden" onClick={(e) => e.stopPropagation()}>
 
                   {!publishSubmitted ? (
                     <>
                       <div className="relative px-8 pt-8 pb-4 text-center">
-                        <button onClick={() => { setShowPublishDialog(false); setPublishTarget(null); }} className="absolute right-4 top-4 p-1.5 rounded-lg hover:bg-accent text-muted-foreground transition-colors"><X className="w-5 h-5" /></button>
+                        <button onClick={() => { setShowPublishDialog(false); setPublishTarget("personal"); }} className="absolute right-4 top-4 p-1.5 rounded-lg hover:bg-accent text-muted-foreground transition-colors"><X className="w-5 h-5" /></button>
                         <h2 className="text-xl font-semibold text-foreground">选择发布位置</h2>
                         <p className="text-sm text-muted-foreground mt-1">你的知识文档将发布到选定的位置</p>
                       </div>
@@ -1201,9 +1243,9 @@ const KnowledgeExtract = () => {
                           : "审批请求已发送给直属上级和 BG/BU 管理员，审批通过后将自动发布"
                         }
                       </p>
-                      <button onClick={() => { setShowPublishDialog(false); setPublishTarget(null); setPublishSubmitted(false); setAppMode("select"); }}
+                      <button onClick={() => { setShowPublishDialog(false); setPublishTarget("personal"); setPublishSubmitted(false); navigate("/case/1"); }}
                         className="px-6 py-2 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors">
-                        返回首页
+                        查看文章详情
                       </button>
                     </motion.div>
                   )}
