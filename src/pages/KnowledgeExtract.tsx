@@ -355,7 +355,20 @@ const KnowledgeExtract = () => {
     setInitialDoc(GENERATED_DOC);
     setParagraphTools({});
     setDropHighlight(null);
-    setAppMode("deep-structuring");
+    // Show generating animation, then go to deep-structuring
+    setAppMode("generating");
+    setGeneratingProgress(0);
+    const genSteps = ["📋 分析对话内容", "🧠 提炼隐性知识", "📝 生成结构化初稿"];
+    const totalSteps = genSteps.length * 3;
+    let step = 0;
+    const interval = setInterval(() => {
+      step++;
+      setGeneratingProgress(Math.min((step / totalSteps) * 100, 100));
+      if (step >= totalSteps) {
+        clearInterval(interval);
+        setTimeout(() => setAppMode("deep-structuring"), 600);
+      }
+    }, 350);
   };
 
   const addToolToParagraph = (paragraphIdx: number, toolId: string) => {
@@ -943,8 +956,13 @@ const KnowledgeExtract = () => {
 
   // ───── Generating ─────
   if (appMode === "generating") {
-    const steps = currentTemplate?.preview || ["📋 分析内容", "🧠 提炼知识", "📝 生成文档"];
+    const deepGenSteps = ["📋 分析对话内容", "🧠 提炼隐性知识", "📝 生成结构化初稿"];
+    const steps = extractMode === "deep" ? deepGenSteps : (currentTemplate?.preview || ["📋 分析内容", "🧠 提炼知识", "📝 生成文档"]);
     const currentStepIdx = Math.floor((generatingProgress / 100) * steps.length);
+    const genTitle = extractMode === "deep" ? "AI 正在生成结构化初稿" : `AI 正在生成${currentTemplate?.label || "文档"}`;
+    const genDesc = extractMode === "deep"
+      ? `基于 ${chatMessages.filter(m => m.role === "user").length} 轮对话，正在提炼并生成初稿...`
+      : `基于 ${sources.length} 份资料，使用「${currentTemplate?.label}」模板生成中...`;
     return (
       <AppLayout>
         <div className="flex items-center justify-center h-[calc(100vh-56px)] bg-background">
@@ -952,16 +970,28 @@ const KnowledgeExtract = () => {
             {/* Animated icon */}
             <div className="relative w-28 h-28 mx-auto mb-8">
               <motion.div animate={{ rotate: 360 }} transition={{ duration: 10, repeat: Infinity, ease: "linear" }} className="absolute inset-0">
-                {sources.slice(0, 5).map((s, i) => {
-                  const Icon = FILE_TYPE_ICON[s.type] || File;
-                  const angle = (i / Math.min(sources.length, 5)) * Math.PI * 2;
-                  return (
-                    <motion.div key={s.id} className="absolute w-8 h-8 rounded-lg bg-accent flex items-center justify-center shadow-sm"
-                      style={{ top: `${50 + 42 * Math.sin(angle)}%`, left: `${50 + 42 * Math.cos(angle)}%`, transform: "translate(-50%, -50%)" }}>
-                      <Icon className="w-4 h-4 text-primary" />
-                    </motion.div>
-                  );
-                })}
+                {extractMode === "deep" ? (
+                  [MessageSquare, BookOpen, Sparkles, Wand2, FileText].map((Icon, i) => {
+                    const angle = (i / 5) * Math.PI * 2;
+                    return (
+                      <motion.div key={i} className="absolute w-8 h-8 rounded-lg bg-accent flex items-center justify-center shadow-sm"
+                        style={{ top: `${50 + 42 * Math.sin(angle)}%`, left: `${50 + 42 * Math.cos(angle)}%`, transform: "translate(-50%, -50%)" }}>
+                        <Icon className="w-4 h-4 text-primary" />
+                      </motion.div>
+                    );
+                  })
+                ) : (
+                  sources.slice(0, 5).map((s, i) => {
+                    const Icon = FILE_TYPE_ICON[s.type] || File;
+                    const angle = (i / Math.min(sources.length, 5)) * Math.PI * 2;
+                    return (
+                      <motion.div key={s.id} className="absolute w-8 h-8 rounded-lg bg-accent flex items-center justify-center shadow-sm"
+                        style={{ top: `${50 + 42 * Math.sin(angle)}%`, left: `${50 + 42 * Math.cos(angle)}%`, transform: "translate(-50%, -50%)" }}>
+                        <Icon className="w-4 h-4 text-primary" />
+                      </motion.div>
+                    );
+                  })
+                )}
               </motion.div>
               <div className="absolute inset-0 flex items-center justify-center">
                 <motion.div animate={{ scale: [1, 1.12, 1] }} transition={{ duration: 2, repeat: Infinity }} className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center shadow-inner">
@@ -970,8 +1000,8 @@ const KnowledgeExtract = () => {
               </div>
             </div>
 
-            <h2 className="text-xl font-bold text-foreground mb-2">AI 正在生成{currentTemplate?.label || "文档"}</h2>
-            <p className="text-sm text-muted-foreground mb-8">基于 {sources.length} 份资料，使用「{currentTemplate?.label}」模板生成中...</p>
+            <h2 className="text-xl font-bold text-foreground mb-2">{genTitle}</h2>
+            <p className="text-sm text-muted-foreground mb-8">{genDesc}</p>
 
             <div className="w-full h-2.5 rounded-full bg-accent overflow-hidden mb-6">
               <motion.div className="h-full rounded-full bg-gradient-to-r from-primary to-primary/70" initial={{ width: "0%" }} animate={{ width: `${generatingProgress}%` }} transition={{ duration: 0.3 }} />
@@ -1011,7 +1041,6 @@ const KnowledgeExtract = () => {
     const steps = [
       { n: 1, label: "知识发现" },
       { n: 2, label: "结构化处理" },
-      { n: 3, label: "生成预览" },
     ];
     return (
       <div className="flex items-center gap-2">
@@ -1253,10 +1282,20 @@ const KnowledgeExtract = () => {
               </button>
               <DeepStepIndicator current={2} />
             </div>
-            <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={startGeneration}
-              className="flex items-center gap-2 px-5 py-2 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 shadow-md">
-              <Wand2 className="w-4 h-4" /> 生成预览
-            </motion.button>
+            <div className="flex items-center gap-2">
+              <button onClick={() => setIsEditing(!isEditing)}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm transition-colors ${isEditing ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-accent"}`}>
+                <Edit3 className="w-3.5 h-3.5" />{isEditing ? "预览" : "编辑"}
+              </button>
+              <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
+                <Save className="w-3.5 h-3.5" /> 保存草稿
+              </button>
+              <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
+                onClick={() => setShowPublishDialog(true)}
+                className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 shadow-sm transition-colors">
+                <CheckCircle2 className="w-3.5 h-3.5" /> 确认发布
+              </motion.button>
+            </div>
           </div>
 
           <div className="flex flex-1 overflow-hidden">
