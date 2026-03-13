@@ -133,9 +133,9 @@ const LOCAL_UPLOAD_TYPES = [
 ];
 
 const ONLINE_UPLOAD_TYPES = [
-  { icon: BookOpen, label: "JoySpace", desc: "获取 JoySpace 文档或目录下文档内容，进行解析和切分处理，支持设置自动更新", type: "url" as const, gradient: "from-red-400 to-red-600" },
-  { icon: Globe, label: "网页", desc: "获取上传 URL 的网页数据，进行解析和切分处理，支持设置自动更新", type: "url" as const, gradient: "from-blue-500 to-blue-700" },
-  { icon: Landmark, label: "神灯文章", desc: "获取神灯文章文档或目录下文档内容，进行解析和切分处理，支持设置自动更新", type: "url" as const, gradient: "from-amber-500 to-amber-700" },
+  { icon: BookOpen, label: "JoySpace", desc: "获取 JoySpace 文档或目录下文档内容，进行解析和切分处理，支持设置自动更新", type: "url" as const, color: "text-red-600" },
+  { icon: Globe, label: "网页", desc: "获取上传 URL 的网页数据，进行解析和切分处理，支持设置自动更新", type: "url" as const, color: "text-blue-600" },
+  { icon: Landmark, label: "神灯文章", desc: "获取神灯文章文档或目录下文档内容，进行解析和切分处理，支持设置自动更新", type: "url" as const, color: "text-amber-600" },
 ];
 
 const FILE_TYPE_ICON: Record<string, typeof FileText> = {
