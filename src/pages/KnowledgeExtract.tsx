@@ -1911,7 +1911,10 @@ const KnowledgeExtract = () => {
           <div className="px-4 py-3 border-t border-border space-y-2">
             <div className="flex items-center justify-between text-xs text-muted-foreground">
               <span>已选中 {selectedCount} / {sources.length}</span>
-              <button onClick={() => setSources(prev => prev.map(s => ({ ...s, selected: true })))} className="text-primary hover:underline">全选</button>
+              <button onClick={() => {
+                const allSelected = sources.every(s => s.selected);
+                setSources(prev => prev.map(s => ({ ...s, selected: !allSelected })));
+              }} className="text-primary hover:underline">{sources.every(s => s.selected) ? "取消全选" : "全选"}</button>
             </div>
             {/* Source limit progress bar */}
             <div className="flex items-center gap-2.5">
