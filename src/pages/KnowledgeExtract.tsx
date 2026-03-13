@@ -10,7 +10,7 @@ import {
   Headphones, StickyNote, Layers, PenTool, Table2,
   HelpCircle, Monitor, Cloud, Landmark, Building2, ChevronDown,
   GripVertical, Trash2, Import, Shield, Users, Lock, UserCheck, Maximize2, Minimize2,
-  Home as HomeIcon, Star, Columns, Workflow, BoxSelect
+  Home as HomeIcon, Star, Columns, Workflow, BoxSelect, Code2, Network
 } from "lucide-react";
 import AppLayout from "@/components/AppLayout";
 
@@ -238,12 +238,13 @@ const KnowledgeExtract = () => {
   const [expandedResult, setExpandedResult] = useState<string | null>(null);
 
   const [tools, setTools] = useState<ToolOption[]>([
-    { id: "structured-text", label: "结构化文本", desc: "将内容转为结构化文本", icon: FileText, checked: false, color: "text-blue-600 bg-blue-50 border-blue-200" },
-    { id: "mindmap", label: "思维导图", desc: "生成思维导图", icon: GitBranch, checked: false, color: "text-purple-600 bg-purple-50 border-purple-200" },
-    { id: "flashcard", label: "知识闪卡", desc: "提炼知识闪卡", icon: Zap, checked: false, color: "text-amber-600 bg-amber-50 border-amber-200" },
-    { id: "chart", label: "数据图表", desc: "生成数据图表", icon: BarChart3, checked: false, color: "text-emerald-600 bg-emerald-50 border-emerald-200" },
-    { id: "audio", label: "音频概览", desc: "音频内容概览", icon: Mic, checked: false, color: "text-orange-600 bg-orange-50 border-orange-200" },
-    { id: "video", label: "视频概览", desc: "视频内容概览", icon: Video, checked: false, color: "text-rose-600 bg-rose-50 border-rose-200" },
+    { id: "image", label: "图片", desc: "插入或生成图片", icon: Image, checked: false, color: "text-blue-600 bg-blue-50 border-blue-200" },
+    { id: "columns", label: "分栏", desc: "内容分栏布局", icon: Columns, checked: false, color: "text-indigo-600 bg-indigo-50 border-indigo-200" },
+    { id: "flowchart", label: "流程图", desc: "生成流程图", icon: Workflow, checked: false, color: "text-emerald-600 bg-emerald-50 border-emerald-200" },
+    { id: "mindmap", label: "脑图", desc: "生成脑图", icon: Network, checked: false, color: "text-purple-600 bg-purple-50 border-purple-200" },
+    { id: "uml", label: "UML", desc: "生成UML图", icon: BoxSelect, checked: false, color: "text-amber-600 bg-amber-50 border-amber-200" },
+    { id: "codeblock", label: "代码块", desc: "插入代码块", icon: Code2, checked: false, color: "text-slate-600 bg-slate-50 border-slate-200" },
+    { id: "chart", label: "图表", desc: "生成数据图表", icon: BarChart3, checked: false, color: "text-rose-600 bg-rose-50 border-rose-200" },
   ]);
 
   const MOCK_SEARCH_RESULTS: SearchResult[] = [
@@ -387,12 +388,13 @@ const KnowledgeExtract = () => {
   };
 
   const TOOL_MOCK_RESULTS: Record<string, string> = {
-    "structured-text": "📝 结构化文本\n\n已将内容转化为结构化格式：\n\n一、项目背景\n  1.1 业务挑战与痛点\n  1.2 目标设定与预期\n\n二、实施方案\n  2.1 技术选型与评估\n  2.2 流程重构设计\n\n三、成果与反思\n  3.1 核心指标改进\n  3.2 经验与教训",
-    mindmap: "🧠 思维导图\n\n研发效能提升\n├── 背景\n│   ├── 交付周期长\n│   ├── 质量不稳定\n│   └── 协作低效\n├── 方案\n│   ├── CI/CD 流水线\n│   ├── 敏捷混合模式\n│   └── 代码质量管控\n└── 成果\n    ├── 发布周期 ↓40%\n    ├── Bug修复 ↓75%\n    └── 满意度 ↑123%",
-    flashcard: "⚡ 知识闪卡\n\n【卡片1】渐进式变革\nQ: 为什么渐进式推进比一刀切更有效？\nA: 避免团队抵触，让团队逐步适应变化\n\n【卡片2】数据驱动\nQ: 如何确保改进有据可依？\nA: 通过量化指标持续跟踪每个改进点\n\n【卡片3】接口人机制\nQ: 跨部门协作的关键是什么？\nA: 明确接口人机制，避免沟通成本增加",
-    chart: "📊 数据图表\n\n| 指标 | 改进前 | 改进后 | 变化 |\n|------|--------|--------|------|\n| 发布周期 | 14天 | 8.4天 | ↓40% |\n| Bug修复时长 | 48h | 12h | ↓75% |\n| 代码覆盖率 | 45% | 82% | ↑82% |\n| 需求交付率 | 65% | 91% | ↑40% |\n| 满意度 | 35% | 78% | ↑123% |",
-    audio: "🎧 音频概览\n\n[音频1] Sprint Review 录音 - 核心讨论要点提取\n  • 本迭代完成 12 个需求，3 个延期\n  • 自动化测试覆盖率达标\n\n[音频2] 复盘会议录音 - 关键决策记录\n  • 决定采用渐进式迁移策略\n  • 确认接口人机制方案",
-    video: "🎬 视频概览\n\n[视频1] Sprint Review 录屏 - 展示迭代成果\n[视频2] 团队分享会实录 - 经验传承\n[视频3] 工具演示 - CI/CD 流水线操作指南",
+    "image": "🖼️ 图片\n\n已根据内容生成配图：\n\n[图1] 项目架构总览图\n[图2] 数据流转示意图\n[图3] 团队协作关系图",
+    "columns": "📐 分栏\n\n已将内容转为分栏布局：\n\n| 左栏：背景与挑战 | 右栏：方案与成果 |\n|---|---|\n| 交付周期长、质量不稳定 | CI/CD流水线、发布周期↓40% |\n| 协作效率低下 | 敏捷混合模式、满意度↑123% |",
+    "flowchart": "📋 流程图\n\n需求分析 → 技术评审 → 开发实施 → 自动化测试\n    ↓\n代码审查 → 集成部署 → 验收测试 → 正式发布\n    ↓\n监控反馈 → 迭代优化",
+    "mindmap": "🧠 脑图\n\n研发效能提升\n├── 背景\n│   ├── 交付周期长\n│   ├── 质量不稳定\n│   └── 协作低效\n├── 方案\n│   ├── CI/CD 流水线\n│   ├── 敏捷混合模式\n│   └── 代码质量管控\n└── 成果\n    ├── 发布周期 ↓40%\n    ├── Bug修复 ↓75%\n    └── 满意度 ↑123%",
+    "uml": "📐 UML\n\n类图：\n┌──────────────┐\n│  KnowledgeBase │\n├──────────────┤\n│ +id: string    │\n│ +title: string │\n├──────────────┤\n│ +extract()     │\n│ +structure()   │\n└──────────────┘",
+    "codeblock": "💻 代码块\n\n```typescript\ninterface KnowledgeItem {\n  id: string;\n  title: string;\n  content: string;\n  tags: string[];\n  createdAt: Date;\n}\n\nfunction extractKnowledge(source: Source): KnowledgeItem[] {\n  return parseAndStructure(source);\n}\n```",
+    "chart": "📊 图表\n\n| 指标 | 改进前 | 改进后 | 变化 |\n|------|--------|--------|------|\n| 发布周期 | 14天 | 8.4天 | ↓40% |\n| Bug修复时长 | 48h | 12h | ↓75% |\n| 代码覆盖率 | 45% | 82% | ↑82% |",
   };
 
   const handleToolGenerate = (toolId: string) => {
