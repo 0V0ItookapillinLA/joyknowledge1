@@ -63,6 +63,8 @@ type ExtractMode = "quick" | "deep";
 type SearchScope = "web" | "enterprise";
 type SearchDepth = "fast" | "deep";
 
+const MAX_SOURCES = 100;
+
 /* ───── Mock Content ───── */
 const GENERATED_DOC = `# Q3季度研发效能提升专项总结
 
@@ -277,9 +279,10 @@ const KnowledgeExtract = () => {
 
   /* ───── Source management ───── */
   const addSource = (type: Source["type"], name: string) => {
+    if (sources.length >= MAX_SOURCES) return;
     const sizes: Record<string, string> = { file: "1.2 MB", image: "3.8 MB", audio: "24.5 MB", video: "156 MB" };
     const newSource: Source = { id: Date.now().toString(), name, type, status: "analyzing", selected: true, size: sizes[type] || "" };
-    setSources(prev => [...prev, newSource]);
+    setSources(prev => prev.length >= MAX_SOURCES ? prev : [...prev, newSource]);
     setShowAddSource(false);
     setActiveUploadType(null);
     // Show parsing progress in chat
@@ -297,9 +300,10 @@ const KnowledgeExtract = () => {
   };
 
   const quickAddSource = (type: Source["type"], name: string) => {
+    if (sources.length >= MAX_SOURCES) return;
     const sizes: Record<string, string> = { file: "1.2 MB", image: "3.8 MB", audio: "24.5 MB", video: "156 MB" };
     const newSource: Source = { id: Date.now().toString(), name, type, status: "analyzing", selected: true, size: sizes[type] || "" };
-    setSources(prev => [...prev, newSource]);
+    setSources(prev => prev.length >= MAX_SOURCES ? prev : [...prev, newSource]);
     setActiveUploadType(null);
     setTimeout(() => {
       setSources(prev => prev.map(s => s.id === newSource.id ? { ...s, status: "ready" } : s));
@@ -872,6 +876,23 @@ const KnowledgeExtract = () => {
                   </div>
                 )}
               </div>
+           </div>
+           </div>
+
+          {/* Source limit progress bar */}
+          <div className="px-5 py-3 border-t border-border bg-card/60">
+            <div className="flex items-center gap-3">
+              <div className="flex-1 h-2 rounded-full bg-accent overflow-hidden">
+                <motion.div
+                  className={`h-full rounded-full transition-colors ${sources.length >= MAX_SOURCES ? "bg-destructive" : "bg-primary"}`}
+                  initial={{ width: "0%" }}
+                  animate={{ width: `${Math.min((sources.length / MAX_SOURCES) * 100, 100)}%` }}
+                  transition={{ duration: 0.3 }}
+                />
+              </div>
+              <span className={`text-xs font-medium shrink-0 ${sources.length >= MAX_SOURCES ? "text-destructive" : "text-muted-foreground"}`}>
+                {sources.length} / {MAX_SOURCES}
+              </span>
             </div>
           </div>
 
@@ -1889,10 +1910,24 @@ const KnowledgeExtract = () => {
               })}
             </AnimatePresence>
           </div>
-          <div className="px-4 py-3 border-t border-border">
+          <div className="px-4 py-3 border-t border-border space-y-2">
             <div className="flex items-center justify-between text-xs text-muted-foreground">
               <span>已选中 {selectedCount} / {sources.length}</span>
               <button onClick={() => setSources(prev => prev.map(s => ({ ...s, selected: true })))} className="text-primary hover:underline">全选</button>
+            </div>
+            {/* Source limit progress bar */}
+            <div className="flex items-center gap-2.5">
+              <div className="flex-1 h-1.5 rounded-full bg-accent overflow-hidden">
+                <motion.div
+                  className={`h-full rounded-full transition-colors ${sources.length >= MAX_SOURCES ? "bg-destructive" : "bg-primary"}`}
+                  initial={{ width: "0%" }}
+                  animate={{ width: `${Math.min((sources.length / MAX_SOURCES) * 100, 100)}%` }}
+                  transition={{ duration: 0.3 }}
+                />
+              </div>
+              <span className={`text-[11px] font-medium shrink-0 ${sources.length >= MAX_SOURCES ? "text-destructive" : "text-muted-foreground"}`}>
+                {sources.length} / {MAX_SOURCES}
+              </span>
             </div>
           </div>
         </aside>
