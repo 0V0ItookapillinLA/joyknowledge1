@@ -282,11 +282,18 @@ const KnowledgeExtract = () => {
     setSources(prev => [...prev, newSource]);
     setShowAddSource(false);
     setActiveUploadType(null);
-    setChatMessages(prev => [...prev, { id: `sys-${Date.now()}`, role: "system", content: `正在解析新来源：${name}...` }]);
+    // Show parsing progress in chat
+    setChatMessages(prev => [...prev, { id: `sys-parse-start-${Date.now()}`, role: "system", content: `📄 正在解析「${name}」...` }]);
+    setTimeout(() => {
+      setChatMessages(prev => [...prev, { id: `sys-parse-step1-${Date.now()}`, role: "system", content: `🔍 正在识别「${name}」的文档结构...` }]);
+    }, 800);
+    setTimeout(() => {
+      setChatMessages(prev => [...prev, { id: `sys-parse-step2-${Date.now()}`, role: "system", content: `📊 正在提取「${name}」的关键内容...` }]);
+    }, 1500);
     setTimeout(() => {
       setSources(prev => prev.map(s => s.id === newSource.id ? { ...s, status: "ready" } : s));
-      setChatMessages(prev => [...prev, { id: `ai-${Date.now()}`, role: "assistant", content: `✅ 已完成「${name}」的解析，新增内容已纳入分析范围。` }]);
-    }, 2000);
+      setChatMessages(prev => [...prev, { id: `ai-${Date.now()}`, role: "system", content: `✅「${name}」解析完成，已纳入分析范围` }]);
+    }, 2200);
   };
 
   const quickAddSource = (type: Source["type"], name: string) => {
