@@ -1132,7 +1132,7 @@ const KnowledgeExtract = () => {
                   {!publishSubmitted ? (
                     <>
                       <div className="relative px-8 pt-8 pb-4 text-center">
-                        <button onClick={() => { setShowPublishDialog(false); setPublishTarget(null); }} className="absolute right-4 top-4 p-1.5 rounded-lg hover:bg-accent text-muted-foreground transition-colors"><X className="w-5 h-5" /></button>
+                        <button onClick={() => { setShowPublishDialog(false); setPublishTarget("personal"); }} className="absolute right-4 top-4 p-1.5 rounded-lg hover:bg-accent text-muted-foreground transition-colors"><X className="w-5 h-5" /></button>
                         <h2 className="text-xl font-semibold text-foreground">选择发布位置</h2>
                         <p className="text-sm text-muted-foreground mt-1">你的知识文档将发布到选定的位置</p>
                       </div>
