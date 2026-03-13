@@ -355,7 +355,20 @@ const KnowledgeExtract = () => {
     setInitialDoc(GENERATED_DOC);
     setParagraphTools({});
     setDropHighlight(null);
-    setAppMode("deep-structuring");
+    // Show generating animation, then go to deep-structuring
+    setAppMode("generating");
+    setGeneratingProgress(0);
+    const genSteps = ["📋 分析对话内容", "🧠 提炼隐性知识", "📝 生成结构化初稿"];
+    const totalSteps = genSteps.length * 3;
+    let step = 0;
+    const interval = setInterval(() => {
+      step++;
+      setGeneratingProgress(Math.min((step / totalSteps) * 100, 100));
+      if (step >= totalSteps) {
+        clearInterval(interval);
+        setTimeout(() => setAppMode("deep-structuring"), 600);
+      }
+    }, 350);
   };
 
   const addToolToParagraph = (paragraphIdx: number, toolId: string) => {
