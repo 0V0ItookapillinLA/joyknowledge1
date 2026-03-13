@@ -1265,10 +1265,20 @@ const KnowledgeExtract = () => {
               </button>
               <DeepStepIndicator current={2} />
             </div>
-            <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={startGeneration}
-              className="flex items-center gap-2 px-5 py-2 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 shadow-md">
-              <Wand2 className="w-4 h-4" /> 生成预览
-            </motion.button>
+            <div className="flex items-center gap-2">
+              <button onClick={() => setIsEditing(!isEditing)}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm transition-colors ${isEditing ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-accent"}`}>
+                <Edit3 className="w-3.5 h-3.5" />{isEditing ? "预览" : "编辑"}
+              </button>
+              <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
+                <Save className="w-3.5 h-3.5" /> 保存草稿
+              </button>
+              <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
+                onClick={() => setShowPublishDialog(true)}
+                className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 shadow-sm transition-colors">
+                <CheckCircle2 className="w-3.5 h-3.5" /> 确认发布
+              </motion.button>
+            </div>
           </div>
 
           <div className="flex flex-1 overflow-hidden">
