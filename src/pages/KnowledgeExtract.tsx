@@ -10,7 +10,7 @@ import {
   Headphones, StickyNote, Layers, PenTool, Table2,
   HelpCircle, Monitor, Cloud, Landmark, Building2, ChevronDown,
   GripVertical, Trash2, Import, Shield, Users, Lock, UserCheck, Maximize2, Minimize2,
-  Home as HomeIcon, Star, Columns, Workflow, BoxSelect
+  Home as HomeIcon, Star, Columns, Workflow, BoxSelect, Code2, Network
 } from "lucide-react";
 import AppLayout from "@/components/AppLayout";
 
