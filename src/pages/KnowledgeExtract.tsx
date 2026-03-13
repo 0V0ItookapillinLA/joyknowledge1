@@ -558,8 +558,11 @@ const KnowledgeExtract = () => {
     const handleFileSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
       const files = e.target.files;
       if (files && files.length > 0) {
+        // Find the actual type from the selected label
+        const selectedOpt = LOCAL_UPLOAD_TYPES.find(t => t.label === pendingUploadType);
+        const fileType = selectedOpt?.type || "file";
         Array.from(files).forEach(file => {
-          quickAddSource(pendingUploadType as Source["type"], file.name);
+          quickAddSource(fileType as Source["type"], file.name);
         });
       }
       setPendingUploadType(null);
