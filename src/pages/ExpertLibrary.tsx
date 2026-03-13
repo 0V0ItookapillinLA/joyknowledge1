@@ -36,6 +36,26 @@ const ExpertLibrary = () => {
   const [selectedDomain, setSelectedDomain] = useState("全部领域");
   const [selectedExpert, setSelectedExpert] = useState<typeof MOCK_EXPERTS[0] | null>(null);
   const [sortBy, setSortBy] = useState("按热度排序");
+  const [showRatingDialog, setShowRatingDialog] = useState(false);
+  const [ratingScore, setRatingScore] = useState(0);
+  const [hoverScore, setHoverScore] = useState(0);
+  const [ratingComment, setRatingComment] = useState("");
+  const { toast } = useToast();
+
+  const handleSubmitRating = () => {
+    if (ratingScore === 0) return;
+    toast({ title: "评分成功", description: `您为 ${selectedExpert?.name} 打了 ${ratingScore} 分` });
+    setShowRatingDialog(false);
+    setRatingScore(0);
+    setHoverScore(0);
+    setRatingComment("");
+  };
+
+  const handleViewAllCases = () => {
+    if (selectedExpert) {
+      navigate(`/?author=${encodeURIComponent(selectedExpert.name)}`);
+    }
+  };
 
   useEffect(() => {
     const expertId = searchParams.get("id");
