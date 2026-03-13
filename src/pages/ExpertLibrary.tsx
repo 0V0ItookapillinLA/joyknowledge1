@@ -236,7 +236,7 @@ const ExpertLibrary = () => {
             <div>
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-sm font-semibold text-foreground">已发布案例</h2>
-                <button className="text-sm text-primary hover:underline">查看全部</button>
+                <button onClick={handleViewAllCases} className="text-sm text-primary hover:underline">查看全部</button>
               </div>
 
               <div className="space-y-4">
