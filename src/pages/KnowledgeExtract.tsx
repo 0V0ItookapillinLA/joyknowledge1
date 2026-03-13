@@ -628,26 +628,54 @@ const KnowledgeExtract = () => {
                   </div>
                 </div>
 
-                {/* Drop zone - compact */}
+                {/* Upload zone - larger and more prominent */}
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  multiple
+                  className="hidden"
+                  onChange={handleFileSelected}
+                  accept={pendingUploadType === "video" ? "video/*" : pendingUploadType === "audio" ? "audio/*" : ".pdf,.doc,.docx,.xls,.xlsx,.csv,.ppt,.pptx,.txt,.md"}
+                />
                 <motion.div
                   initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.15 }}
                   onDragOver={(e) => { e.preventDefault(); setIsDragOver(true); }}
                   onDragLeave={() => setIsDragOver(false)}
-                  onDrop={(e) => { e.preventDefault(); setIsDragOver(false); quickAddSource("file", `拖放文件_${sources.length + 1}.pdf`); }}
-                  className={`relative border border-dashed rounded-lg px-4 py-3 text-center transition-all cursor-pointer ${
-                    isDragOver ? "border-primary bg-primary/5" : "border-border hover:border-primary/30 hover:bg-accent/20"
+                  onDrop={(e) => {
+                    e.preventDefault(); setIsDragOver(false);
+                    const files = e.dataTransfer.files;
+                    if (files.length > 0) {
+                      Array.from(files).forEach(file => quickAddSource("file", file.name));
+                    }
+                  }}
+                  onClick={handleUploadZoneClick}
+                  className={`relative border-2 border-dashed rounded-xl px-6 py-8 text-center transition-all cursor-pointer ${
+                    pendingUploadType
+                      ? "border-primary bg-primary/5 shadow-sm"
+                      : isDragOver
+                      ? "border-primary bg-primary/5"
+                      : "border-border hover:border-primary/30 hover:bg-accent/20"
                   }`}
                 >
                   <AnimatePresence>
                     {isDragOver && (
-                      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 rounded-lg bg-primary/10 flex items-center justify-center z-10">
-                        <Upload className="w-8 h-8 text-primary animate-bounce" />
+                      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 rounded-xl bg-primary/10 flex items-center justify-center z-10">
+                        <Upload className="w-10 h-10 text-primary animate-bounce" />
                       </motion.div>
                     )}
                   </AnimatePresence>
-                  <div className="flex items-center justify-center gap-2">
-                    <Upload className="w-4 h-4 text-muted-foreground/50" />
-                    <span className="text-[11px] text-muted-foreground">拖动文件至此处，或点击上方类型按钮上传</span>
+                  <div className="flex flex-col items-center gap-2">
+                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${pendingUploadType ? "bg-primary/10" : "bg-accent"}`}>
+                      <Upload className={`w-6 h-6 ${pendingUploadType ? "text-primary" : "text-muted-foreground/50"}`} />
+                    </div>
+                    <div>
+                      <p className={`text-sm font-medium ${pendingUploadType ? "text-primary" : "text-muted-foreground"}`}>
+                        {pendingUploadType ? "点击此处选择文件上传" : "拖动文件至此处"}
+                      </p>
+                      <p className="text-[11px] text-muted-foreground mt-0.5">
+                        {pendingUploadType ? "或拖动文件到此区域" : "请先点击上方文件类型"}
+                      </p>
+                    </div>
                   </div>
                 </motion.div>
 
