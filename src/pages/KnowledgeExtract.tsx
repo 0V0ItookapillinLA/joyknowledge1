@@ -640,7 +640,12 @@ const KnowledgeExtract = () => {
                   multiple
                   className="hidden"
                   onChange={handleFileSelected}
-                  accept={pendingUploadType === "video" ? "video/*" : pendingUploadType === "audio" ? "audio/*" : ".pdf,.doc,.docx,.xls,.xlsx,.csv,.ppt,.pptx,.txt,.md"}
+                  accept={(() => {
+                    const selectedOpt = LOCAL_UPLOAD_TYPES.find(t => t.label === pendingUploadType);
+                    if (selectedOpt?.type === "video") return "video/*";
+                    if (selectedOpt?.type === "audio") return "audio/*";
+                    return ".pdf,.doc,.docx,.xls,.xlsx,.csv,.ppt,.pptx,.txt,.md";
+                  })()}
                 />
                 <motion.div
                   initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.15 }}
