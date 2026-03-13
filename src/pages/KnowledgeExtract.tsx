@@ -699,9 +699,7 @@ const KnowledgeExtract = () => {
                         className={`group relative p-2.5 rounded-lg border bg-card hover:shadow-sm transition-all text-left ${selectedOnlineType === opt.label ? "border-primary bg-primary/5" : "border-border hover:border-primary/40"}`}
                       >
                         <div className="flex items-center gap-2 mb-1">
-                          <div className={`w-6 h-6 rounded-md bg-gradient-to-br ${opt.gradient} flex items-center justify-center shrink-0 shadow-sm`}>
-                            <opt.icon className="w-3 h-3 text-white" />
-                          </div>
+                          <opt.icon className={`w-5 h-5 shrink-0 ${opt.color}`} />
                           <span className="text-[11px] font-medium text-foreground truncate">{opt.label}</span>
                         </div>
                         <p className="text-[9px] text-muted-foreground leading-tight line-clamp-2">{opt.desc}</p>
