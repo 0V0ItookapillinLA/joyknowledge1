@@ -1549,6 +1549,136 @@ const KnowledgeExtract = () => {
               );
             })()}
           </AnimatePresence>
+
+          {/* ═══ Publish Dialog ═══ */}
+          <AnimatePresence>
+            {showPublishDialog && (
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/40" onClick={() => { setShowPublishDialog(false); setPublishTarget("personal"); setPublishSubmitted(false); }}>
+                <motion.div initial={{ opacity: 0, scale: 0.95, y: 12 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 12 }}
+                  className="w-full max-w-lg bg-card rounded-2xl shadow-2xl border border-border overflow-hidden" onClick={(e) => e.stopPropagation()}>
+
+                  {!publishSubmitted ? (
+                    <>
+                      <div className="relative px-8 pt-8 pb-4 text-center">
+                        <button onClick={() => { setShowPublishDialog(false); setPublishTarget("personal"); }} className="absolute right-4 top-4 p-1.5 rounded-lg hover:bg-accent text-muted-foreground transition-colors"><X className="w-5 h-5" /></button>
+                        <h2 className="text-xl font-semibold text-foreground">选择发布位置</h2>
+                        <p className="text-sm text-muted-foreground mt-1">你的知识文档将发布到选定的位置</p>
+                      </div>
+                      <div className="px-8 pb-6 grid grid-cols-2 gap-4">
+                        <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
+                          onClick={() => setPublishTarget("personal")}
+                          className={`relative text-left p-5 rounded-2xl border-2 transition-all ${
+                            publishTarget === "personal" ? "border-primary shadow-lg bg-primary/5" : "border-border hover:border-primary/30"
+                          }`}>
+                          {publishTarget === "personal" && (
+                            <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="absolute top-3 right-3 w-5 h-5 rounded-full bg-primary flex items-center justify-center">
+                              <Check className="w-3 h-3 text-primary-foreground" />
+                            </motion.div>
+                          )}
+                          <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center mb-3">
+                            <Lock className="w-5 h-5 text-blue-600" />
+                          </div>
+                          <h3 className="text-sm font-semibold text-foreground mb-1">个人专区</h3>
+                          <p className="text-xs text-muted-foreground leading-relaxed">发布到个人知识库，作为私人智库沉淀</p>
+                          <div className="mt-3 flex items-center gap-1.5 text-[10px] text-emerald-600">
+                            <CheckCircle2 className="w-3 h-3" /> 无需审批，即时发布
+                          </div>
+                        </motion.button>
+
+                        <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
+                          onClick={() => setPublishTarget("bgbu")}
+                          className={`relative text-left p-5 rounded-2xl border-2 transition-all ${
+                            publishTarget === "bgbu" ? "border-primary shadow-lg bg-primary/5" : "border-border hover:border-primary/30"
+                          }`}>
+                          {publishTarget === "bgbu" && (
+                            <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="absolute top-3 right-3 w-5 h-5 rounded-full bg-primary flex items-center justify-center">
+                              <Check className="w-3 h-3 text-primary-foreground" />
+                            </motion.div>
+                          )}
+                          <div className="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center mb-3">
+                            <Building2 className="w-5 h-5 text-purple-600" />
+                          </div>
+                          <h3 className="text-sm font-semibold text-foreground mb-1">BG/BU 专区</h3>
+                          <p className="text-xs text-muted-foreground leading-relaxed">发布到部门知识库，共享给团队成员</p>
+                          <div className="mt-3 flex items-center gap-1.5 text-[10px] text-amber-600">
+                            <Shield className="w-3 h-3" /> 需要审批流程
+                          </div>
+                        </motion.button>
+                      </div>
+
+                      <AnimatePresence>
+                        {publishTarget === "bgbu" && (
+                          <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}
+                            className="px-8 pb-4 overflow-hidden">
+                            <div className="p-4 rounded-xl bg-amber-50 border border-amber-200">
+                              <div className="flex items-center gap-2 mb-3">
+                                <Shield className="w-4 h-4 text-amber-600" />
+                                <span className="text-xs font-semibold text-amber-800">审批流程</span>
+                              </div>
+                              <div className="space-y-2.5">
+                                <div className="flex items-center gap-3">
+                                  <div className="w-6 h-6 rounded-full bg-amber-100 flex items-center justify-center text-[10px] font-bold text-amber-700">1</div>
+                                  <div className="flex items-center gap-2">
+                                    <UserCheck className="w-3.5 h-3.5 text-amber-600" />
+                                    <span className="text-xs text-amber-800">直属上级审批</span>
+                                  </div>
+                                </div>
+                                <div className="ml-3 w-px h-3 bg-amber-300" />
+                                <div className="flex items-center gap-3">
+                                  <div className="w-6 h-6 rounded-full bg-amber-100 flex items-center justify-center text-[10px] font-bold text-amber-700">2</div>
+                                  <div className="flex items-center gap-2">
+                                    <Users className="w-3.5 h-3.5 text-amber-600" />
+                                    <span className="text-xs text-amber-800">BG/BU 专区管理员审批</span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+
+                      <div className="px-8 pb-8">
+                        <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
+                          disabled={!publishTarget}
+                          onClick={() => setPublishSubmitted(true)}
+                          className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 shadow-md disabled:opacity-40 transition-all">
+                          {publishTarget === "bgbu" ? (
+                            <><Shield className="w-4 h-4" /> 提交审批</>
+                          ) : (
+                            <><CheckCircle2 className="w-4 h-4" /> 立即发布</>
+                          )}
+                        </motion.button>
+                      </div>
+                    </>
+                  ) : (
+                    <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="px-8 py-12 text-center">
+                      <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", stiffness: 200 }}
+                        className={`w-16 h-16 rounded-2xl mx-auto mb-5 flex items-center justify-center ${publishTarget === "personal" ? "bg-emerald-100" : "bg-amber-100"}`}>
+                        {publishTarget === "personal"
+                          ? <CheckCircle2 className="w-8 h-8 text-emerald-600" />
+                          : <Shield className="w-8 h-8 text-amber-600" />
+                        }
+                      </motion.div>
+                      <h3 className="text-lg font-bold text-foreground mb-2">
+                        {publishTarget === "personal" ? "发布成功！" : "已提交审批！"}
+                      </h3>
+                      <p className="text-sm text-muted-foreground mb-6">
+                        {publishTarget === "personal"
+                          ? "知识文档已发布到你的个人专区"
+                          : "审批请求已发送给直属上级和 BG/BU 管理员，审批通过后将自动发布"
+                        }
+                      </p>
+                      <button onClick={() => { setShowPublishDialog(false); setPublishTarget("personal"); setPublishSubmitted(false); navigate("/case/1"); }}
+                        className="px-6 py-2 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors">
+                        查看文章详情
+                      </button>
+                    </motion.div>
+                  )}
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </AppLayout>
     );
