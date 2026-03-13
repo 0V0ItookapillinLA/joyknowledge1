@@ -815,7 +815,7 @@ const KnowledgeExtract = () => {
             {/* Right: Added files */}
             <div className="w-[360px] shrink-0 overflow-y-auto flex flex-col">
               <div className="px-5 py-4 border-b border-border">
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between mb-2.5">
                   <div className="flex items-center gap-2">
                     <span className="text-xs font-semibold text-foreground">已添加资料</span>
                     <span className="px-1.5 py-0.5 rounded-md bg-primary/10 text-primary text-[10px] font-medium">{sources.length}</span>
@@ -829,6 +829,20 @@ const KnowledgeExtract = () => {
                       })}
                     </div>
                   )}
+                </div>
+                {/* Source limit progress bar */}
+                <div className="flex items-center gap-2.5">
+                  <div className="flex-1 h-1.5 rounded-full bg-accent overflow-hidden">
+                    <motion.div
+                      className={`h-full rounded-full transition-colors ${sources.length >= MAX_SOURCES ? "bg-destructive" : "bg-primary"}`}
+                      initial={{ width: "0%" }}
+                      animate={{ width: `${Math.min((sources.length / MAX_SOURCES) * 100, 100)}%` }}
+                      transition={{ duration: 0.3 }}
+                    />
+                  </div>
+                  <span className={`text-[11px] font-medium shrink-0 ${sources.length >= MAX_SOURCES ? "text-destructive" : "text-muted-foreground"}`}>
+                    {sources.length} / {MAX_SOURCES}
+                  </span>
                 </div>
               </div>
 
@@ -879,22 +893,6 @@ const KnowledgeExtract = () => {
            </div>
            </div>
 
-          {/* Source limit progress bar */}
-          <div className="px-5 py-3 border-t border-border bg-card/60">
-            <div className="flex items-center gap-3">
-              <div className="flex-1 h-2 rounded-full bg-accent overflow-hidden">
-                <motion.div
-                  className={`h-full rounded-full transition-colors ${sources.length >= MAX_SOURCES ? "bg-destructive" : "bg-primary"}`}
-                  initial={{ width: "0%" }}
-                  animate={{ width: `${Math.min((sources.length / MAX_SOURCES) * 100, 100)}%` }}
-                  transition={{ duration: 0.3 }}
-                />
-              </div>
-              <span className={`text-xs font-medium shrink-0 ${sources.length >= MAX_SOURCES ? "text-destructive" : "text-muted-foreground"}`}>
-                {sources.length} / {MAX_SOURCES}
-              </span>
-            </div>
-          </div>
 
         </div>
       </AppLayout>
@@ -1875,8 +1873,10 @@ const KnowledgeExtract = () => {
                   <motion.div key={source.id} layout
                     initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20, height: 0 }}
                     className={`flex items-center gap-2.5 px-3 py-3 rounded-xl border group transition-all cursor-pointer ${source.selected ? "bg-card border-primary/20 shadow-sm" : "bg-card/50 border-border hover:border-border"}`}
-                    onClick={() => toggleSource(source.id)}>
-                    <div className={`w-4 h-4 rounded border-2 flex items-center justify-center shrink-0 transition-colors ${source.selected ? "bg-primary border-primary" : "border-muted-foreground/30"}`}>
+                    onClick={() => setSources(prev => prev.map(s => ({ ...s, selected: s.id === source.id })))}>
+                    <div
+                      className={`w-4 h-4 rounded border-2 flex items-center justify-center shrink-0 transition-colors ${source.selected ? "bg-primary border-primary" : "border-muted-foreground/30"}`}
+                      onClick={(e) => { e.stopPropagation(); toggleSource(source.id); }}>
                       {source.selected && <CheckCircle2 className="w-3 h-3 text-primary-foreground" />}
                     </div>
                     <Icon className={`w-4 h-4 shrink-0 ${source.selected ? "text-primary" : "text-muted-foreground"}`} />
@@ -1913,7 +1913,10 @@ const KnowledgeExtract = () => {
           <div className="px-4 py-3 border-t border-border space-y-2">
             <div className="flex items-center justify-between text-xs text-muted-foreground">
               <span>已选中 {selectedCount} / {sources.length}</span>
-              <button onClick={() => setSources(prev => prev.map(s => ({ ...s, selected: true })))} className="text-primary hover:underline">全选</button>
+              <button onClick={() => {
+                const allSelected = sources.every(s => s.selected);
+                setSources(prev => prev.map(s => ({ ...s, selected: !allSelected })));
+              }} className="text-primary hover:underline">{sources.every(s => s.selected) ? "取消全选" : "全选"}</button>
             </div>
             {/* Source limit progress bar */}
             <div className="flex items-center gap-2.5">
