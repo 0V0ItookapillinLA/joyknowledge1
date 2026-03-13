@@ -431,6 +431,20 @@ const KnowledgeExtract = () => {
     }, 1500);
   };
 
+  const DEEP_CONTINUE_RESPONSES = [
+    "好的，让我继续挖掘。\n\n你在刚才提到了团队协作——**你认为跨部门沟通中最容易被忽视的环节是什么？**",
+    "让我换个角度追问。\n\n在这个过程中，**有没有某个关键转折点**，让你的思路发生了根本性的改变？",
+    "很好，我们继续深入。\n\n你提到的这些经验中，**哪些是只有亲历者才能体会到的「隐性感知」**？",
+    "我想从另一个维度来探索。\n\n如果时间回到项目开始之前，**你会做出哪些不同的决策？**为什么？",
+    "继续挖掘一下。\n\n在推进过程中，**你是如何判断事情正在朝正确方向发展的？**有没有一些非正式的信号或指标？",
+  ];
+
+  const DEEP_SUMMARY_RESPONSES = [
+    "## 🧠 隐性知识萃取总结\n\n1. **决策直觉**：倾向于「先小范围试点，再逐步推广」\n2. **团队管理**：「数据说话」比「行政命令」更能推动变革\n3. **风险感知**：能提前识别软性风险并渐进式化解\n4. **方法论迁移**：善于将成功经验抽象后跨场景应用\n\n> 准备好后可以点击「生成初稿」按钮。",
+    "## 🧠 隐性知识提炼\n\n1. **模式识别**：能快速从碎片信息中识别出系统性问题\n2. **节奏把控**：对变革推进的节奏有精准的直觉判断\n3. **关系洞察**：善于在复杂利益关系中找到共赢方案\n4. **复盘能力**：习惯性地从失败中提取可复用的认知框架\n\n> 如果你觉得信息已经充分，可以点击「生成初稿」。",
+    "## 🧠 知识图谱梳理\n\n1. **情境判断力**：能根据不同场景灵活调整策略\n2. **隐性规则感知**：对组织内非正式规则有深刻理解\n3. **经验传递**：擅长将抽象经验转化为具体可操作的步骤\n4. **预见性思维**：能基于历史经验预判潜在风险\n\n> 你的隐性知识已经初步梳理完成，可以选择继续深入或生成初稿。",
+  ];
+
   const handleSuggestionClick = (text: string) => {
     setChatInput(text);
     setTimeout(() => {
@@ -438,16 +452,26 @@ const KnowledgeExtract = () => {
       setChatInput("");
       setIsAiTyping(true);
       setTimeout(() => {
-        const deepMap: Record<string, string> = {
-          "继续追问我": "好的，让我继续挖掘。\n\n你在刚才提到了团队协作——**你认为跨部门沟通中最容易被忽视的环节是什么？**",
-          "总结我的隐性知识": "## 🧠 隐性知识萃取总结\n\n1. **决策直觉**：倾向于「先小范围试点，再逐步推广」\n2. **团队管理**：「数据说话」比「行政命令」更能推动变革\n3. **风险感知**：能提前识别软性风险并渐进式化解\n4. **方法论迁移**：善于将成功经验抽象后跨场景应用\n\n> 准备好后可以选择工具并开始生成文档。",
-        };
-        const quickMap: Record<string, string> = {
-          "帮我提炼核心观点": "## 📌 核心观点\n\n1. DevOps 流水线是效能提升的关键基础设施\n2. 渐进式推进比一刀切更适合组织变革\n3. 数据驱动是持续优化的核心方法论\n4. 跨部门协作需要明确的机制保障\n\n准备好后请选择右侧工具并点击生成。",
-          "补充背景信息": "好的，请告诉我更多关于项目的背景信息。",
-        };
-        const map = extractMode === "deep" ? deepMap : quickMap;
-        const response = map[text] || (extractMode === "deep" ? SOCRATIC_RESPONSES[socraticIndex % SOCRATIC_RESPONSES.length] : QUICK_RESPONSES[quickIndex % QUICK_RESPONSES.length]);
+        let response: string;
+        if (extractMode === "deep") {
+          if (text === "继续追问我") {
+            response = DEEP_CONTINUE_RESPONSES[socraticIndex % DEEP_CONTINUE_RESPONSES.length];
+            setSocraticIndex(prev => prev + 1);
+          } else if (text === "总结我的隐性知识") {
+            response = DEEP_SUMMARY_RESPONSES[quickIndex % DEEP_SUMMARY_RESPONSES.length];
+            setQuickIndex(prev => prev + 1);
+          } else {
+            response = SOCRATIC_RESPONSES[socraticIndex % SOCRATIC_RESPONSES.length];
+            setSocraticIndex(prev => prev + 1);
+          }
+        } else {
+          const quickMap: Record<string, string> = {
+            "帮我提炼核心观点": "## 📌 核心观点\n\n1. DevOps 流水线是效能提升的关键基础设施\n2. 渐进式推进比一刀切更适合组织变革\n3. 数据驱动是持续优化的核心方法论\n4. 跨部门协作需要明确的机制保障\n\n准备好后请选择右侧工具并点击生成。",
+            "补充背景信息": "好的，请告诉我更多关于项目的背景信息。",
+          };
+          response = quickMap[text] || QUICK_RESPONSES[quickIndex % QUICK_RESPONSES.length];
+          setQuickIndex(prev => prev + 1);
+        }
         setChatMessages(prev => [...prev, { id: (Date.now() + 1).toString(), role: "assistant", content: response }]);
         setIsAiTyping(false);
       }, 1500);
