@@ -872,57 +872,49 @@ const KnowledgeExtract = () => {
               </motion.div>
 
               {/* Template grid */}
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-3 gap-3">
                 {OUTPUT_TEMPLATES.map((tpl, i) => {
                   const isSelected = selectedTemplate === tpl.id;
                   return (
                     <motion.button
                       key={tpl.id}
-                      initial={{ opacity: 0, y: 16 }}
+                      initial={{ opacity: 0, y: 12 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.1 + i * 0.06 }}
-                      whileHover={{ scale: 1.01, y: -2 }}
-                      whileTap={{ scale: 0.99 }}
+                      transition={{ delay: 0.08 + i * 0.04 }}
+                      whileHover={{ scale: 1.02, y: -1 }}
+                      whileTap={{ scale: 0.98 }}
                       onClick={() => setSelectedTemplate(isSelected ? null : tpl.id)}
-                      className={`relative text-left p-5 rounded-2xl border-2 transition-all ${
+                      className={`relative text-left p-3 rounded-xl border-2 transition-all ${
                         isSelected
-                          ? "border-primary shadow-lg shadow-primary/10 bg-card"
-                          : "border-border bg-card hover:border-primary/30 hover:shadow-md"
+                          ? "border-primary shadow-md shadow-primary/10 bg-card"
+                          : "border-border bg-card hover:border-primary/30 hover:shadow-sm"
                       }`}
                     >
-                      {/* Selected check */}
                       {isSelected && (
                         <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", stiffness: 300 }}
-                          className="absolute top-4 right-4 w-6 h-6 rounded-full bg-primary flex items-center justify-center">
-                          <Check className="w-3.5 h-3.5 text-primary-foreground" />
+                          className="absolute top-2.5 right-2.5 w-5 h-5 rounded-full bg-primary flex items-center justify-center">
+                          <Check className="w-3 h-3 text-primary-foreground" />
                         </motion.div>
                       )}
-
-                      {/* Icon + Title */}
-                      <div className="flex items-start gap-3 mb-3">
-                        <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${tpl.gradient} flex items-center justify-center shrink-0`}>
-                          <tpl.icon className="w-5 h-5 text-white" />
+                      <div className="flex items-start gap-2 mb-2">
+                        <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${tpl.gradient} flex items-center justify-center shrink-0`}>
+                          <tpl.icon className="w-4 h-4 text-white" />
                         </div>
                         <div className="min-w-0">
-                          <h3 className="text-sm font-semibold text-foreground">{tpl.label}</h3>
-                          <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{tpl.desc}</p>
+                          <h3 className="text-xs font-semibold text-foreground leading-tight">{tpl.label}</h3>
+                          <p className="text-[10px] text-muted-foreground mt-0.5 leading-snug line-clamp-2">{tpl.desc}</p>
                         </div>
                       </div>
-
-                      {/* Preview structure */}
-                      <div className={`rounded-xl p-3 space-y-1.5 transition-colors ${isSelected ? tpl.color : "bg-accent/50"}`}>
-                        {tpl.preview.map((item, j) => (
-                          <motion.div
-                            key={j}
-                            initial={{ opacity: 0, x: -8 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: 0.2 + i * 0.06 + j * 0.04 }}
-                            className="flex items-center gap-2"
-                          >
+                      <div className={`rounded-lg p-2 space-y-1 transition-colors ${isSelected ? tpl.color : "bg-accent/50"}`}>
+                        {tpl.preview.slice(0, 3).map((item, j) => (
+                          <div key={j} className="flex items-center gap-1.5">
                             <div className={`w-1 h-1 rounded-full ${isSelected ? "bg-primary" : "bg-muted-foreground/30"}`} />
-                            <span className="text-[11px] text-muted-foreground">{item}</span>
-                          </motion.div>
+                            <span className="text-[10px] text-muted-foreground">{item}</span>
+                          </div>
                         ))}
+                        {tpl.preview.length > 3 && (
+                          <span className="text-[10px] text-muted-foreground/50 pl-2.5">+{tpl.preview.length - 3} more</span>
+                        )}
                       </div>
                     </motion.button>
                   );
