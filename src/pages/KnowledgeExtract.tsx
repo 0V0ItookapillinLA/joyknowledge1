@@ -934,30 +934,6 @@ const KnowledgeExtract = () => {
                 })}
               </div>
 
-              {/* Title input */}
-              <AnimatePresence>
-                {selectedTemplate && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
-                    exit={{ opacity: 0, height: 0 }}
-                    className="overflow-hidden mt-4"
-                  >
-                    <div className="p-4 rounded-xl border border-border bg-card space-y-2">
-                      <div className="flex items-center gap-2">
-                        <PenTool className="w-3.5 h-3.5 text-primary" />
-                        <span className="text-xs font-medium text-foreground">为文档命名（可选）</span>
-                      </div>
-                      <input
-                        value={quickTitle}
-                        onChange={(e) => setQuickTitle(e.target.value)}
-                        className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm outline-none focus:border-primary/50 transition-colors"
-                        placeholder="AI 将根据内容自动生成标题，你也可以自定义..."
-                      />
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
             </div>
           </div>
         </div>
