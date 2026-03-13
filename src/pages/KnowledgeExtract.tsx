@@ -1337,7 +1337,7 @@ const KnowledgeExtract = () => {
                 <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground mb-2">
                   <Layers className="w-3 h-3" /> 结构化工具
                 </div>
-                <div className="grid grid-cols-3 gap-2">
+                <div className="flex items-center gap-1.5">
                   {tools.map((tool) => {
                     const isSelected = selectedStructTool === tool.id;
                     const hasResult = !!toolResults[tool.id];
@@ -1345,29 +1345,24 @@ const KnowledgeExtract = () => {
                     return (
                       <motion.button
                         key={tool.id}
-                        whileHover={{ scale: 1.03 }}
-                        whileTap={{ scale: 0.97 }}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
                         onClick={() => setSelectedStructTool(isSelected ? null : tool.id)}
-                        className={`relative flex flex-col items-center gap-1.5 p-3 rounded-xl border transition-all text-center ${
+                        className={`relative flex items-center gap-1 px-2.5 py-1.5 rounded-lg border transition-all text-center whitespace-nowrap ${
                           isSelected
-                            ? "border-primary bg-primary/5 shadow-md"
+                            ? "border-primary bg-primary/5 shadow-sm"
                             : hasResult
-                            ? `${tool.color} border-2`
-                            : "border-border bg-card hover:border-primary/30 hover:shadow-sm"
+                            ? `${tool.color} border`
+                            : "border-border bg-card hover:border-primary/30"
                         }`}
                       >
-                        {hasResult && (
-                          <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-primary flex items-center justify-center">
-                            <Check className="w-2.5 h-2.5 text-primary-foreground" />
+                        {(hasResult || isGenerating) && (
+                          <div className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-primary flex items-center justify-center">
+                            {isGenerating ? <Loader2 className="w-2 h-2 text-primary-foreground animate-spin" /> : <Check className="w-2 h-2 text-primary-foreground" />}
                           </div>
                         )}
-                        {isGenerating && (
-                          <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-primary flex items-center justify-center">
-                            <Loader2 className="w-2.5 h-2.5 text-primary-foreground animate-spin" />
-                          </div>
-                        )}
-                        <tool.icon className={`w-5 h-5 ${isSelected ? "text-primary" : "text-muted-foreground"}`} />
-                        <span className={`text-[11px] font-medium ${isSelected ? "text-primary" : "text-foreground"}`}>{tool.label}</span>
+                        <tool.icon className={`w-3.5 h-3.5 ${isSelected ? "text-primary" : "text-muted-foreground"}`} />
+                        <span className={`text-[10px] font-medium ${isSelected ? "text-primary" : "text-foreground"}`}>{tool.label}</span>
                       </motion.button>
                     );
                   })}
