@@ -1298,7 +1298,7 @@ const KnowledgeExtract = () => {
             </div>
             <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={startGeneration}
               className="flex items-center gap-2 px-5 py-2 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 shadow-md">
-              <Wand2 className="w-4 h-4" /> 最终生成
+              <Wand2 className="w-4 h-4" /> 生成预览
             </motion.button>
           </div>
 
