@@ -333,7 +333,9 @@ const KnowledgeExtract = () => {
         const newSource: Source = { id: `search-${Date.now()}-${i}`, name: result.title, type: "url", status: "analyzing", selected: true };
         setSources(prev => [...prev, newSource]);
         setTimeout(() => {
-          setSources(prev => prev.map(s => s.id === newSource.id ? { ...s, status: "ready" } : s));
+          // Randomly make some imports fail (about 30% chance)
+          const isFailed = Math.random() < 0.3;
+          setSources(prev => prev.map(s => s.id === newSource.id ? { ...s, status: isFailed ? "failed" : "ready" } : s));
         }, 1500 + Math.random() * 1000);
       }, i * 200);
     });
