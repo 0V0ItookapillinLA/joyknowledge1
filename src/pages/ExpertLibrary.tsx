@@ -224,6 +224,12 @@ const ExpertLibrary = () => {
                   <p className="text-xs text-muted-foreground mt-0.5">专家评分</p>
                 </div>
               </div>
+              <button
+                onClick={() => setShowRatingDialog(true)}
+                className="mt-4 inline-flex items-center gap-1.5 px-4 py-1.5 rounded-lg border border-primary/30 text-primary text-sm font-medium hover:bg-primary/5 transition-colors"
+              >
+                <Star className="w-4 h-4" /> 我要评分
+              </button>
             </motion.div>
 
             {/* Cases */}
