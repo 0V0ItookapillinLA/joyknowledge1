@@ -1,5 +1,5 @@
 import { useParams, Link } from "react-router-dom";
-import { ArrowLeft, Heart, MessageCircle, Bookmark, Share2, Eye, ThumbsUp, ChevronRight, List } from "lucide-react";
+import { ArrowLeft, Heart, MessageCircle, Bookmark, Share2, Eye, ThumbsUp, ThumbsDown, ChevronRight, List } from "lucide-react";
 import { motion } from "framer-motion";
 import { useState, useEffect, useRef } from "react";
 import AppLayout from "@/components/AppLayout";
@@ -177,6 +177,9 @@ const CaseDetail = () => {
                 </button>
                 <button className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors">
                   <Share2 className="w-4 h-4" /> 分享
+                </button>
+                <button className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-destructive transition-colors">
+                  <ThumbsDown className="w-4 h-4" /> 不感兴趣
                 </button>
                 <span className="ml-auto text-sm text-muted-foreground flex items-center gap-1">
                   <Eye className="w-4 h-4" /> 阅读 {formatNumber(caseItem.views)}
