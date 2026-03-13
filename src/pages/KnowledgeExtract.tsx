@@ -620,7 +620,7 @@ const KnowledgeExtract = () => {
                         whileTap={{ scale: 0.97 }}
                         onClick={() => handleTypeClick(opt)}
                         className={`group relative p-2.5 rounded-lg border bg-card hover:shadow-sm transition-all text-left ${
-                          pendingUploadType === opt.type && activeUploadType === opt.type ? "border-primary bg-primary/5 shadow-sm" : "border-border hover:border-primary/40"
+                          pendingUploadType === opt.label ? "border-primary bg-primary/5 shadow-sm" : "border-border hover:border-primary/40"
                         }`}
                       >
                         <div className="flex items-center gap-2 mb-1">
