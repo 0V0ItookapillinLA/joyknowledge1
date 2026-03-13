@@ -202,7 +202,9 @@ const KnowledgeExtract = () => {
   const [pickerTab, setPickerTab] = useState("最近打开");
   const [pickerNav, setPickerNav] = useState("home");
   const [pendingUploadType, setPendingUploadType] = useState<string | null>(null);
+  const [deepSourceType, setDeepSourceType] = useState<"joyspace" | "local">("joyspace");
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const deepFileInputRef = useRef<HTMLInputElement>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   // Deep mode search state
