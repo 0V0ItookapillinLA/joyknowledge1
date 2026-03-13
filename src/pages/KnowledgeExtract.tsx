@@ -178,6 +178,7 @@ const OUTPUT_TEMPLATES: OutputTemplate[] = [
 
 /* ───── Component ───── */
 const KnowledgeExtract = () => {
+  const navigate = useNavigate();
   const [appMode, setAppMode] = useState<AppMode>("select");
   const [extractMode, setExtractMode] = useState<ExtractMode>("quick");
 
@@ -200,6 +201,8 @@ const KnowledgeExtract = () => {
   const [pickerSelected, setPickerSelected] = useState<string[]>([]);
   const [pickerTab, setPickerTab] = useState("最近打开");
   const [pickerNav, setPickerNav] = useState("home");
+  const [pendingUploadType, setPendingUploadType] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   // Deep mode search state
