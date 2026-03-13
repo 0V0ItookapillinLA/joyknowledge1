@@ -1873,8 +1873,10 @@ const KnowledgeExtract = () => {
                   <motion.div key={source.id} layout
                     initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20, height: 0 }}
                     className={`flex items-center gap-2.5 px-3 py-3 rounded-xl border group transition-all cursor-pointer ${source.selected ? "bg-card border-primary/20 shadow-sm" : "bg-card/50 border-border hover:border-border"}`}
-                    onClick={() => toggleSource(source.id)}>
-                    <div className={`w-4 h-4 rounded border-2 flex items-center justify-center shrink-0 transition-colors ${source.selected ? "bg-primary border-primary" : "border-muted-foreground/30"}`}>
+                    onClick={() => setSources(prev => prev.map(s => ({ ...s, selected: s.id === source.id })))}>
+                    <div
+                      className={`w-4 h-4 rounded border-2 flex items-center justify-center shrink-0 transition-colors ${source.selected ? "bg-primary border-primary" : "border-muted-foreground/30"}`}
+                      onClick={(e) => { e.stopPropagation(); toggleSource(source.id); }}>
                       {source.selected && <CheckCircle2 className="w-3 h-3 text-primary-foreground" />}
                     </div>
                     <Icon className={`w-4 h-4 shrink-0 ${source.selected ? "text-primary" : "text-muted-foreground"}`} />
