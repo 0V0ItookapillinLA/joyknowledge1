@@ -1415,7 +1415,9 @@ const KnowledgeExtract = () => {
 
           <div className="flex flex-1 overflow-hidden">
             {/* Left: Word-style document - directly editable */}
-            <div className="w-[65%] shrink-0 overflow-y-auto">
+            <div className="w-[65%] shrink-0 flex flex-col overflow-hidden">
+              <RichTextToolbar />
+              <div className="flex-1 overflow-y-auto">
               <div className="max-w-3xl mx-auto py-8 px-10">
                 <textarea
                   value={initialDoc}
