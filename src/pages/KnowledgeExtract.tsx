@@ -1426,6 +1426,7 @@ const KnowledgeExtract = () => {
                   placeholder="在此编辑文档内容..."
                 />
               </div>
+              </div>
             </div>
 
             {/* Right: Tool bar + workspace - compact */}
