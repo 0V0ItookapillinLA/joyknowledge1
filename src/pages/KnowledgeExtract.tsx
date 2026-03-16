@@ -1417,7 +1417,30 @@ const KnowledgeExtract = () => {
             {/* Left: Word-style document - directly editable */}
             <div className="w-[65%] shrink-0 flex flex-col overflow-hidden">
               <RichTextToolbar />
-              <div className="flex-1 overflow-y-auto">
+              <div
+                className={`flex-1 overflow-y-auto transition-colors ${dropHighlight !== null ? "bg-primary/5" : ""}`}
+                onDragOver={(e) => { e.preventDefault(); e.dataTransfer.dropEffect = "copy"; setDropHighlight(0); }}
+                onDragLeave={() => setDropHighlight(null)}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  setDropHighlight(null);
+                  const toolId = e.dataTransfer.getData("resultToolId");
+                  if (toolId && toolResults[toolId]) {
+                    const toolObj = tools.find(t => t.id === toolId);
+                    const label = toolObj?.label || toolId;
+                    const insertText = `\n\n--- ${label} ---\n${toolResults[toolId]}\n`;
+                    // Try to insert at cursor position in textarea
+                    const textarea = e.currentTarget.querySelector("textarea");
+                    if (textarea) {
+                      const pos = textarea.selectionStart ?? initialDoc.length;
+                      const newDoc = initialDoc.slice(0, pos) + insertText + initialDoc.slice(pos);
+                      setInitialDoc(newDoc);
+                    } else {
+                      setInitialDoc(prev => prev + insertText);
+                    }
+                  }
+                }}
+              >
               <div className="max-w-3xl mx-auto py-8 px-10">
                 <textarea
                   value={initialDoc}
