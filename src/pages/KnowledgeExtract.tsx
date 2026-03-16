@@ -566,7 +566,69 @@ const KnowledgeExtract = () => {
     );
   }
 
-  /* ───── Step indicator component ───── */
+  /* ───── Rich Text Toolbar ───── */
+  const RichTextToolbar = () => {
+    const execCmd = (cmd: string, value?: string) => {
+      document.execCommand(cmd, false, value);
+    };
+    const btnClass = "p-1.5 rounded hover:bg-accent text-muted-foreground hover:text-foreground transition-colors";
+    const sepClass = "w-px h-5 bg-border mx-0.5";
+    return (
+      <div className="flex items-center gap-0.5 px-4 py-2 border-b border-border bg-card/80 backdrop-blur-sm flex-wrap">
+        {/* Insert */}
+        <button className="flex items-center gap-1 px-2 py-1 rounded text-xs font-medium text-primary hover:bg-accent transition-colors">
+          <Plus className="w-3.5 h-3.5" /> 插入
+        </button>
+        <div className={sepClass} />
+        {/* Undo / Redo */}
+        <button onClick={() => execCmd("undo")} className={btnClass} title="撤销"><Undo2 className="w-4 h-4" /></button>
+        <button onClick={() => execCmd("redo")} className={btnClass} title="重做"><Redo2 className="w-4 h-4" /></button>
+        <div className={sepClass} />
+        {/* Page width / Font / Style / Size */}
+        <button className="flex items-center gap-1 px-2 py-1 rounded text-xs text-muted-foreground hover:bg-accent transition-colors">
+          页宽 <ChevronDown className="w-3 h-3" />
+        </button>
+        <button className="flex items-center gap-1 px-2 py-1 rounded text-xs text-muted-foreground hover:bg-accent transition-colors">
+          字体 <ChevronDown className="w-3 h-3" />
+        </button>
+        <button className="flex items-center gap-1 px-2 py-1 rounded text-xs text-muted-foreground hover:bg-accent transition-colors">
+          正文 <ChevronDown className="w-3 h-3" />
+        </button>
+        <div className="flex items-center border border-border rounded px-1.5 py-0.5">
+          <span className="text-xs text-foreground w-5 text-center">16</span>
+        </div>
+        <div className={sepClass} />
+        {/* Format */}
+        <button onClick={() => execCmd("bold")} className={btnClass} title="加粗"><Bold className="w-4 h-4" /></button>
+        <button onClick={() => execCmd("italic")} className={btnClass} title="斜体"><Italic className="w-4 h-4" /></button>
+        <button onClick={() => execCmd("strikeThrough")} className={btnClass} title="删除线"><Strikethrough className="w-4 h-4" /></button>
+        <button onClick={() => execCmd("underline")} className={btnClass} title="下划线"><Underline className="w-4 h-4" /></button>
+        <button className={btnClass} title="代码"><Code2 className="w-4 h-4" /></button>
+        <button className={btnClass} title="字体颜色"><Palette className="w-4 h-4" /></button>
+        <div className={sepClass} />
+        {/* Alignment */}
+        <button onClick={() => execCmd("justifyLeft")} className={btnClass} title="左对齐"><AlignLeft className="w-4 h-4" /></button>
+        <button onClick={() => execCmd("justifyCenter")} className={btnClass} title="居中"><AlignCenter className="w-4 h-4" /></button>
+        <button onClick={() => execCmd("justifyRight")} className={btnClass} title="右对齐"><AlignRight className="w-4 h-4" /></button>
+        <button onClick={() => execCmd("justifyFull")} className={btnClass} title="两端对齐"><AlignJustify className="w-4 h-4" /></button>
+        <div className={sepClass} />
+        {/* Lists */}
+        <button onClick={() => execCmd("insertUnorderedList")} className={btnClass} title="无序列表"><List className="w-4 h-4" /></button>
+        <button onClick={() => execCmd("insertOrderedList")} className={btnClass} title="有序列表"><ListOrdered className="w-4 h-4" /></button>
+        <button className={btnClass} title="待办列表"><ListChecks className="w-4 h-4" /></button>
+        <div className={sepClass} />
+        {/* Link / Table / Image */}
+        <button className={btnClass} title="链接"><LinkIcon className="w-4 h-4" /></button>
+        <button className={btnClass} title="表格"><Table2 className="w-4 h-4" /></button>
+        <button className={btnClass} title="图片"><Image className="w-4 h-4" /></button>
+        <button className={btnClass} title="书签"><Bookmark className="w-4 h-4" /></button>
+        <div className={sepClass} />
+        <button className={btnClass} title="更多"><MoreVertical className="w-4 h-4" /></button>
+      </div>
+    );
+  };
+
+
   const StepIndicator = ({ current }: { current: number }) => {
     const steps = [
       { n: 1, label: "上传资料" },
