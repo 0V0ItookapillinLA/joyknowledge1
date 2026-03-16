@@ -10,7 +10,10 @@ import {
   Headphones, StickyNote, Layers, PenTool, Table2,
   HelpCircle, Monitor, Cloud, Landmark, Building2, ChevronDown,
   GripVertical, Trash2, Import, Shield, Users, Lock, UserCheck, Maximize2, Minimize2,
-  Home as HomeIcon, Star, Columns, Workflow, BoxSelect, Code2, Network
+  Home as HomeIcon, Star, Columns, Workflow, BoxSelect, Code2, Network,
+  Bold, Italic, Strikethrough, Underline, AlignLeft, AlignCenter, AlignRight, AlignJustify,
+  List, ListOrdered, ListChecks, Link as LinkIcon, Undo2, Redo2, Type, Palette,
+  Minus, MoreVertical, Bookmark
 } from "lucide-react";
 import AppLayout from "@/components/AppLayout";
 
