@@ -1227,12 +1227,12 @@ const KnowledgeExtract = () => {
                 suppressContentEditableWarning
                 onBlur={(e) => setResultContent(e.currentTarget.innerText)}
                 className="w-full min-h-[70vh] text-sm text-foreground leading-relaxed outline-none focus:ring-0 prose prose-sm max-w-none
-                  [&>h1]:text-2xl [&>h1]:font-bold [&>h1]:text-foreground [&>h1]:mt-8 [&>h1]:mb-4
-                  [&>h2]:text-xl [&>h2]:font-semibold [&>h2]:text-foreground [&>h2]:mt-6 [&>h2]:mb-3
-                  [&>h3]:text-base [&>h3]:font-medium [&>h3]:text-foreground [&>h3]:mt-4 [&>h3]:mb-2
-                  [&>p]:text-sm [&>p]:text-foreground [&>p]:leading-relaxed
-                  [&>hr]:border-border [&>hr]:my-6
-                  [&>ul]:ml-4 [&>ul>li]:text-sm [&>ul>li]:text-foreground [&>ul>li]:mb-1.5
+                  [&>h1]:text-xl [&>h1]:font-bold [&>h1]:text-foreground [&>h1]:mt-5 [&>h1]:mb-2
+                  [&>h2]:text-lg [&>h2]:font-semibold [&>h2]:text-foreground [&>h2]:mt-4 [&>h2]:mb-1.5
+                  [&>h3]:text-base [&>h3]:font-medium [&>h3]:text-foreground [&>h3]:mt-3 [&>h3]:mb-1
+                  [&>p]:text-sm [&>p]:text-foreground [&>p]:leading-relaxed [&>p]:mb-1
+                  [&>hr]:border-border [&>hr]:my-3
+                  [&>ul]:ml-4 [&>ul]:mb-1 [&>ul>li]:text-sm [&>ul>li]:text-foreground [&>ul>li]:mb-0.5
                   [&>blockquote]:text-sm [&>blockquote]:text-muted-foreground [&>blockquote]:border-l-2 [&>blockquote]:border-primary/30 [&>blockquote]:pl-3 [&>blockquote]:my-1 [&>blockquote]:italic
                 "
                 dangerouslySetInnerHTML={{ __html: resultContent.split("\n").map((line) => {
@@ -1242,7 +1242,7 @@ const KnowledgeExtract = () => {
                   if (line.startsWith("---")) return `<hr/>`;
                   if (line.startsWith("- ")) return `<ul><li>${line.slice(2)}</li></ul>`;
                   if (line.startsWith("> ")) return `<blockquote>${line.slice(2)}</blockquote>`;
-                  if (line.trim() === "") return `<br/>`;
+                  if (line.trim() === "") return "";
                   return `<p>${line.replace(/\*\*/g, "")}</p>`;
                 }).join("") }}
               />
