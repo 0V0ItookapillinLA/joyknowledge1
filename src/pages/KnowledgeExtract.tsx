@@ -1129,10 +1129,6 @@ const KnowledgeExtract = () => {
               {extractMode === "deep" && <><div className="h-5 w-px bg-border" /><DeepStepIndicator current={3} /></>}
             </div>
             <div className="flex items-center gap-2">
-              <button onClick={() => setIsEditing(!isEditing)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm transition-colors ${isEditing ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-accent"}`}>
-                <Edit3 className="w-3.5 h-3.5" />{isEditing ? "预览" : "编辑"}
-              </button>
               <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
                 <Save className="w-3.5 h-3.5" /> 保存草稿
               </button>
@@ -1159,26 +1155,30 @@ const KnowledgeExtract = () => {
                 </span>
               </motion.div>
 
-              {isEditing ? (
-                <textarea value={resultContent} onChange={(e) => setResultContent(e.target.value)}
-                  className="w-full min-h-[70vh] bg-transparent text-sm text-foreground leading-relaxed outline-none resize-none font-mono" />
-              ) : (
-                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }} className="space-y-1">
-                  {resultContent.split("\n").map((line, i) => {
-                    if (line.startsWith("# ")) return <h1 key={i} className="text-2xl font-bold text-foreground mt-8 mb-4">{line.slice(2)}</h1>;
-                    if (line.startsWith("## ")) return <h2 key={i} className="text-xl font-semibold text-foreground mt-6 mb-3">{line.slice(3)}</h2>;
-                    if (line.startsWith("### ")) return <h3 key={i} className="text-base font-medium text-foreground mt-4 mb-2">{line.slice(4)}</h3>;
-                    if (line.startsWith("---")) return <hr key={i} className="border-border my-6" />;
-                    if (line.startsWith("- ")) return <li key={i} className="text-sm text-foreground ml-4 mb-1.5 list-disc">{line.slice(2)}</li>;
-                    if (line.startsWith("> ")) return <blockquote key={i} className="text-sm text-muted-foreground border-l-2 border-primary/30 pl-3 my-1 italic">{line.slice(2)}</blockquote>;
-                    if (line.startsWith("```")) return <div key={i} className="text-xs text-muted-foreground font-mono" />;
-                    if (line.startsWith("|")) return <p key={i} className="text-sm text-foreground font-mono bg-accent/50 px-3 py-1 rounded">{line}</p>;
-                    if (line.startsWith("**") && line.includes("**")) return <p key={i} className="text-sm font-semibold text-foreground mb-1">{line.replace(/\*\*/g, "")}</p>;
-                    if (line.trim() === "") return <div key={i} className="h-2" />;
-                    return <p key={i} className="text-sm text-foreground leading-relaxed">{line}</p>;
-                  })}
-                </motion.div>
-              )}
+              <div
+                contentEditable
+                suppressContentEditableWarning
+                onBlur={(e) => setResultContent(e.currentTarget.innerText)}
+                className="w-full min-h-[70vh] text-sm text-foreground leading-relaxed outline-none focus:ring-0 prose prose-sm max-w-none
+                  [&>h1]:text-2xl [&>h1]:font-bold [&>h1]:text-foreground [&>h1]:mt-8 [&>h1]:mb-4
+                  [&>h2]:text-xl [&>h2]:font-semibold [&>h2]:text-foreground [&>h2]:mt-6 [&>h2]:mb-3
+                  [&>h3]:text-base [&>h3]:font-medium [&>h3]:text-foreground [&>h3]:mt-4 [&>h3]:mb-2
+                  [&>p]:text-sm [&>p]:text-foreground [&>p]:leading-relaxed
+                  [&>hr]:border-border [&>hr]:my-6
+                  [&>ul]:ml-4 [&>ul>li]:text-sm [&>ul>li]:text-foreground [&>ul>li]:mb-1.5
+                  [&>blockquote]:text-sm [&>blockquote]:text-muted-foreground [&>blockquote]:border-l-2 [&>blockquote]:border-primary/30 [&>blockquote]:pl-3 [&>blockquote]:my-1 [&>blockquote]:italic
+                "
+                dangerouslySetInnerHTML={{ __html: resultContent.split("\n").map((line) => {
+                  if (line.startsWith("# ")) return `<h1>${line.slice(2)}</h1>`;
+                  if (line.startsWith("## ")) return `<h2>${line.slice(3)}</h2>`;
+                  if (line.startsWith("### ")) return `<h3>${line.slice(4)}</h3>`;
+                  if (line.startsWith("---")) return `<hr/>`;
+                  if (line.startsWith("- ")) return `<ul><li>${line.slice(2)}</li></ul>`;
+                  if (line.startsWith("> ")) return `<blockquote>${line.slice(2)}</blockquote>`;
+                  if (line.trim() === "") return `<br/>`;
+                  return `<p>${line.replace(/\*\*/g, "")}</p>`;
+                }).join("") }}
+              />
             </div>
           </motion.div>
 
