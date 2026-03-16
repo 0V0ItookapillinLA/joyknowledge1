@@ -1205,6 +1205,8 @@ const KnowledgeExtract = () => {
             </div>
           </motion.div>
 
+          {/* Rich Text Toolbar */}
+          <RichTextToolbar />
           {/* Document preview */}
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="flex-1 overflow-y-auto">
             <div className="max-w-3xl mx-auto py-8 px-6">
